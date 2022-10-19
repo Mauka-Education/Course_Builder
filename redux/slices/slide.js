@@ -1,7 +1,6 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// const url = "https://lms.maukaeducation.com/api";
 const url ="http://localhost:3000/api/admin"
 const prodUrl="https://lms.maukaeducation.com/api/admin"
 
