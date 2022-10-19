@@ -1,0 +1,5 @@
+export {default as Home} from "./Home/Home"
+export {default as Login} from "./Login/Login"
+export {default as Form} from "./Form/Form"
+export {default as Slide} from "./Slide/Slide"
+export {default as Test} from "./Slide/Test"

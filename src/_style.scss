@@ -1,0 +1,55 @@
+.mauka__builder{
+    &-card{
+        @include card_shadow;
+        width: 23rem;
+        height: 27rem;
+        max-width: 30rem;
+        border-radius: 10px;
+        padding: 1rem;
+        @include center_elem;
+        flex-direction: column;
+
+        justify-content: space-between;
+
+        img{
+            border-radius: 1rem;
+        }
+        &__content{
+            margin-top: 1rem;
+            @include center_elem;
+            flex-direction: column;
+            align-items: initial;
+            justify-content: space-between;
+            height: 100%;
+            width: 100%;
+            .title{
+                h2{
+                    font-size: 1.5rem;
+                }
+                p{
+                    font-size: .85rem;
+                    color: gray;
+                }
+            }
+            .info{
+                @include center_elem;
+                justify-content: space-around;
+                margin: 1rem 0;
+                &__time,&__lesson{
+                    @include center_elem;
+                    p{
+                        margin-left: .5rem;
+                    }
+                }
+            }
+            .preview{
+                text-align: center;
+                background: $secondar_btn_color;
+                padding: .5rem 1rem;
+                color: white;
+                cursor: pointer;
+                border-radius: 10px;
+            }
+        }
+    }
+}

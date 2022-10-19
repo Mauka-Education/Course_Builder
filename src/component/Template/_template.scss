@@ -1,0 +1,179 @@
+@mixin input_style {
+  input,
+  textarea {
+    padding: 1rem;
+    @include card_shadow;
+    width: 100%;
+    font-size: 1.1rem;
+  }
+  textarea {
+    resize: none;
+  }
+}
+
+@mixin save_btn_style {
+  .save__btn {
+    background: $primary_btn_color;
+    width: 7rem;
+    color: white;
+    @include center_elem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+
+@mixin form_style {
+  padding: 2rem;
+  @include box-shadow;
+}
+
+.course__builder {
+  &-temp1 {
+    @include form_style;
+
+    @include input_style;
+
+    .item {
+      margin-bottom: 1.5rem;
+
+      &.mark{
+        width: 5rem;
+        
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+      .ql-container {
+        height: 10rem !important;
+      }
+      &.quil_small {
+        .ql-container {
+          height: 4rem !important;
+        }
+      }
+
+      &.image {
+        span {
+          @include heading_font;
+        }
+        .image__inner {
+          margin-top: .5rem;
+          @include center_elem;
+          justify-content: flex-start;
+          span {
+            background: red;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            @include card_shadow;
+            padding: 0.5rem 1rem;
+          }
+
+          label {
+            margin-right: 2rem;
+            background: $safe_color;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            @include center_elem;
+            width: 10rem;
+
+            cursor: pointer;
+          }
+        }
+      }
+
+      &.tab{
+        @include center_elem;
+
+        justify-content: flex-start;
+
+        span{
+          padding: .5rem 1rem;
+          @include box-shadow;
+          margin-right: 1rem;
+          cursor: pointer;
+          border-radius: 5px;
+          
+          &.active{
+            background: $ligt_blue;
+            
+          }
+
+        }
+      }
+    }
+
+    .multi {
+      @include center_elem;
+      justify-content: space-between;
+      margin: 2rem 0;
+      .item {
+        width: 100%;
+        margin-bottom: 0;
+
+        &:first-child {
+          margin-right: 1.5rem;
+        }
+      }
+    }
+    .upload {
+      display: none;
+    }
+    @include save_btn_style;
+  }
+
+  &-template {
+    &__option {
+      .upper {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+
+        grid-gap: 2rem;
+
+        &__item {
+          p {
+            color: gray;
+            margin-bottom: 0.5rem;
+          }
+        }
+      }
+      .lower {
+        @include center_elem;
+        justify-content: flex-start;
+
+        &__left{
+          width: 5rem;
+          margin-right: 3rem;
+
+        }
+
+        margin-top: 2rem;
+        p {
+          color: gray;
+          margin-bottom: 0.5rem;
+        }
+
+        &__answer {
+          @include center_elem;
+          justify-content: flex-start;
+
+          h3 {
+            cursor: pointer;
+            padding: 0.7rem 2rem;
+            border-radius: 4px;
+            @include card_shadow;
+            margin-right: 2rem;
+
+            &.corr {
+              background: #4cb777;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+}

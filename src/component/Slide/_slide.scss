@@ -1,0 +1,153 @@
+.course__builder-slide {
+  padding: 5rem;
+  height: 100vh;
+  @include center_elem;
+  flex-direction: column;
+  
+  justify-content: space-between;
+
+  .upper{
+    width: 100%;
+  }
+  .option {
+    position: absolute;
+    top: 6rem;
+    background-color: white;
+    z-index: 3;
+
+    @include box-shadow;
+    width: 100%;
+    left: 0;
+
+    &__item {
+      @include center_elem;
+      
+      padding: 1rem 2rem;
+      justify-content: flex-start;
+      cursor: pointer;
+
+      h2{
+        &:first-child{
+            @include regular_font;
+        }
+      }
+      &:hover {
+        background: rgb(199, 199, 199);
+      }
+    }
+  }
+
+  &__title {
+    width: 100%;
+    position: relative;
+    @include center_elem;
+    justify-content: space-between;
+    @include box-shadow;
+    padding: 1.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 4rem;
+
+    .left {
+      @include center_elem;
+
+      h2 {
+        &:first-child {
+          @include regular_font;
+        }
+      }
+    }
+  }
+  &__template{
+    width: 100%;
+    position: relative;
+    .button{
+      cursor: pointer;
+      margin-top: .5rem;
+      border-radius: 5px;
+      @include center_elem;
+      width: 25rem;
+      padding: 1rem;
+      @include card_shadow;
+
+      h3{
+        margin-right: 1rem;
+      }
+    }
+    .option{
+      width: 25rem;
+      height: 17rem;
+      overflow-y: scroll;
+      @include custom__track;
+    } 
+  }
+  &__form{
+    margin-top: 3rem;
+    
+    
+  }
+
+  &__navigation{
+    margin: 4rem 4rem 0;
+    padding-bottom: 2rem;
+    width: 100%;
+    @include center_elem;
+    justify-content: space-between;
+    .main__btn {
+      @include center_elem;
+      justify-content: space-between;
+
+      .prev,
+      .next {
+        width: 7rem;
+        background: $main_color;
+        color: white;
+        @include center_elem;
+        padding: 0.7rem 1rem;
+        border-radius: 5px;
+      }
+      .prev {
+        cursor: pointer;
+        margin-right: 4rem;
+        p {
+          margin-left: 0.5rem;
+        }
+      }
+      .next {
+        cursor: pointer;
+        p {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+    .lesson__btn {
+      @include center_elem;
+      justify-content: space-between;
+      .previous,
+      .add {
+        width: 10rem;
+        background: $main_color;
+        color: white;
+        @include center_elem;
+        padding: 0.7rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        p {
+          margin-right: 0.5rem;
+        }
+      }
+      .add {
+        margin: 0 3rem;
+      }
+      .done {
+        cursor: pointer;
+        width: 7rem;
+        background: #4cb777;
+        color: white;
+        @include center_elem;
+        padding: 0.7rem 1rem;
+        border-radius: 5px;
+      }
+    }
+  }
+}
