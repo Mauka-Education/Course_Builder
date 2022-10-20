@@ -44,6 +44,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, isTest }) => {
             })
         } else {
             addTestSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark } }).unwrap().then(res => {
+                onAddSlide({ ...res.data, slideno: 3,added:true })
                 toast.success("Test Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -67,7 +68,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, isTest }) => {
                     <h3>Save</h3>
                 </motion.button>
             </form>
-            <Preview type={3} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined) }} isTest={isTest} />
+            <Preview type={3} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined),isTest }} />
         </>
     )
 }

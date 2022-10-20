@@ -51,7 +51,7 @@ const CourseStructue = ({ course }) => {
 
 
                             {
-                                item?.assignment &&
+                                (item?.assignment && item?.assignment.length!==0 )&& 
                                 (<>
                                     <div className="line"></div>
                                     {item.assignment.map((a, i) => (
@@ -76,7 +76,7 @@ const CourseStructue = ({ course }) => {
                             }
 
                             {
-                                item?.test &&
+                                (item?.test && item?.test.length!==0 ) &&
                                 (<>
 
                                     <div className="line"></div>

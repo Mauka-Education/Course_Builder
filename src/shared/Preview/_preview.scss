@@ -58,10 +58,13 @@
         }
       }
       .temp2 {
+
         @include center_elem;
         flex-direction: column;
-        width: 24rem;
+        // width: 24rem;
         align-items: flex-start;
+        min-width: 24rem;
+        max-width: calc(500px + 1.5rem);
         
 
         .question {
@@ -90,14 +93,22 @@
             width: 100%;
             cursor: pointer;
             border-radius: 50px;
-            padding: 0.5rem 1rem;
-            background: $ligt_blue;
+            padding: 0.6rem 1.5rem;
+            background: rgba($ligth_violet,.5);
+            // background: rgba($ligth_violet,);
             margin-bottom: 1rem;
+            @include center_elem;
+            justify-content: space-between;
 
             &.correct {
-              background-color: $primary_btn_color;
+              background-color: $correct_color;
               color: white;
             }
+            &.incorrect{
+              background-color: $wrong;
+              color: white;
+            }
+            
           }
         }
 

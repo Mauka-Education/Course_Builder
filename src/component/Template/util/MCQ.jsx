@@ -30,6 +30,12 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer,setMark,isTest=false }) =
     setQuestArray(item => item.map(p => p.id === id ? { ...p, val: value } : p))
 
   }
+
+  useEffect(()=>{
+    setQuestion((questArray.map((item,i)=>{
+      return `Option ${i+1}`
+    })))
+  },[])
   useEffect(() => {
 
     setAnswer(questArray.map((item) => {

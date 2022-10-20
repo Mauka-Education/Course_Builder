@@ -13,6 +13,7 @@ const Temp1 = ({ lessonId,toast,onAddSlide }) => {
   const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
   const [subText, setSubText] = useState(null)
   const [addSlide] = useCreateSlideMutation()
+  
 
   const onSubmitHandler = (data) => {
     if(!subText){
@@ -20,6 +21,7 @@ const Temp1 = ({ lessonId,toast,onAddSlide }) => {
     }
     addSlide({ id: lessonId, data: { ...data, subtext: subText, type: 0 } }).unwrap().then((res) => {
       onAddSlide({...res.data,slideno: 0})
+      
       toast.success("Slide Added")
     }).catch((err) => {
       toast.error("Error Occured")

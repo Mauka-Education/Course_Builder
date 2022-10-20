@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { BsArrowLeft, BsArrowRight, BsChevronDown } from "react-icons/bs"
+import {  BsChevronDown } from "react-icons/bs"
+import { useRouter } from "next/router"
 import { MdOutlineArrowBackIos } from "react-icons/md"
 import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
@@ -19,6 +20,7 @@ const Slide = ({ title, id, no,lessonId }) => {
 
     const [totalSlideAdded, setTotalSlideAdded] = useState([])
     const dispatch=useDispatch()
+    const router=useRouter()
 
     useEffect(()=>{
         if(slide){
@@ -38,11 +40,12 @@ const Slide = ({ title, id, no,lessonId }) => {
         setCurrentTemplate({ id: id, name: name, temp })
         setShowTemplateOpt(false)
     }
-    console.log({slide})
     
     const onAddSlide=(data)=>{
         setTotalSlideAdded(item=>[...item,{...data}])
     }
+    
+    
     const templateType = [
         {
             id: 0,
@@ -53,61 +56,61 @@ const Slide = ({ title, id, no,lessonId }) => {
         {
             id: 1,
             name: "Short Answer Only",
-            slideno: 0,
+            slideno: 1,
             comp: <Temp2 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 2,
             name: "SCQ Only",
-            slideno: 0,
+            slideno: 2,
             comp: <Temp3 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 3,
             name: "MCQ Only",
-            slideno: 0,
+            slideno: 3,
             comp: <Temp4 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 4,
             name: "Opinion Scale",
-            slideno: 0,
+            slideno: 4,
             comp: <Temp5 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 5,
             name: "Image Slider",
-            slideno: 0,
+            slideno: 5,
             comp: <Temp6 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 6,
             name: "Media + Heading",
-            slideno: 0,
+            slideno: 6,
             comp: <Temp7 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 7,
             name: "Media + Short Answer",
-            slideno: 0,
+            slideno: 7,
             comp: <Temp8 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 8,
             name: "Media + SCQ",
-            slideno: 0,
+            slideno: 8,
             comp: <Temp9 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 9,
             name: "Media + MCQ",
-            slideno: 0,
+            slideno: 9,
             comp: <Temp10 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         {
             id: 10,
             name: "Media + Text",
-            slideno: 0,
+            slideno: 10,
             comp: <Temp11 lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
         },
         // {
@@ -132,7 +135,7 @@ const Slide = ({ title, id, no,lessonId }) => {
 
     return (
         <div className="course__builder-slide">
-            <ToastContainer position="top-right" delay={3000} />
+            <ToastContainer position="bottom-left" delay={3000} />
             <div className="upper">
                 <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
                     <div className="left">
@@ -193,25 +196,18 @@ const Slide = ({ title, id, no,lessonId }) => {
             </div> */}
             <div className="course__builder-slide__navigation">
                 <div className="main__btn">
-                    {/* <motion.button className="prev" whileTap={{ scale: .97 }} onClick={() => dispatch(setActiveStep(activeStep - 1))} type="button">
-                        <BsArrowLeft size={20} />
-                        <p>Previous</p>
-                    </motion.button>
-                    <motion.button className="next" whileTap={{ scale: .97 }} type="submit">
-                        <p>Next</p>
-                        <BsArrowRight size={20} />
-                    </motion.button> */}
+                    
                 </div>
                 <div className="lesson__btn">
                     <motion.button className="previous" whileTap={{ scale: .97 }} onClick={onPrevClick} >
                         <p>Previous Slide</p>
                         <MdOutlineArrowBackIos size={20} />
                     </motion.button>
-                    <motion.button className="add" whileTap={{ scale: .97 }} >
+                    <motion.button className="add" whileTap={{ scale: .97 }}  onClick={()=>setCurrentTemplate({id: null, name: null, temp: null})}>
                         <p>Add Slide</p>
                         <AiOutlinePlus size={20} />
                     </motion.button>
-                    <motion.button className="done" whileTap={{ scale: .97 }} >
+                    <motion.button className="done" whileTap={{ scale: .97 }} onClick={()=>router.push("/addcourse")}>
                         Done
                     </motion.button>
                 </div>

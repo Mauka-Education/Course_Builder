@@ -74,11 +74,11 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest=false }) => {
         if (selectedFile.url === "" && watch("video_url") === undefined) {
             return toast.error("Please Select Image/Video")
         }
-
+        
 
         if (selectedFile.type === "image") {
             addTestSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } ,mark}}).unwrap().then((res) => {
-                onAddSlide({ ...res.data, slideno: 7 })
+                onAddSlide({ ...res.data, slideno: 7,added:true })
                 toast.success("Test Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -86,7 +86,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest=false }) => {
             })
         } else {
             addTestSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url,mark } }).unwrap().then((res) => {
-                onAddSlide({ ...res.data, slideno: 7 })
+                onAddSlide({ ...res.data, slideno: 7,added:true })
                 toast.success("Test Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -154,7 +154,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest=false }) => {
                     <h3>Save</h3>
                 </motion.button>
             </form>
-            <Preview type={7} data={{ question: subText, url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null }} />
+            <Preview type={7} data={{ question: subText, url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null,isTest }} />
         </>
     )
 }
