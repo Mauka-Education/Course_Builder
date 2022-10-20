@@ -1,9 +1,11 @@
 import React from 'react'
-import { Form } from '../src/component'
+import { Form, Layout } from '../src/component'
 
 const Addcourse = () => {
   return (
-        <Form />
+    <Layout>
+      <Form />
+    </Layout>
   )
 }
 

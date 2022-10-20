@@ -9,6 +9,8 @@ const QullEditor = dynamic(import("react-quill"), {
     ssr: false,
 })
 
+
+
 const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
 
     const [subText, setSubText] = useState(null)
@@ -18,6 +20,8 @@ const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
     const [option, setOption] = useState([])
     const [correctOpt, setCorrectOpt] = useState([])
     const [mark, setMark] = useState(0)
+
+
 
     const onSubmitHandler = (e) => {
         e.preventDefault()
@@ -43,7 +47,8 @@ const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
                 console.log("Err", err)
             })
         } else {
-            addTestSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio",mark } }).unwrap().then(res => {
+            addTestSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark } }).unwrap().then(res => {
+                onAddSlide({ ...res.data, slideno: 2, added: true })
                 toast.success("Test Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -52,7 +57,6 @@ const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
         }
     }
 
-    console.log(option, correctOpt)
 
     return (
         <>
@@ -68,7 +72,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
                     <h3>Save</h3>
                 </motion.button>
             </form>
-            <Preview type={2} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined)[0] }} isTest={isTest} />
+            <Preview type={2} data={{ question: subText, option: option.filter((item) => item.val !== ""), correct: correctOpt.filter((item) => item !== undefined)[0], isTest }} />
         </>
     )
 }

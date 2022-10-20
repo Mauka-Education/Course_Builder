@@ -3,7 +3,7 @@ import { BsArrowRight, BsArrowLeft } from "react-icons/bs"
 import { motion } from 'framer-motion'
 import { Structure, Title, CourseStructure } from './subComp'
 import { useForm, FormProvider } from 'react-hook-form'
-import { useCreateCourseMutation,useUpdateCourseMutation } from '../../../redux/slices/course'
+import { useCreateCourseMutation, useUpdateCourseMutation } from '../../../redux/slices/course'
 import { useSelector, useDispatch } from 'react-redux'
 import { setActiveStep, setCourseData, setInitiated } from '../../../redux/slices/util'
 import { toast, ToastContainer } from 'react-toast'
@@ -14,14 +14,14 @@ const Form = () => {
     const dispatch = useDispatch()
 
     const [createCourseTitle] = useCreateCourseMutation()
-    const [updateCourseTitle]=useUpdateCourseMutation()
-    const [courseImage, setCourseImage] = useState({url:null,type:null})
+    const [updateCourseTitle] = useUpdateCourseMutation()
+    const [courseImage, setCourseImage] = useState({ url: null, type: null })
     const { activeStep, initiated, course } = useSelector(state => state.util)
 
 
     useEffect(() => {
 
-    }, [dispatch,initiated])
+    }, [dispatch, initiated])
 
 
     function formStep(step) {
@@ -41,53 +41,53 @@ const Form = () => {
         switch (activeStep) {
             case 0:
                 if (!initiated.once) {
-                    createCourseTitle({ ...data, image_url: courseImage.url,type:courseImage.type }).unwrap().then((res) => {
+                    createCourseTitle({ ...data, image_url: courseImage.url, type: courseImage.type }).unwrap().then((res) => {
                         dispatch(setActiveStep(activeStep + 1))
                         dispatch(setInitiated({ once: true }))
-                        dispatch(setCourseData({ ...data,id: res.id }))
-                        
+                        dispatch(setCourseData({ ...data, id: res.id }))
+
                     }).catch((err) => {
                         toast.error(err?.data?.message)
                     })
-                } else if ( initiated.once && initiated.refactor) {
+                } else if (initiated.once && initiated.refactor) {
                     dispatch(setInitiated({ refactor: false }))
-                    
-                    if(course?.image_url===courseImage.url){
+
+                    if (course?.image_url === courseImage.url) {
                         console.log("running this")
-                        updateCourseTitle({ data,id: course?.id}).unwrap().then((res)=>{
-                            dispatch(setCourseData({...data,...res.data}))
-                            
+                        updateCourseTitle({ data, id: course?.id }).unwrap().then((res) => {
+                            dispatch(setCourseData({ ...data, ...res.data }))
+
                             dispatch(setActiveStep(activeStep + 1))
-                        }).catch((err)=>{
-                            console.log({err})
+                        }).catch((err) => {
+                            console.log({ err })
                             toast.error("Error Occured")
                         })
-                    }else{
+                    } else {
                         console.log("running")
-                        updateCourseTitle({ data:{...data,image_url: courseImage.url,type:courseImage.type,update_img:true},id: course?.id}).unwrap().then((res)=>{
-                            dispatch(setCourseData({...data,...res.data,image_url: courseImage.url}))
+                        updateCourseTitle({ data: { ...data, image_url: courseImage.url, type: courseImage.type, update_img: true }, id: course?.id }).unwrap().then((res) => {
+                            dispatch(setCourseData({ ...data, ...res.data, image_url: courseImage.url }))
                             dispatch(setActiveStep(activeStep + 1))
-                        }).catch((err)=>{
-                            console.log({err})
+                        }).catch((err) => {
+                            console.log({ err })
                             toast.error("Error Occured")
                         })
 
                     }
-                    
+
                 }
                 else {
                     dispatch(setActiveStep(activeStep + 1))
                 }
                 break
             case 1:
-                dispatch(setActiveStep(activeStep+1))
+                dispatch(setActiveStep(activeStep + 1))
 
             default:
                 return "No Function"
         }
     }
 
-    console.log({initiated})
+    console.log({ initiated })
     return (
         <FormProvider {...methods}>
             <ToastContainer position="top-right" delay={3000} />
@@ -105,10 +105,15 @@ const Form = () => {
                                 </motion.button>
                             )
                         }
-                        <motion.button className="next" whileTap={{ scale: .97 }} type="submit">
-                            <p>Next</p>
-                            <BsArrowRight size={20} />
-                        </motion.button>
+                        {
+                            activeStep !== 2 && (
+                                <motion.button className="next" whileTap={{ scale: .97 }} type="submit">
+                                    <p>Next</p>
+                                    <BsArrowRight size={20} />
+                                </motion.button>
+
+                            )
+                        }
                     </div>
                     {/* <div className="lesson__btn">
                         <motion.button className="previous" whileTap={{ scale: .97 }} >

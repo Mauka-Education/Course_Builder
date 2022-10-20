@@ -1,4 +1,38 @@
 .mauka__builder{
+    &-nav{
+        @include center_elem;
+        justify-content: space-between;
+        padding: 1rem 5rem;
+        padding-right: 2rem;
+        margin-bottom: 2rem;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        // border-bottom: 2px solid black;
+        background: white;
+        @include card_shadow;
+        z-index: 2;
+
+        .nav{
+            @include center_elem;
+
+
+            &__item{
+                margin-right: 2rem;
+                cursor: pointer;
+                border-bottom: 2px solid black;
+            }
+        }
+        .complete{
+            padding: .8rem 1rem;
+            color: white;
+            cursor: pointer;
+            background: $dark_blue;
+            border-radius: 5px;
+        }
+        
+        
+    }
     &-card{
         @include card_shadow;
         width: 23rem;

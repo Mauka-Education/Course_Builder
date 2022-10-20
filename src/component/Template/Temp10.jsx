@@ -82,7 +82,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
             
             if (selectedFile.type === "image") {
                 addTestSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox",mark } }).unwrap().then((res) => {
-                    onAddSlide({ ...res.data, slideno: 9 })
+                    onAddSlide({ ...res.data, slideno: 9,added:true })
                     toast.success("Test Slide Added")
                 }).catch((err) => {
                     toast.error("Error Occured")
@@ -90,7 +90,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
                 })
             } else {
                 addTestSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox",mark } }).unwrap().then((res) => {
-                    onAddSlide({ ...res.data, slideno: 9 })
+                    onAddSlide({ ...res.data, slideno: 9,added:true })
                     toast.success("Test Slide Added")
                 }).catch((err) => {
                     toast.error("Error Occured")
@@ -158,7 +158,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
                     <h3>Save</h3>
                 </motion.button>
             </form>
-            <Preview type={9} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined), url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null }} />
+            <Preview type={9} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined), url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null,isTest }} />
         </>
     )
 }

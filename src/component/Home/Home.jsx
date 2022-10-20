@@ -15,7 +15,7 @@ const Home = ({ data }) => {
     )
   }
 
-  if(!data){
+  if (!data) {
     return null
   }
 
@@ -36,7 +36,7 @@ const Home = ({ data }) => {
         {
           data?.map((item, index) => (
             <div key={index}>
-            <Card img={item?.img_url ?? item?.image_url } title={item?.name} subtitle={shorten(item?.short_desc, 60, " ", index, item)} duration={item.time_to_finish} lesson={item?.lessons?.length} />
+              <Card img={item?.img_url ?? item?.image_url} title={item?.name} subtitle={shorten(item?.short_desc, 60, " ", index, item)} duration={item.time_to_finish} lesson={item?.lessons?.length} />
             </div>
           ))
         }
