@@ -3,9 +3,9 @@ import { BsArrowRight, BsArrowLeft } from "react-icons/bs"
 import { motion } from 'framer-motion'
 import { Structure, Title, CourseStructure } from './subComp'
 import { useForm, FormProvider } from 'react-hook-form'
-import { useCreateCourseMutation, useUpdateCourseMutation } from '../../../redux/slices/course'
+import { useCreateCourseMutation, useGetLessonMutation, useUpdateCourseMutation } from '../../../redux/slices/course'
 import { useSelector, useDispatch } from 'react-redux'
-import { setActiveStep, setCourseData, setInitiated } from '../../../redux/slices/util'
+import { setActiveStep, setCourseData, setInitiated, setPreRequisite } from '../../../redux/slices/util'
 import { toast, ToastContainer } from 'react-toast'
 
 
@@ -16,9 +16,15 @@ const Form = () => {
     const [createCourseTitle] = useCreateCourseMutation()
     const [updateCourseTitle] = useUpdateCourseMutation()
     const [courseImage, setCourseImage] = useState({ url: null, type: null })
-    const { activeStep, initiated, course } = useSelector(state => state.util)
+    const { activeStep, initiated, course, isPreview } = useSelector(state => state.util)
 
+    const [getLessons] = useGetLessonMutation()
 
+    useEffect(() => {
+        if (isPreview) {
+            setCourseImage({ url: course?.image_url })
+        }
+    }, [])
     useEffect(() => {
 
     }, [dispatch, initiated])
@@ -27,7 +33,7 @@ const Form = () => {
     function formStep(step) {
         switch (step) {
             case 0:
-                return <Title setCourseImage={setCourseImage} />
+                return <Title setCourseImage={setCourseImage} isPreview={isPreview} />
             case 1:
                 return <Structure toast={toast} />
             case 2:
@@ -37,14 +43,35 @@ const Form = () => {
         }
     }
 
+    const getAllLesson = () => {
+        if (!course?.structure) {
+            getLessons(course?.id).unwrap().then((res) => {
+                let arr = []
+                let preType=[]
+                res.data.forEach((item,index) => {
+                    arr.push({ name: item?.name, pre: item?.pre, row: item?.order, isSaved: item?._id })
+                    preType.push({id: index, name: item?.name})
+                    // dispatch(setCourseData({structure:{name: "", pre: null, row: 0, isSaved: null, update: false}}))
+                })
+                dispatch(setCourseData({ structure: arr }))
+                dispatch(setPreRequisite(preType))
+                dispatch(setActiveStep(activeStep + 1))
+            }).catch((err) => {
+                console.log({ err })
+            })
+        }else dispatch(setActiveStep(activeStep + 1))
+    }
+    console.log({ course })
+
+
     const onSubmitHandler = (data) => {
         switch (activeStep) {
             case 0:
                 if (!initiated.once) {
-                    createCourseTitle({ ...data, image_url: courseImage.url, type: courseImage.type }).unwrap().then((res) => {
+                    createCourseTitle({ ...data, img_url: courseImage.url, type: courseImage.type }).unwrap().then((res) => {
                         dispatch(setActiveStep(activeStep + 1))
                         dispatch(setInitiated({ once: true }))
-                        dispatch(setCourseData({ ...data, id: res.id }))
+                        dispatch(setCourseData({ ...data, image_url: res.data?.img_url, id: res.id }))
 
                     }).catch((err) => {
                         toast.error(err?.data?.message)
@@ -53,30 +80,33 @@ const Form = () => {
                     dispatch(setInitiated({ refactor: false }))
 
                     if (course?.image_url === courseImage.url) {
-                        console.log("running this")
                         updateCourseTitle({ data, id: course?.id }).unwrap().then((res) => {
                             dispatch(setCourseData({ ...data, ...res.data }))
-
                             dispatch(setActiveStep(activeStep + 1))
                         }).catch((err) => {
                             console.log({ err })
                             toast.error("Error Occured")
                         })
                     } else {
-                        console.log("running")
                         updateCourseTitle({ data: { ...data, image_url: courseImage.url, type: courseImage.type, update_img: true }, id: course?.id }).unwrap().then((res) => {
-                            dispatch(setCourseData({ ...data, ...res.data, image_url: courseImage.url }))
+                            dispatch(setCourseData({ ...data, ...res.data }))
                             dispatch(setActiveStep(activeStep + 1))
                         }).catch((err) => {
                             console.log({ err })
                             toast.error("Error Occured")
                         })
-
+                        
                     }
+                    getAllLesson()
 
                 }
                 else {
-                    dispatch(setActiveStep(activeStep + 1))
+                    if (isPreview) {
+                        getAllLesson()
+                    } else {
+                        dispatch(setActiveStep(activeStep + 1))
+                        // dispatch(setActiveStep(activeStep + 1))
+                    }
                 }
                 break
             case 1:
@@ -86,11 +116,9 @@ const Form = () => {
                 return "No Function"
         }
     }
-
-    console.log({ initiated })
     return (
         <FormProvider {...methods}>
-            <ToastContainer position="top-right" delay={3000} />
+            <ToastContainer position="bottom-left" delay={3000} />
             <form className="mauka__builder-create" onSubmit={methods.handleSubmit(onSubmitHandler)}>
                 <div className="mauka__builder-create__form">
                     {formStep(activeStep)}
@@ -115,19 +143,6 @@ const Form = () => {
                             )
                         }
                     </div>
-                    {/* <div className="lesson__btn">
-                        <motion.button className="previous" whileTap={{ scale: .97 }} >
-                            <p>Previous Slide</p>
-                            <MdOutlineArrowBackIos size={20} />
-                        </motion.button>
-                        <motion.button className="add" whileTap={{ scale: .97 }} >
-                            <p>Add Slide</p>
-                            <AiOutlinePlus size={20} />
-                        </motion.button>
-                        <motion.button className="done" whileTap={{ scale: .97 }} >
-                            Done
-                        </motion.button>
-                    </div> */}
                 </div>
             </form>
         </FormProvider>

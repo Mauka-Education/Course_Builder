@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { RiArrowDownSLine } from "react-icons/ri"
 import { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setCourseData } from "../../../../../redux/slices/util"
 import { MdDelete } from "react-icons/md"
-import { useDeleteAssignmentMutation, useUpdateAssignmentMutation, useAddAssignmentMutation } from "../../../../../redux/slices/course"
+import { useDeleteAssignmentMutation, useUpdateAssignmentMutation, useAddAssignmentMutation,useGetAssignmentMutation } from "../../../../../redux/slices/course"
 
 
 const Assignment = ({ course, toast }) => {
@@ -17,7 +17,9 @@ const Assignment = ({ course, toast }) => {
   const [addAssignment] = useAddAssignmentMutation()
   const [deleteAssignment] = useDeleteAssignmentMutation()
   const [updateAssignment] = useUpdateAssignmentMutation()
+  const [getAssignment]=useGetAssignmentMutation()
   const [isUpdate, setIsUpdate] = useState(false)
+  const {isPreview}=useSelector(state=>state.util)
 
 
   useEffect(() => {
@@ -27,7 +29,20 @@ const Assignment = ({ course, toast }) => {
     if (course?.assigment) {
       setSavedData(course?.assigment)
     }
+    if(isPreview){
+      getAssignment(course?.id).unwrap().then((res)=>{
+        let arr=[]
+        res.data.forEach((item)=>{
+          arr.push({heading:item.heading,id:item._id,lesson: item.lesson, time_to_finish: item.time_to_finish,subtext:item.subtext})
+        })
+        setSavedData(arr)
+      }).catch((err)=>{
+        toast.error("Error Occured while Fetching")
+      })
+    }
   }, [])
+
+  console.log({savedData})
 
 
   useEffect(() => {
