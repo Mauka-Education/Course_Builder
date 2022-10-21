@@ -131,7 +131,7 @@ const Slide = ({ title, id, no,lessonId }) => {
         }
     }
 
-    console.log({currentTemplate})
+    console.log({course})
 
     return (
         <div className="course__builder-slide">
@@ -148,7 +148,7 @@ const Slide = ({ title, id, no,lessonId }) => {
                             showOpt && (
                                 <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                                     {course.structure.map((item, i) => (
-                                        <Link href={`/slide/lesson?no=${i + 1}&title=${item?.name}&key=${lessonId}`} key={item?.name}>
+                                        <Link href={`/slide/lesson?no=${i + 1}&title=${item?.name}&key=${item.isSaved}`} key={item?.name}>
                                             <div className="option__item">
                                                 <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
                                                 <h3>{item.name}</h3>

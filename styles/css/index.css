@@ -154,8 +154,39 @@ input::-webkit-inner-spin-button {
   border-radius: 10px;
 }
 
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 3rem;
+  background: white;
+  z-index: 2;
+  position: fixed;
+  width: 100%;
+  box-shadow: 0 0.125rem 0.5rem -0.25rem rgba(31, 27, 45, 0.12), 0 0.25rem 1rem rgba(31, 27, 45, 0.12) !important;
+}
+.header__left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.header__left h1 {
+  margin-left: 1rem;
+}
+.header__right {
+  padding: 0.5rem 1rem;
+  background: #2b3990;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .mauka__builder-home {
   padding: 2rem 4rem;
+}
+.mauka__builder-home.pad {
+  padding-top: 6rem;
 }
 .mauka__builder-home__title {
   font-size: 1.5rem;

@@ -1,5 +1,36 @@
+
+.header{
+  @include center_elem;
+  justify-content: space-between;
+  padding: 1rem 3rem;
+  background: white;
+  z-index: 2;
+  position: fixed;
+  width: 100%;
+  @include card_shadow;
+
+  &__left{
+    @include center_elem;
+
+    h1{
+      margin-left: 1rem;
+    }
+  }
+  &__right{
+    padding: .5rem 1rem;
+    background: $dark_blue;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
 .mauka__builder-home {
   padding: 2rem 4rem;
+
+  &.pad{
+    padding-top: 6rem;
+
+  }
   &__title {
     font-size: 1.5rem;
     @include heading_font;

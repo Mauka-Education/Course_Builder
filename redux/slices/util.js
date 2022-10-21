@@ -14,6 +14,10 @@ const utilSlice = createSlice({
     slide: [],
     test: [],
     user: {},
+    isPreview:{
+      is:false,
+      id:null 
+    }
   },
   reducers: {
     setWinWidth: (state, action) => {
@@ -40,7 +44,7 @@ const utilSlice = createSlice({
     setAdmin: (state, action) => {
       state.user = action.payload;
     },
-    clearCourse: (state, action) => {
+    clearCourse: (state) => {
       state.winWidth = 0;
       state.activeStep = 0;
       state.initiated = {
@@ -52,6 +56,9 @@ const utilSlice = createSlice({
       state.slide = [];
       state.test = [];
     },
+    setIsPreview: (state,action)=>{
+      state.isPreview= {  ...state.isPreview,...action.payload}
+    }
   },
 });
 
@@ -62,6 +69,7 @@ export const {
   setCourseData,
   setPreRequisite,
   setSlideData,
+  setIsPreview,
   setAdmin,
   setTestData,
   clearCourse

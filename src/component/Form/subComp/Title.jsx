@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setInitiated } from '../../../../redux/slices/util'
 import { convertToBase64 } from '../../../util/ConvertImageToBase64'
 
-const Title = ({ setCourseImage }) => {
+const Title = ({ setCourseImage,isPreview,data }) => {
     const dispatch=useDispatch()
     const [inputText, setInputText] = useState("")
     const {course}=useSelector(state=>state.util)
@@ -24,6 +24,7 @@ const Title = ({ setCourseImage }) => {
     useEffect(() => {
 
     }, [dispatch])
+    
     
 
     return (
