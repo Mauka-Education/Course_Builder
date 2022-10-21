@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const url ="http://localhost:3000/api/admin"
-const prodUrl="https://lms.maukaeducation.com/api/admin"
+const url = "http://localhost:3000/api/admin";
+const prodUrl = "https://lms.maukaeducation.com/api/admin";
 
 export const courseApi = createApi({
   reducerPath: "course",
@@ -21,6 +21,12 @@ export const courseApi = createApi({
         url: "/courses",
       }),
     }),
+    getCourseById: builder.mutation({
+      query: (id) => ({
+        url: `/courses/${id}`,
+        method: "GET",
+      }),
+    }),
     createCourse: builder.mutation({
       query: (data) => ({
         url: "/addcourse",
@@ -33,6 +39,12 @@ export const courseApi = createApi({
         url: `/addcourse/${id}`,
         method: "PATCH",
         body: data,
+      }),
+    }),
+    getLesson: builder.mutation({
+      query: (id) => ({
+        url: `/lesson/${id}`,
+        method: "GET",
       }),
     }),
     addLesson: builder.mutation({
@@ -55,6 +67,12 @@ export const courseApi = createApi({
         method: "DELETE",
       }),
     }),
+    getAssignment: builder.mutation({
+      query: (id) => ({
+        url: `/assignment/${id}`,
+        method: "GET",
+      }),
+    }),
     addAssignment: builder.mutation({
       query: (data) => ({
         url: `/addassignment`,
@@ -73,6 +91,12 @@ export const courseApi = createApi({
       query: (id) => ({
         url: `/deleteassignment/${id}`,
         method: "DELETE",
+      }),
+    }),
+    getTest: builder.mutation({
+      query: (id) => ({
+        url: `/test/${id}`,
+        method: "GET",
       }),
     }),
     addTest: builder.mutation({
@@ -103,12 +127,16 @@ export const {
   useCreateCourseMutation,
   useUpdateCourseMutation,
   useAddLessonMutation,
+  useGetCourseByIdMutation,
   useAddAssignmentMutation,
   useGetCoursesQuery,
   useUpdateLessonMutation,
+  useGetAssignmentMutation,
   useDeleteLessonMutation,
+  useGetLessonMutation,
   useDeleteAssignmentMutation,
   useAddTestMutation,
+  useGetTestMutation,
   useDeleteTestMutation,
   useUpdateTestMutation,
 } = courseApi;

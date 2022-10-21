@@ -82,7 +82,7 @@ function Lesson(props) {
                     scale: 0,
                     opacity: 0
                 }}>
-                    {props.preType.map(item => item.id !== index && <div className="opt" id={item.value} onClick={() => props.optionSelectHandler("pre", item.value, index)}>
+                    {props.preType.map(item => item.id !== index && <div className="opt" key={item.name} id={item.name} onClick={() => props.optionSelectHandler(item.name, index)}>
                         <p>{item.name}</p>
                     </div>)}
 
@@ -129,6 +129,8 @@ const Structure = ({ toast }) => {
 
     const [preType, setPreType] = useState([])
     
+    console.table(preType)
+    
 
     useEffect(() => {
 
@@ -169,7 +171,7 @@ const Structure = ({ toast }) => {
         setFieldArr(list => list.map((obj, i) => i === index ? { ...obj, name: value, update: obj.isSaved ? true : false } : obj))
 
         if (preType[index]?.id === index) {
-            setPreType(list => list.map((obj, i) => i === index ? { ...obj, name: value, value } : obj))
+            setPreType(list => list.map((obj, i) => i === index ? { ...obj, name: value } : obj))
         } else {
             setPreType([...preType, { id: index, name: fieldArr[index].name, }])
         }
@@ -197,8 +199,9 @@ const Structure = ({ toast }) => {
         }
     }
 
-    const optionSelectHandler = (type, data, row) => {
-        setFieldArr(list => list.map((obj, i) => i === row ? { ...obj, [type]: data, update: obj.isSaved ? true : false } : obj))
+    const optionSelectHandler = (data, row) => {
+        console.log(data)
+        setFieldArr(list => list.map((obj, i) => i === row ? { ...obj, pre: data, update: obj.isSaved ? true : false } : obj))
         setShowOption(item => ({ ...item, id: null, show: false, row: null }))
     }
 
@@ -272,7 +275,7 @@ const Structure = ({ toast }) => {
         <div className="course__structure">
 
             <div className="course__structure-title">
-                <h1>Structure</h1>
+                <h1>{course?.name ?? "Structure"}</h1>
                 {
                     switchOption === "Lesson" && (
                         <motion.div className="save" whileTap={{ scale: .97 }} onClick={onSaveHandler}>

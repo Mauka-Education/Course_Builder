@@ -30,7 +30,7 @@ const Navbar = () => {
         <div className="nav">
           {
             navItem.map(item=>(
-              <Link href={item.link} >
+              <Link href={item.link} key={item.name}>
               <div className="nav__item" key={item.name}>
                 <h3>{item.name}</h3>
               </div>
