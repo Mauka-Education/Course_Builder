@@ -20,9 +20,9 @@ const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false }) => {
   const [mark, setMark] = useState(0)
 
   useEffect(() => {
-    
+
   }, [])
-  
+
 
   const onSubmitHandler = (e) => {
     e.preventDefault()
@@ -57,16 +57,18 @@ const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false }) => {
         </div>
         {
           isTest && (
-            <div className="item">
-              <p>Sample Answer</p>
-              <QullEditor onChange={(data) => setIdealAns(data)} theme="snow" placeholder='Enter Ideal Answer for this Question' />
-            </div>
+            <>
+              <div className="item">
+                <p>Sample Answer</p>
+                <QullEditor onChange={(data) => setIdealAns(data)} theme="snow" placeholder='Enter Ideal Answer for this Question' />
+              </div>
+              <div className="item mark">
+                <p>Mark</p>
+                <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={1} />
+              </div>
+            </>
           )
         }
-        <div className="item mark">
-          <p>Mark</p>
-          <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={1} />
-        </div>
         <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
           <h3>Save</h3>
         </motion.button>

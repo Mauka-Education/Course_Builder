@@ -7,7 +7,6 @@ const Slide = () => {
   const {id,title,no,key}=router.query
   return  (
     <Layout>
-    
     {
       id==="lesson" ? (
         <SlideComp title={title} id={id} no={no} lessonId={key} />
