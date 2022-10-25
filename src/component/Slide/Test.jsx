@@ -11,7 +11,7 @@ import { setTestData } from "../../../redux/slices/util"
 
 
 const Test = ({ title, id, no, lessonId }) => {
-    const { course, test, slide } = useSelector(state => state.util)
+    const { course, test } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null, temp: null })
@@ -94,8 +94,9 @@ const Test = ({ title, id, no, lessonId }) => {
 
     }
 
+    console.log({ test })
 
-    
+
     return (
         <div className="course__builder-slide">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -160,6 +161,15 @@ const Test = ({ title, id, no, lessonId }) => {
             </div> */}
             <div className="course__builder-slide__navigation">
                 <div className="main__btn">
+                    {
+                        test.length !== 0 && (
+                            <Link href={`/slide?key=${lessonId}&type=test`}>
+                                <div className="all">
+                                    <p>All Slides</p>
+                                </div>
+                            </Link>
+                        )
+                    }
                 </div>
                 <div className="lesson__btn">
                     {

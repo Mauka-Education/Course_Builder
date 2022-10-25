@@ -22,7 +22,7 @@ const tabItem = [
     },
 ]
 
-const Temp8 = ({ lessonId, toast, onAddSlide, isTest=false }) => {
+const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     const [addSlide] = useCreateSlideMutation()
     const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
@@ -74,19 +74,19 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest=false }) => {
         if (selectedFile.url === "" && watch("video_url") === undefined) {
             return toast.error("Please Select Image/Video")
         }
-        
+
 
         if (selectedFile.type === "image") {
-            addTestSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } ,mark}}).unwrap().then((res) => {
-                onAddSlide({ ...res.data, slideno: 7,added:true })
+            addTestSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, mark } }).unwrap().then((res) => {
+                onAddSlide({ ...res.data, slideno: 7, added: true })
                 toast.success("Test Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
                 console.log("Err", err)
             })
         } else {
-            addTestSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url,mark } }).unwrap().then((res) => {
-                onAddSlide({ ...res.data, slideno: 7,added:true })
+            addTestSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, mark } }).unwrap().then((res) => {
+                onAddSlide({ ...res.data, slideno: 7, added: true })
                 toast.success("Test Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -145,16 +145,21 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest=false }) => {
                         ))
                     }
                 </div>
-                <div className="item mark">
-                    <p>Mark</p>
-                    <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={1} />
-                </div>
+                {
+                    isTest && (
+                        <div className="item mark">
+                            <p>Mark</p>
+                            <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={1} />
+                        </div>
+
+                    )
+                }
 
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
                     <h3>Save</h3>
                 </motion.button>
             </form>
-            <Preview type={7} data={{ question: subText, url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null,isTest }} />
+            <Preview type={7} data={{ question: subText, url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null, isTest }} />
         </>
     )
 }

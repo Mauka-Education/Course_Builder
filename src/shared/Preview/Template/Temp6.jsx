@@ -36,7 +36,7 @@ const Temp5 = ({ data }) => {
           }
           {data?.images?.map((item,index) => (
             <SwiperSlide key={index}>
-              <img src={item?.url} alt="" />
+              <img src={item?.url ? item?.url : item} alt="" />
             </SwiperSlide>
           ))}
         </Swiper>

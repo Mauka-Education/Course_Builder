@@ -3,10 +3,15 @@
   height: 100vh;
   @include center_elem;
   flex-direction: column;
-  
+
   justify-content: space-between;
 
-  .upper{
+  &.preview {
+    height: auto;
+    display: block;
+  }
+
+  .upper {
     width: 100%;
   }
   .option {
@@ -21,14 +26,14 @@
 
     &__item {
       @include center_elem;
-      
+
       padding: 1rem;
       justify-content: flex-start;
       cursor: pointer;
 
-      h2{
-        &:first-child{
-            @include regular_font;
+      h2 {
+        &:first-child {
+          @include regular_font;
         }
       }
       &:hover {
@@ -58,36 +63,34 @@
       }
     }
   }
-  &__template{
+  &__template {
     width: 100%;
     position: relative;
-    .button{
+    .button {
       cursor: pointer;
-      margin-top: .5rem;
+      margin-top: 0.5rem;
       border-radius: 5px;
       @include center_elem;
       width: 25rem;
       padding: 1rem;
       @include card_shadow;
 
-      h3{
+      h3 {
         margin-right: 1rem;
       }
     }
-    .option{
+    .option {
       width: 25rem;
       height: 17rem;
       overflow-y: scroll;
       @include custom__track;
-    } 
+    }
   }
-  &__form{
+  &__form {
     margin-top: 3rem;
-    
-    
   }
 
-  &__navigation{
+  &__navigation {
     margin: 4rem 4rem 0;
     padding-bottom: 2rem;
     width: 100%;
@@ -97,8 +100,11 @@
       @include center_elem;
       justify-content: space-between;
 
+      
+
       .prev,
-      .next {
+      .next,.all {
+        cursor: pointer;
         width: 7rem;
         background: $main_color;
         color: white;
@@ -150,4 +156,58 @@
       }
     }
   }
+
+  .slides {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 3rem;
+
+    &__item {
+      @include center_elem;
+      justify-content: flex-start;
+      align-items: flex-start;
+
+      .preview {
+        width: 35rem;
+        padding: 1rem;
+      }
+      .edit {
+        margin-left: .5in;
+        
+        &__order {
+          position: relative;
+
+          .title {
+            border-radius: .5rem;
+            margin-top: 1rem;
+            @include heading_font;
+            padding: 1rem 2rem;
+            @include card_shadow;
+            @include center_elem;
+            cursor: pointer;
+            justify-content: space-between;
+
+            p {
+              margin-right: 1rem;
+            }
+          }
+
+        }
+        &__delete{
+          margin-top: 2rem;
+
+          width: 3.5rem;
+          height: 3.5rem;
+          cursor: pointer;
+          padding: .5rem;
+          background-color: $wrong;
+          color: white;
+          border-radius: .5rem;
+          @include center_elem;
+        }
+      }
+    }
+  }
+
+  
 }

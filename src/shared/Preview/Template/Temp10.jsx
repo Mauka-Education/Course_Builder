@@ -18,7 +18,7 @@ const Temp10 = ({ data }) => {
                 }
                 {
                     (data?.url && data?.url !== "") && (
-                        <ReactPlayer url={data?.url} controls width={"27rem"} height={"17rem"} />
+                        <ReactPlayer url={data?.url} controls width={ data?.allSlide ?  "100%" : "27rem"} height={ !data?.allSlide && "17rem"} />
                     )
                 }
                 {

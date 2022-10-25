@@ -11,7 +11,6 @@ import { toast, ToastContainer } from "react-toast"
 import { setSlideData } from "../../../redux/slices/util"
 
 
-
 const Slide = ({ title, id, no,lessonId }) => {
     const { course,slide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
@@ -131,7 +130,7 @@ const Slide = ({ title, id, no,lessonId }) => {
         }
     }
 
-    console.log({course})
+    
 
     return (
         <div className="course__builder-slide">
@@ -196,7 +195,15 @@ const Slide = ({ title, id, no,lessonId }) => {
             </div> */}
             <div className="course__builder-slide__navigation">
                 <div className="main__btn">
-                    
+                {
+                        slide.length !== 0 && (
+                            <Link href={`/slide?key=${lessonId}&type=lesson`}>
+                                <div className="all">
+                                    <p>All Slides</p>
+                                </div>
+                            </Link>
+                        )
+                    }
                 </div>
                 <div className="lesson__btn">
                     <motion.button className="previous" whileTap={{ scale: .97 }} onClick={onPrevClick} >
@@ -215,8 +222,6 @@ const Slide = ({ title, id, no,lessonId }) => {
         </div >
     )
 }
-
-
 
 
 export default Slide

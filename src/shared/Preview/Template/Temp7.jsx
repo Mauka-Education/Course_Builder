@@ -3,7 +3,7 @@
 import ReactPlayer from "react-player"
 
 const Temp7 = ({ data }) => {
-    console.log(!data?.image_url , data?.video_url)
+    console.log({data})
     return (
         <div className="temp1">
             <div className="title">
@@ -25,9 +25,10 @@ const Temp7 = ({ data }) => {
             }
             {
                 (data?.url && data?.url!=="") && (
-                    <ReactPlayer url={data?.url} controls />
+                    <ReactPlayer url={data?.url} controls width={data?.allSlide && "100%"} height={data?.allSlide && "15rem"} />
                 )
             }
+            
         </div>
     )
 }

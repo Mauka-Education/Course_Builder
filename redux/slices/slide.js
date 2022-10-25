@@ -30,11 +30,25 @@ export const slideApi = createApi({
         method:"POST",
         body: data
       })
-    })
+    }),
+    deleteSlide: builder.mutation({
+      query:(id)=>({
+        url:`/deleteslide/${id}`,
+        method:"DELETE"
+      })
+    }),
+    deleteTestSlide: builder.mutation({
+      query:(id)=>({
+        url:`/testslide/${id}`,
+        method:"DELETE"
+      })
+    }),
   }),
 });
 
 export const {
   useCreateSlideMutation,
-  useCreateTestSlideMutation
+  useCreateTestSlideMutation,
+  useDeleteSlideMutation,
+  useDeleteTestSlideMutation  
 } = slideApi;

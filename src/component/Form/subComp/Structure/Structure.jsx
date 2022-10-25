@@ -129,8 +129,6 @@ const Structure = ({ toast }) => {
 
     const [preType, setPreType] = useState([])
     
-    console.table(preType)
-    
 
     useEffect(() => {
 

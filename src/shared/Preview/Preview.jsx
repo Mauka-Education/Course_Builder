@@ -3,7 +3,7 @@ import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 
 import { Temp1,Temp2,Temp3,Temp4,Temp5, Temp6, Temp7, Temp8, Temp9,Temp10, Temp11 } from './Template'; 
 
-const Preview = ({ type, data }) => {
+const Preview = ({ type, data,allSlide }) => {
     function renderer() {
         switch (type) {
             case 0:
@@ -35,22 +35,26 @@ const Preview = ({ type, data }) => {
 
     const centerElem=(type===1 || type===7 || type===2 || type===3 ) ? true :false 
     return (
-        <div className="course__builder-preview">
-            <h1>Preview</h1>
+        <div className="course__builder-preview" style={{marginTop:allSlide && 0}}>
+            {
+                !allSlide && (
+                    <h1>Preview</h1>   
+                )
+            }
 
-            <div className="preview">
-                <div className={`preview__item ${centerElem ? "center" : ""}`}>
+            <div className={`preview ${allSlide && "all"}`}>
+                <div className={`preview__item ${centerElem ? "center" : ""} ${allSlide ? "all" : ""} `}>
                     {renderer()}
                 </div>
 
                 <div className="preview__btn">
                     <button className="prev" >
-                        <BsArrowLeft size={20} />
+                        <BsArrowLeft size={ allSlide ? 14 : 20} />
                         <p>Previous</p>
                     </button>
                     <button className="next">
                         <p>Next</p>
-                        <BsArrowRight size={20} />
+                        <BsArrowRight size={allSlide ? 14 :20} />
                     </button>
                 </div>
             </div>
