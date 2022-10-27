@@ -8,20 +8,31 @@ import { useDispatch, useSelector } from "react-redux"
 import { Temp10, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
 import { setTestData } from "../../../redux/slices/util"
+import { useGetTestSlideMutation } from "../../../redux/slices/slide"
 
 
 const Test = ({ title, id, no, lessonId }) => {
     const { course, test } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
-    const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null, temp: null })
+    const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
 
     const [totalSlideAdded, setTotalSlideAdded] = useState([])
     const dispatch = useDispatch()
+    const [getTestSlide] = useGetTestSlideMutation()
 
     useEffect(() => {
         if (test) {
             setTotalSlideAdded(test)
+        }
+
+        if (test.length === 0) {
+            getTestSlide(lessonId).unwrap().then((res) => {
+                setTestData(res.data)
+                setTotalSlideAdded(res.data)
+            }).catch((err) => {
+                console.log("Error Occured", err)
+            })
         }
     }, [])
     useEffect(() => {
@@ -33,8 +44,8 @@ const Test = ({ title, id, no, lessonId }) => {
     }, [totalSlideAdded])
 
 
-    const onTempSelectHandler = (id, name, temp) => {
-        setCurrentTemplate({ id: id, name: name, temp })
+    const onTempSelectHandler = (id,name) => {
+        setCurrentTemplate({ id, name })
         setShowTemplateOpt(false)
     }
 
@@ -47,39 +58,33 @@ const Test = ({ title, id, no, lessonId }) => {
         {
             id: 0,
             name: "Short Answer Only",
-            slideno: 1,
-            comp: <Temp2 isTest={true} lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
+            slideno: 1
         },
         {
             id: 1,
             name: "SCQ Only",
-            slideno: 2,
-            comp: <Temp3 isTest={true} lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
+            slideno: 2
         },
         {
             id: 2,
             name: "MCQ Only",
-            slideno: 3,
-            comp: <Temp4 isTest={true} lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
+            slideno: 3
         },
 
         {
             id: 3,
             name: "Media + Short Answer",
-            slideno: 7,
-            comp: <Temp8 isTest={true} lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
+            slideno: 7
         },
         {
             id: 4,
             name: "Media + SCQ",
-            slideno: 8,
-            comp: <Temp9 isTest={true} lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
+            slideno: 8
         },
         {
             id: 5,
             name: "Media + MCQ",
-            slideno: 9,
-            comp: <Temp10 isTest={true} lessonId={lessonId} toast={toast} onAddSlide={onAddSlide} />
+            slideno: 9
         }
     ]
 
@@ -94,7 +99,32 @@ const Test = ({ title, id, no, lessonId }) => {
 
     }
 
-    console.log({ test })
+    function renderer(id) {
+        const config = {
+            lessonId,
+            toast,
+            onAddSlide,
+            order: test.length,
+            isTest: true
+        }
+
+        switch (id) {
+            case 0:
+                return <Temp2 {...config} />
+            case 1:
+                return <Temp3 {...config} />
+            case 2:
+                return <Temp4 {...config} />
+            case 3:
+                return <Temp8 {...config} />
+            case 4:
+                return <Temp9 {...config} />
+            case 5:
+                return <Temp10 {...config} />
+            default:
+                return <Temp2 {...config} />
+        }
+    }
 
 
     return (
@@ -137,7 +167,7 @@ const Test = ({ title, id, no, lessonId }) => {
                                 <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                                     {
                                         templateType.map(item => (
-                                            <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name, item.comp)}>
+                                            <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
                                                 <p>{item.name}</p>
                                             </div>
                                         ))
@@ -148,17 +178,13 @@ const Test = ({ title, id, no, lessonId }) => {
                     </AnimatePresence>
                 </div>
                 {
-                    currentTemplate.temp && (
+                    currentTemplate.name && (
                         <div className="course__builder-slide__form">
-                            {currentTemplate.temp}
+                            {renderer(currentTemplate.id)}
                         </div>
                     )
                 }
             </div>
-
-            {/* <div className="course__builder-slide__preview">
-
-            </div> */}
             <div className="course__builder-slide__navigation">
                 <div className="main__btn">
                     {

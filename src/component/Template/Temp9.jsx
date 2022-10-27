@@ -22,7 +22,7 @@ const tabItem = [
     },
 ]
 
-const Temp9 = ({ lessonId, toast, onAddSlide, isTest }) => {
+const Temp9 = ({ lessonId, toast, onAddSlide, isTest,order }) => {
 
     const [subText, setSubText] = useState(null)
     const [addSlide] = useCreateSlideMutation()
@@ -60,7 +60,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest }) => {
 
         if (!isTest) {
             if (selectedFile.type === "image") {
-                addSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
+                addSlide({ id: lessonId, data: { question: subText,builderslideno:8,order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 8 })
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -68,7 +68,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest }) => {
                     console.log("Err", err)
                 })
             } else {
-                addSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
+                addSlide({ id: lessonId, data: { question: subText,builderslideno:8,order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 8 })
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -79,7 +79,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest }) => {
             }
         }else{
             if (selectedFile.type === "image") {
-                addTestSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio",mark } }).unwrap().then((res) => {
+                addTestSlide({ id: lessonId, data: { question: subText,builderslideno:8,order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio",mark } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 8,added:true })
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -87,7 +87,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest }) => {
                     console.log("Err", err)
                 })
             } else {
-                addTestSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio",mark } }).unwrap().then((res) => {
+                addTestSlide({ id: lessonId, data: { question: subText,builderslideno:8,order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio",mark } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 8,added:true })
                     toast.success("Slide Added")
                 }).catch((err) => {

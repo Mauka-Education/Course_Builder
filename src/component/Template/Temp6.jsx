@@ -6,7 +6,7 @@ import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 
 
-const Temp4 = ({ lessonId, toast, onAddSlide }) => {
+const Temp4 = ({ lessonId, toast, onAddSlide,order }) => {
     const [previewImg, setPreviewImg] = useState([])
 
     const [addSlide] = useCreateSlideMutation()
@@ -17,7 +17,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide }) => {
             return toast.error("Please Select Image")
         }
 
-        addSlide({ id: lessonId, data:{images: previewImg,type:8} }).unwrap().then((res) => {
+        addSlide({ id: lessonId, data:{images: previewImg,type:8,builderslideno:5,order} }).unwrap().then((res) => {
             onAddSlide({...res.data,slideno: 5})
             toast.success("Slide Added")
         }).catch((err) => {

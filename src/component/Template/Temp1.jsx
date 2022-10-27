@@ -9,7 +9,7 @@ const QullEditor = dynamic(import("react-quill"), {
   ssr: false,
 })
 
-const Temp1 = ({ lessonId,toast,onAddSlide }) => {
+const Temp1 = ({ lessonId,toast,onAddSlide,order }) => {
   const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
   const [subText, setSubText] = useState(null)
   const [addSlide] = useCreateSlideMutation()
@@ -19,7 +19,7 @@ const Temp1 = ({ lessonId,toast,onAddSlide }) => {
     if(!subText){
       return toast.error("Please Add Paragraph")
     }
-    addSlide({ id: lessonId, data: { ...data, subtext: subText, type: 0 } }).unwrap().then((res) => {
+    addSlide({ id: lessonId, data: { ...data, subtext: subText, type: 0,builderslideno:0,order } }).unwrap().then((res) => {
       onAddSlide({...res.data,slideno: 0})
       
       toast.success("Slide Added")
@@ -27,7 +27,10 @@ const Temp1 = ({ lessonId,toast,onAddSlide }) => {
       toast.error("Error Occured")
       console.log("Err", err)
     })
-  }  
+    
+  } 
+  
+  
 
   return (
     <>

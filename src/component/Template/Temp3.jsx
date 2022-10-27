@@ -11,7 +11,7 @@ const QullEditor = dynamic(import("react-quill"), {
 
 
 
-const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
+const Temp3 = ({ lessonId, toast, onAddSlide, isTest,order }) => {
 
     const [subText, setSubText] = useState(null)
     const [addSlide] = useCreateSlideMutation()
@@ -39,7 +39,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
 
         if (!isTest) {
 
-            addSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
+            addSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio",builderslideno:2,order } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 2 })
                 toast.success("Slide Added")
             }).catch((err) => {
@@ -47,7 +47,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, isTest }) => {
                 console.log("Err", err)
             })
         } else {
-            addTestSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark } }).unwrap().then(res => {
+            addTestSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark,builderslideno:2,order } }).unwrap().then(res => {
                 onAddSlide({ ...res.data, slideno: 2, added: true })
                 toast.success("Test Slide Added")
             }).catch((err) => {

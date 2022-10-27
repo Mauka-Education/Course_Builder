@@ -989,6 +989,11 @@ input::-webkit-inner-spin-button {
   justify-content: flex-start;
   align-items: flex-start;
 }
+.course__builder-slide .slides__item .update {
+  position: absolute;
+  z-index: 2;
+  cursor: pointer;
+}
 .course__builder-slide .slides__item .preview {
   width: 35rem;
   padding: 1rem;
@@ -1183,11 +1188,19 @@ input::-webkit-inner-spin-button {
   width: 60rem;
   height: 35rem;
   padding: 2rem;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
+}
+.course__builder-preview .preview__edit {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 23;
+  cursor: pointer;
 }
 .course__builder-preview .preview.all {
   height: 23rem;

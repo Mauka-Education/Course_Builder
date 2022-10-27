@@ -167,6 +167,11 @@
       justify-content: flex-start;
       align-items: flex-start;
 
+      .update{
+        position: absolute;
+        z-index: 2;
+        cursor: pointer;
+      }
       .preview {
         width: 35rem;
         padding: 1rem;

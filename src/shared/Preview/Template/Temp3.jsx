@@ -21,7 +21,6 @@ const Temp3 = ({ data }) => {
 
     function marker(val) {
         const isElem = data?.option?.findIndex((item) => item?.val === val)
-        console.log({ isElem })
         if (isElem > -1) {
             if (data?.isTest) {
 
