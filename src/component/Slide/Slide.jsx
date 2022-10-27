@@ -78,7 +78,7 @@ const templateType = [
 ]
 
 const Slide = ({ title, id, no, lessonId }) => {
-    const { course, slide } = useSelector(state => state.util)
+    const { course, slide,updateSlide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -102,12 +102,12 @@ const Slide = ({ title, id, no, lessonId }) => {
                 console.log("Error Occured", err)
             })
         }
-
-        if(router.query?.update){
-            const id=parseInt(router.query.temp)
-            const name=templateType.find((obj)=>obj.id===id)?.name
-            setCurrentTemplate({id,name:name})
+        if(updateSlide?.is){
+            const name=templateType.find((item)=>item.id===updateSlide.data.builderslideno).name
+            setCurrentTemplate({id:updateSlide.data.builderslideno,name})
         }
+
+        console.log({updateSlide})
     }, [])
     useEffect(() => {
     }, [dispatch, slide])
@@ -144,7 +144,8 @@ const Slide = ({ title, id, no, lessonId }) => {
             toast: toast,
             onAddSlide: onAddSlide,
             order: slide.length,
-            update: router.query?.update ? true :false
+            update: updateSlide,
+            slide
         }
         
         switch (id) {
