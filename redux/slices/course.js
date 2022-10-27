@@ -6,7 +6,7 @@ const prodUrl = "https://lms.maukaeducation.com/api/admin";
 export const courseApi = createApi({
   reducerPath: "course",
   baseQuery: fetchBaseQuery({
-    baseUrl: url,
+    baseUrl: prodUrl,
     prepareHeaders: (headers, { getState }) => {
       headers.set(
         "Authorization",
