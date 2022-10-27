@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
@@ -9,11 +9,14 @@ const QullEditor = dynamic(import("react-quill"), {
   ssr: false,
 })
 
-const Temp1 = ({ lessonId,toast,onAddSlide,order }) => {
+const Temp1 = ({ lessonId,toast,onAddSlide,order,update }) => {
   const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
   const [subText, setSubText] = useState(null)
   const [addSlide] = useCreateSlideMutation()
   
+  useEffect(()=>{
+    
+  },[])
 
   const onSubmitHandler = (data) => {
     if(!subText){
@@ -21,17 +24,13 @@ const Temp1 = ({ lessonId,toast,onAddSlide,order }) => {
     }
     addSlide({ id: lessonId, data: { ...data, subtext: subText, type: 0,builderslideno:0,order } }).unwrap().then((res) => {
       onAddSlide({...res.data,slideno: 0})
-      
       toast.success("Slide Added")
     }).catch((err) => {
       toast.error("Error Occured")
       console.log("Err", err)
     })
-    
-  } 
+  }
   
-  
-
   return (
     <>
       <form className="course__builder-temp1" onSubmit={handleSubmit(onSubmitHandler)}>

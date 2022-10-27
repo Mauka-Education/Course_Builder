@@ -11,6 +11,71 @@ import { toast, ToastContainer } from "react-toast"
 import { setSlideData } from "../../../redux/slices/util"
 import { useGetSlideMutation } from "../../../redux/slices/slide"
 
+const templateType = [
+    {
+        id: 0,
+        name: "Text Only",
+        slideno: 0,
+
+    },
+    {
+        id: 1,
+        name: "Short Answer Only",
+        slideno: 1,
+        
+    },
+    {
+        id: 2,
+        name: "SCQ Only",
+        slideno: 2
+    },
+    {
+        id: 3,
+        name: "MCQ Only",
+        slideno: 3
+    },
+    {
+        id: 4,
+        name: "Opinion Scale",
+        slideno: 4
+    },
+    {
+        id: 5,
+        name: "Image Slider",
+        slideno: 5
+    },
+    {
+        id: 6,
+        name: "Media + Heading",
+        slideno: 6
+    },
+    {
+        id: 7,
+        name: "Media + Short Answer",
+        slideno: 7
+    },
+    {
+        id: 8,
+        name: "Media + SCQ",
+        slideno: 8
+    },
+    {
+        id: 9,
+        name: "Media + MCQ",
+        slideno: 9
+    },
+    {
+        id: 10,
+        name: "Media + Text",
+        slideno: 10
+    },
+    // {
+    //     id: 11,
+    //     name: "Media + Short Answer + Text",
+    //     slideno: 0,
+    //     comp: <Temp1 />
+    // },
+]
 
 const Slide = ({ title, id, no, lessonId }) => {
     const { course, slide } = useSelector(state => state.util)
@@ -37,6 +102,12 @@ const Slide = ({ title, id, no, lessonId }) => {
                 console.log("Error Occured", err)
             })
         }
+
+        if(router.query?.update){
+            const id=parseInt(router.query.temp)
+            const name=templateType.find((obj)=>obj.id===id)?.name
+            setCurrentTemplate({id,name:name})
+        }
     }, [])
     useEffect(() => {
     }, [dispatch, slide])
@@ -45,7 +116,6 @@ const Slide = ({ title, id, no, lessonId }) => {
     useEffect(() => {
         dispatch(setSlideData(totalSlideAdded))
     }, [totalSlideAdded])
-    3
 
     const onTempSelectHandler = (id, name) => {
         setCurrentTemplate({ id,name })
@@ -57,77 +127,12 @@ const Slide = ({ title, id, no, lessonId }) => {
     }
 
 
-    const templateType = [
-        {
-            id: 0,
-            name: "Text Only",
-            slideno: 0,
-
-        },
-        {
-            id: 1,
-            name: "Short Answer Only",
-            slideno: 1,
-            
-        },
-        {
-            id: 2,
-            name: "SCQ Only",
-            slideno: 2
-        },
-        {
-            id: 3,
-            name: "MCQ Only",
-            slideno: 3
-        },
-        {
-            id: 4,
-            name: "Opinion Scale",
-            slideno: 4
-        },
-        {
-            id: 5,
-            name: "Image Slider",
-            slideno: 5
-        },
-        {
-            id: 6,
-            name: "Media + Heading",
-            slideno: 6
-        },
-        {
-            id: 7,
-            name: "Media + Short Answer",
-            slideno: 7
-        },
-        {
-            id: 8,
-            name: "Media + SCQ",
-            slideno: 8
-        },
-        {
-            id: 9,
-            name: "Media + MCQ",
-            slideno: 9
-        },
-        {
-            id: 10,
-            name: "Media + Text",
-            slideno: 10
-        },
-        // {
-        //     id: 11,
-        //     name: "Media + Short Answer + Text",
-        //     slideno: 0,
-        //     comp: <Temp1 />
-        // },
-    ]
 
     const onPrevClick = () => {
         const lastSlide = slide[slide.length - 1]
         const findSlide = templateType.filter(item => item.id === lastSlide.slideno)[0]
 
-        console.log(lastSlide, findSlide)
+        
         if (lastSlide) {
             setCurrentTemplate({ id: findSlide?.id, name: findSlide?.name, temp: findSlide?.comp })
         }
@@ -138,7 +143,8 @@ const Slide = ({ title, id, no, lessonId }) => {
             lessonId: lessonId,
             toast: toast,
             onAddSlide: onAddSlide,
-            order: slide.length
+            order: slide.length,
+            update: router.query?.update ? true :false
         }
         
         switch (id) {
@@ -169,6 +175,7 @@ const Slide = ({ title, id, no, lessonId }) => {
         }
     }
 
+    console.log({currentTemplate})
     return (
         <div className="course__builder-slide">
             <ToastContainer position="bottom-left" delay={3000} />

@@ -11,6 +11,7 @@ import { RiDeleteBinLine,RiEditCircleFill } from "react-icons/ri"
 import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
 import { setSlideData, setTestData } from "../../../redux/slices/util"
+import { useRouter } from "next/router"
 
 const AllSlide = ({ id: key, type }) => {
     const [showOpt, setShowOpt] = useState(false)
@@ -19,6 +20,7 @@ const AllSlide = ({ id: key, type }) => {
     const { course, slide, test } = useSelector(state => state.util)
 
 
+    const router=useRouter()
     const [deleteSlide] = useDeleteSlideMutation()
     const [deleteTestSlide] = useDeleteTestSlideMutation()
 
@@ -138,9 +140,12 @@ const AllSlide = ({ id: key, type }) => {
                 toast.success("Error Occured")
                 console.log({ err })
             })
-
         }
         setShowSlideOpt({ id: null, show: false })
+    }
+    
+    const editSlide=(item)=>{
+        router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}&update=true&temp=${item.builderslideno}&id=${item._id}`)
     }
 
     return (
@@ -191,9 +196,9 @@ const AllSlide = ({ id: key, type }) => {
                 {
                     lessonSlides?.sort((a, b) => a.order - b.order)?.map((item, id) => (
                         <div className="slides__item" key={id}>
-                            <div className="update">
-                                {/* <RiEditCircleFill size={40} cursor="pointer" /> */}
-                            </div>
+                            <motion.div className="update" whileTap={{scale:.97}} onClick={()=>editSlide(item)}>
+                                <RiEditCircleFill size={40} cursor="pointer" />
+                            </motion.div>
                             <div className="preview">
                                 <Preview type={item?.builderslideno} data={{ ...previewData(item, item?.builderslideno), allSlide: true }} allSlide={true} />
                             </div>
@@ -201,8 +206,8 @@ const AllSlide = ({ id: key, type }) => {
                                 <div className="edit__order">
                                     <p>Slide no</p>
                                     <div className="title" onClick={() => setShowSlideOpt(item => ({ id: id, show: item.id === id ? !item.show : true }))}>
-                                        {/* <p>{item?.order} </p> */}
-                                        <p>{id}</p>
+                                        <p>{item?.order} </p>
+                                        {/* <p>{id}</p> */}
                                         <BsChevronDown size={15} />
                                     </div>
 
