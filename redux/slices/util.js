@@ -17,6 +17,11 @@ const utilSlice = createSlice({
     isPreview:{
       is:false,
       id:null 
+    },
+    updateSlide:{
+      is:false,
+      id:null,
+      data:null
     }
   },
   reducers: {
@@ -58,6 +63,9 @@ const utilSlice = createSlice({
     },
     setIsPreview: (state,action)=>{
       state.isPreview= {  ...state.isPreview,...action.payload}
+    },
+    setUpdateSlide:(state,action)=>{
+      state.updateSlide={...state.updateSlide,...action.payload}
     }
   },
 });
@@ -72,7 +80,8 @@ export const {
   setIsPreview,
   setAdmin,
   setTestData,
-  clearCourse
+  clearCourse,
+  setUpdateSlide
 } = utilSlice.actions;
 
 export default utilSlice;

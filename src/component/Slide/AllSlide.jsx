@@ -10,7 +10,7 @@ import { RiDeleteBinLine,RiEditCircleFill } from "react-icons/ri"
 
 import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
-import { setSlideData, setTestData } from "../../../redux/slices/util"
+import { setSlideData, setTestData,setUpdateSlide } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
 
 const AllSlide = ({ id: key, type }) => {
@@ -26,6 +26,8 @@ const AllSlide = ({ id: key, type }) => {
 
     const [changeSlideOrder] = useChangeSlideOrderMutation()
     const [changeTestSlideOrder] = useChangeTestSlideOrderMutation()
+
+    
 
     const dispatch = useDispatch()
 
@@ -145,7 +147,8 @@ const AllSlide = ({ id: key, type }) => {
     }
     
     const editSlide=(item)=>{
-        router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}&update=true&temp=${item.builderslideno}&id=${item._id}`)
+        dispatch(setUpdateSlide({is:true,data:item,id:item._id}))
+        router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
     }
 
     return (
