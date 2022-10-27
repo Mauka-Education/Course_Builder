@@ -9,11 +9,20 @@
     width: 60rem;
     height: 35rem;
     padding: 2rem;
+    position: relative;
 
     @include center_elem;
     flex-direction: column;
     justify-content: space-between;
     // pointer-events: none;
+
+    &__edit{
+      position: absolute;
+      top: .5rem;
+      right: .5rem;
+      z-index: 23;
+      cursor: pointer;
+    }
 
     &.all {
       height: 23rem;

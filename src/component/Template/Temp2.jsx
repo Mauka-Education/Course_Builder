@@ -8,7 +8,7 @@ const QullEditor = dynamic(import("react-quill"), {
   ssr: false,
 })
 
-const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false }) => {
+const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false,order }) => {
   const [subText, setSubText] = useState(null)
   const [idealAns, setIdealAns] = useState(null)
 
@@ -30,7 +30,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false }) => {
       return toast.error("Please Add Paragraph")
     }
     if (!isTest) {
-      addSlide({ id: lessonId, data: { question: subText, type: 5 } }).unwrap().then((res) => {
+      addSlide({ id: lessonId, data: { question: subText, type: 5,builderslideno:1,order } }).unwrap().then((res) => {
         onAddSlide({ ...res.data, slideno: 1 })
         toast.success("Slide Added")
       }).catch((err) => {
@@ -38,7 +38,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false }) => {
         console.log("Err", err)
       })
     } else {
-      addTestSlide({ id: lessonId, data: { question: subText, type: 5, mark, model_answer: idealAns } }).unwrap().then((res) => {
+      addTestSlide({ id: lessonId, data: { question: subText, type: 5, mark, model_answer: idealAns,builderslideno:1,order } }).unwrap().then((res) => {
         onAddSlide({ ...res.data, slideno: 1, added: true })
         toast.success("Test Slide Added")
       }).catch((err) => {

@@ -22,7 +22,7 @@ const tabItem = [
     },
 ]
 
-const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
+const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false,order  }) => {
 
     const [subText, setSubText] = useState(null)
     const [addSlide] = useCreateSlideMutation()
@@ -61,7 +61,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
         
         if (!isTest) {
             if (selectedFile.type === "image") {
-                addSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox" } }).unwrap().then((res) => {
+                addSlide({ id: lessonId, data: { question: subText,builderslideno:9,order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 9 })
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -69,7 +69,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
                     console.log("Err", err)
                 })
             } else {
-                addSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox" } }).unwrap().then((res) => {
+                addSlide({ id: lessonId, data: { question: subText,builderslideno:9,order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 9 })
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -81,7 +81,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
         }else{
             
             if (selectedFile.type === "image") {
-                addTestSlide({ id: lessonId, data: { question: subText, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox",mark } }).unwrap().then((res) => {
+                addTestSlide({ id: lessonId, data: { question: subText,builderslideno:9,order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox",mark } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 9,added:true })
                     toast.success("Test Slide Added")
                 }).catch((err) => {
@@ -89,7 +89,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
                     console.log("Err", err)
                 })
             } else {
-                addTestSlide({ id: lessonId, data: { question: subText, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox",mark } }).unwrap().then((res) => {
+                addTestSlide({ id: lessonId, data: { question: subText,builderslideno:9,order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox",mark } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 9,added:true })
                     toast.success("Test Slide Added")
                 }).catch((err) => {
@@ -158,7 +158,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest=false  }) => {
                     <h3>Save</h3>
                 </motion.button>
             </form>
-            <Preview type={9} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined), url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null,isTest }} />
+            <Preview type={9} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined), url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null,isTest}} />
         </>
     )
 }

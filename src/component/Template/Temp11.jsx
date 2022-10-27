@@ -22,7 +22,7 @@ const tabItem = [
   },
 ]
 
-const Temp11 = ({ lessonId, toast, onAddSlide }) => {
+const Temp11 = ({ lessonId, toast, onAddSlide,order }) => {
   const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
   const [addSlide] = useCreateSlideMutation()
 
@@ -45,7 +45,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide }) => {
       return toast.error("Please Add Quetion")
     }
     if (selectedFile.type === "image") {
-      addSlide({ id: lessonId, data: { ...data,subtext: subText, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }} }).unwrap().then((res) => {
+      addSlide({ id: lessonId, data: { ...data,subtext: subText,builderslideno:10,order, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }} }).unwrap().then((res) => {
         onAddSlide({...res.data,slideno: 10})
         toast.success("Slide Added")
       }).catch((err) => {
@@ -53,14 +53,13 @@ const Temp11 = ({ lessonId, toast, onAddSlide }) => {
         console.log("Err", err)
       })
     } else {
-      addSlide({ id: lessonId, data: { ...data,subtext: subText, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
+      addSlide({ id: lessonId, data: { ...data,subtext: subText,builderslideno:10,order, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
         onAddSlide({...res.data,slideno: 10})
         toast.success("Slide Added")
       }).catch((err) => {
         toast.error("Error Occured")
         console.log("Err", err)
       })
-
     }
   }
 
