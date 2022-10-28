@@ -8,7 +8,7 @@ import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
 import { Temp1, Temp10, Temp11, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setSlideData } from "../../../redux/slices/util"
+import { setSlideData, setUpdateSlide,updateSlides } from "../../../redux/slices/util"
 import { useGetSlideMutation } from "../../../redux/slices/slide"
 
 const templateType = [
@@ -22,7 +22,7 @@ const templateType = [
         id: 1,
         name: "Short Answer Only",
         slideno: 1,
-        
+
     },
     {
         id: 2,
@@ -78,7 +78,7 @@ const templateType = [
 ]
 
 const Slide = ({ title, id, no, lessonId }) => {
-    const { course, slide,updateSlide } = useSelector(state => state.util)
+    const { course, slide, updateSlide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -102,28 +102,33 @@ const Slide = ({ title, id, no, lessonId }) => {
                 console.log("Error Occured", err)
             })
         }
-        if(updateSlide?.is){
-            const name=templateType.find((item)=>item.id===updateSlide.data.builderslideno).name
-            setCurrentTemplate({id:updateSlide.data.builderslideno,name})
+        if (updateSlide?.is) {
+            const name = templateType.find((item) => item.id === updateSlide.data.builderslideno).name
+            setCurrentTemplate({ id: updateSlide.data.builderslideno, name })
         }
 
-        console.log({updateSlide})
     }, [])
     useEffect(() => {
     }, [dispatch, slide])
 
-    
+
     useEffect(() => {
         dispatch(setSlideData(totalSlideAdded))
     }, [totalSlideAdded])
 
     const onTempSelectHandler = (id, name) => {
-        setCurrentTemplate({ id,name })
+        setCurrentTemplate({ id, name })
         setShowTemplateOpt(false)
     }
 
     const onAddSlide = (data) => {
         setTotalSlideAdded(item => [...item, { ...data }])
+    }
+
+    const onSlideUpdateHandler = (id, data) => {
+        dispatch(updateSlides({id,data}))
+        dispatch(setUpdateSlide({id:null,is:false,data:null}))
+        router.back()
     }
 
 
@@ -132,11 +137,12 @@ const Slide = ({ title, id, no, lessonId }) => {
         const lastSlide = slide[slide.length - 1]
         const findSlide = templateType.filter(item => item.id === lastSlide.slideno)[0]
 
-        
+
         if (lastSlide) {
             setCurrentTemplate({ id: findSlide?.id, name: findSlide?.name, temp: findSlide?.comp })
         }
     }
+
 
     function renderer(id) {
         const config = {
@@ -145,9 +151,9 @@ const Slide = ({ title, id, no, lessonId }) => {
             onAddSlide: onAddSlide,
             order: slide.length,
             update: updateSlide,
-            slide
+            onSlideUpdateHandler
         }
-        
+
         switch (id) {
             case 0:
                 return <Temp1 {...config} />
@@ -176,7 +182,7 @@ const Slide = ({ title, id, no, lessonId }) => {
         }
     }
 
-    console.log({currentTemplate})
+
     return (
         <div className="course__builder-slide">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -205,6 +211,7 @@ const Slide = ({ title, id, no, lessonId }) => {
                     </AnimatePresence>
                 </div>
                 <div className="course__builder-slide__template">
+
                     <h3>Template</h3>
                     <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
                         <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
@@ -235,15 +242,13 @@ const Slide = ({ title, id, no, lessonId }) => {
                 }
             </div>
 
-            {/* <div className="course__builder-slide__preview">
-
-            </div> */}
+            
             <div className="course__builder-slide__navigation">
                 <div className="main__btn">
                     {
                         slide.length !== 0 && (
                             <Link href={`/slide?key=${lessonId}&type=lesson`}>
-                                <div className="all">
+                                <div className="all" onClick={()=>setUpdateSlide({id:null,is:false,data:null})}>
                                     <p>All Slides</p>
                                 </div>
                             </Link>

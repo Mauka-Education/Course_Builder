@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation,useUpdateSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 
 const QullEditor = dynamic(import("react-quill"), {
   ssr: false,
 })
 
-const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false,order }) => {
+const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false }) => {
   const [subText, setSubText] = useState(null)
   const [idealAns, setIdealAns] = useState(null)
 
-  const [slideId, setSlideId] = useState(null)
-
   const [addSlide] = useCreateSlideMutation()
   const [addTestSlide] = useCreateTestSlideMutation()
-
+  
   const [mark, setMark] = useState(0)
+  
+  const [updateSlide] = useUpdateSlideMutation()
+  const isUpdate = update?.is
 
   useEffect(() => {
 
@@ -48,19 +49,30 @@ const Temp2 = ({ lessonId, toast, onAddSlide, isTest = false,order }) => {
     }
   }
 
+  const onUpdateHandler = () => {
+    updateSlide({ id: update?.id, data: { question: subText } }).unwrap().then((res) => {
+      onSlideUpdateHandler(update?.id,res.data)
+      toast.success("Slide updated")
+    }).catch((err) => {
+      toast.error("Error Occured")
+      console.log("Err", err)
+    })
+  }
+  
+
   return (
     <>
-      <form className="course__builder-temp1" onSubmit={onSubmitHandler}>
+      <form className="course__builder-temp1" onSubmit={ !isUpdate ? onSubmitHandler : onUpdateHandler }>
         <div className="item quil_small">
           <p>Question/Prompt</p>
-          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' />
+          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={update.is ? update.data.question :null} />
         </div>
         {
           isTest && (
             <>
               <div className="item">
                 <p>Sample Answer</p>
-                <QullEditor onChange={(data) => setIdealAns(data)} theme="snow" placeholder='Enter Ideal Answer for this Question' />
+                <QullEditor onChange={(data) => setIdealAns(data)} theme="snow" placeholder='Enter Ideal Answer for this Question'  />
               </div>
               <div className="item mark">
                 <p>Mark</p>

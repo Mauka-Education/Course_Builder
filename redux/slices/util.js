@@ -60,12 +60,27 @@ const utilSlice = createSlice({
       state.preRequisite = [];
       state.slide = [];
       state.test = [];
+      state.updateSlide={
+        is:false,
+        id:null,
+        data:null
+      }
     },
     setIsPreview: (state,action)=>{
       state.isPreview= {  ...state.isPreview,...action.payload}
     },
     setUpdateSlide:(state,action)=>{
       state.updateSlide={...state.updateSlide,...action.payload}
+    },
+    updateSlides:(state,action)=>{
+      const {id,data}=action.payload
+      const index=state?.slide?.findIndex(obj=>obj._id===id)
+      
+      console.log({action})
+      if(index>=0){
+        state.slide[index]=data
+        
+      }      
     }
   },
 });
@@ -81,7 +96,9 @@ export const {
   setAdmin,
   setTestData,
   clearCourse,
-  setUpdateSlide
+  setUpdateSlide,
+  updateSlides
+  
 } = utilSlice.actions;
 
 export default utilSlice;

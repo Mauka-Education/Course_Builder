@@ -23,19 +23,32 @@ const initialValue = [
     isCorrect: false
   },
 ]
-const MCQ = ({ isMulti = false, setQuestion, setAnswer,setMark,isTest=false }) => {
-  const [questArray, setQuestArray] = useState(initialValue)
+const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false, update }) => {
+  const [questArray, setQuestArray] = useState( !update?.is ? initialValue : [])
 
   const onChangeHandler = (id, value) => {
     setQuestArray(item => item.map(p => p.id === id ? { ...p, val: value } : p))
 
   }
 
-  useEffect(()=>{
-    setQuestion((questArray.map((item,i)=>{
-      return `Option ${i+1}`
-    })))
-  },[])
+  useEffect(() => {
+    if (update?.is) {
+      update.data.options.forEach((item,i)=>{
+        if(isMulti){
+          const isCorrect= update.data.correct_options.find(ans=>ans.val===item.val)
+          setQuestArray(prev=>[...prev,{id:i,val: item.val,_id:item._id,isCorrect: isCorrect ? true : false}])
+        }else{
+          setQuestArray(prev=>[...prev,{id:i,val: item.val,_id:item._id,isCorrect: update.data.correct_options[0]?.val===item.val ? true :false}])
+        }
+      })
+    } else {
+      setQuestion((questArray.map((item, i) => {
+        return `Option ${i + 1}`
+      })))
+    }
+  }, [])
+
+  console.log({questArray})
   useEffect(() => {
 
     setAnswer(questArray.map((item) => {
@@ -62,7 +75,7 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer,setMark,isTest=false }) =
           questArray.map((item, i) => (
             <div className="upper__item" key={item.id}>
               <p>Option {item.id + 1}</p>
-              <input type="text" placeholder='Lorem Ipsum' onChange={(e) => onChangeHandler(i, e.target.value)} />
+              <input type="text" placeholder='Lorem Ipsum' onChange={(e) => onChangeHandler(i, e.target.value)} defaultValue={item.val} />
             </div>
           ))
         }
@@ -70,10 +83,10 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer,setMark,isTest=false }) =
       <div className="lower">
         {
           isTest && (
-        <div className="lower__left">
-          <p>Marks</p>
-          <input type="number" defaultValue={1} onChange={(e)=>setMark(e.target.value)}  />
-        </div>
+            <div className="lower__left">
+              <p>Marks</p>
+              <input type="number" defaultValue={1} onChange={(e) => setMark(e.target.value)} />
+            </div>
 
           )
         }

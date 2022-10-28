@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation ,useUpdateSlideMutation} from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
@@ -17,19 +17,31 @@ const tabItem = [
     },
 ]
 
-const Temp7 = ({ lessonId, toast, onAddSlide,order }) => {
+const Temp7 = ({ lessonId, toast, onAddSlide,order,update,onSlideUpdateHandler }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     const [addSlide] = useCreateSlideMutation()
     const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
 
     const [activeTab, setActiveTab] = useState(0)
+    const [updateSlide] = useUpdateSlideMutation()
+    const isUpdate=update.is
 
-    console.log({da: watch("video_url")})
+    
     useEffect(() => {
         if (selectedFile.url !== "") {
             setSelectedFile({ url: "", type: "", name: "" })
         }
     }, [watch("video_url")])
+
+    useEffect(()=>{
+        if(isUpdate){
+            if(update?.data?.image_url){
+                setSelectedFile({url: update?.data?.image_url,type:"image",name:"Image"})
+            }else{
+                setSelectedFile({url: update?.data?.video_url,type:"video",name:"Video"})
+            }
+        }
+    },[])
 
     
     const onSubmitHandler = (data) => {
@@ -65,6 +77,27 @@ const Temp7 = ({ lessonId, toast, onAddSlide,order }) => {
         }
     }
 
+    const onUpdateHandler = (data) => {
+        if(selectedFile.type==="image"){
+            updateSlide({ id: update?.id, data:{...data,image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name },video_url:null} }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        }else{
+            updateSlide({ id: update?.id, data:{...data,video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url,image_url:null} }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+            
+        }
+    }
+
     function renderer(no) {
         switch (no) {
             case 0:
@@ -89,13 +122,14 @@ const Temp7 = ({ lessonId, toast, onAddSlide,order }) => {
                 break;
         }
     }
+    console.log({update})
 
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={handleSubmit(onSubmitHandler)}>
+            <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
                 <div className="item">
                     <p>Heading</p>
-                    <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} />
+                    <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={isUpdate ? update?.data?.heading : null}  />
                 </div>
                 {renderer(activeTab)}
                 <div className="item tab">

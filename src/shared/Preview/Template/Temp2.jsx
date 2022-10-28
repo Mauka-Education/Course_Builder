@@ -2,7 +2,7 @@
 
 const Temp2 = ({ data,style }) => {
     const dummyText = "Lorem ipsum dolor sit amet consectetur adipisicing elit. A cum, blanditiis aspernatur quibusdam fugit enim omnis nostrum amet, numquam tempore possimus officia obcaecati veritatis. Alias dignissimos deserunt reiciendis?"
-
+    
     return (
         <div className="temp2" style={{...style}} >
             <div className="question">

@@ -42,7 +42,6 @@ const Temp4 = ({ lessonId, toast, onAddSlide,order }) => {
         }
     }
     
-    console.log({previewImg})
 
     return (
         <>
