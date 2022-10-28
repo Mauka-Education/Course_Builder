@@ -37,6 +37,7 @@ const AllSlide = ({ id: key, type }) => {
         } else if (test && type === "test") {
             setAllSlides(test)
         }
+        
     }, [])
 
 
@@ -50,7 +51,7 @@ const AllSlide = ({ id: key, type }) => {
     }, [allSlides])
 
     useEffect(() => {
-    }, [dispatch])
+    }, [dispatch,slide])
 
 
     const lesson = course?.structure?.find(item => item?.isSaved === key)
@@ -59,6 +60,7 @@ const AllSlide = ({ id: key, type }) => {
 
     const Test = course?.test?.find((item) => item?.id === key)
     // if (!lesson) return null
+
 
     function previewData(item, no) {
         switch (no) {
@@ -71,7 +73,7 @@ const AllSlide = ({ id: key, type }) => {
             case 3:
                 return { question: item?.question, option: item?.options, correct: item?.correct_options, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
             case 4:
-                return { title: item?.subtext, lowLabel: item?.lowLabel, highLabel: item?.highLabel, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
+                return { title: item?.heading, lowLabel: item?.lowLabel, highLabel: item?.highLabel, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
             case 5:
                 return { images: item?.images, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
             case 6:
@@ -151,6 +153,7 @@ const AllSlide = ({ id: key, type }) => {
         router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
     }
 
+    
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -160,6 +163,7 @@ const AllSlide = ({ id: key, type }) => {
                     <h2>{type === "lesson" ? lesson?.name : Test?.heading}</h2>
                 </div>
                 <BsChevronDown size={30} />
+                
                 <AnimatePresence>
                     {
                         showOpt && type === "lesson" ? (
@@ -196,6 +200,7 @@ const AllSlide = ({ id: key, type }) => {
                 )
             }
             <div className="slides">
+
                 {
                     lessonSlides?.sort((a, b) => a.order - b.order)?.map((item, id) => (
                         <div className="slides__item" key={id}>

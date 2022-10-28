@@ -1,6 +1,7 @@
 import React from 'react'
 
 const Temp5 = ({ data }) => {
+    console.log({data})
     return (
         <div className="temp5">
             <div className="title" >

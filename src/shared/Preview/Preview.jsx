@@ -5,6 +5,7 @@ import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 import { Temp1, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9, Temp10, Temp11 } from './Template';
 
 const Preview = ({ type, data, allSlide }) => {
+    
     function renderer() {
         switch (type) {
             case 0:

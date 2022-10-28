@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useCreateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation,useUpdateSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
@@ -22,7 +22,7 @@ const tabItem = [
     },
 ]
 
-const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false,order }) => {
+const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false,order,update,onSlideUpdateHandler }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     const [addSlide] = useCreateSlideMutation()
     const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
@@ -32,6 +32,9 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false,order }) => {
 
     const [addTestSlide] = useCreateTestSlideMutation()
     const [mark, setMark] = useState(1)
+
+    const [updateSlide] = useUpdateSlideMutation()
+    const isUpdate=update?.is
 
     useEffect(() => {
         if (selectedFile.url !== "") {
@@ -130,12 +133,23 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false,order }) => {
         }
     }
 
+    const onUpdateHandler = (data) => {
+        
+        updateSlide({ id: update?.id, data:{...data,heading:subText} }).unwrap().then((res) => {
+            onSlideUpdateHandler(update?.id, res.data)
+            toast.success("Slide updated")
+        }).catch((err) => {
+            toast.error("Error Occured")
+            console.log("Err", err)
+        })
+    }
+
     return (
         <>
             <form className="course__builder-temp1" onSubmit={handleSubmit(isTest ? onTestSubmitHandler : onSubmitHandler)}>
                 <div className="item">
                     <p>Question/Prompt</p>
-                    <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' />
+                    <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update.data.question : null}  />
                 </div>
                 {renderer(activeTab)}
                 <div className="item tab">

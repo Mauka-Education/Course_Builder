@@ -9,7 +9,7 @@ const QullEditor = dynamic(import("react-quill"), {
   ssr: false,
 })
 
-const Temp1 = ({ lessonId, toast, onAddSlide, order, update,slide }) => {
+const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler }) => {
   const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
   const [subText, setSubText] = useState(null)
   const [addSlide] = useCreateSlideMutation()
@@ -19,7 +19,7 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update,slide }) => {
 
   }, [])
 
-  const isUpdate=update?.is
+  const isUpdate = update?.is
 
   const onSubmitHandler = (data) => {
 
@@ -37,26 +37,28 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update,slide }) => {
 
   const onUpdateHandler = (data) => {
     updateSlide({ id: update?.id, data: { ...data, subtext: subText } }).unwrap().then((res) => {
+      onSlideUpdateHandler(update?.id,res.data)
       toast.success("Slide updated")
     }).catch((err) => {
       toast.error("Error Occured")
-      console.log("Err", err)
+      console.log("Err", {err})
     })
   }
+
   return (
     <>
-      <form className="course__builder-temp1" onSubmit={handleSubmit( !isUpdate ? onSubmitHandler : onUpdateHandler )}>
+      <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
         <div className="item">
           <p>Heading</p>
-          <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={update.is && update.data.heading} />
+          <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={update.is ? update.data.heading : null} />
         </div>
         <div className="item">
           <p>Sub Heading</p>
-          <input type="text" {...register("subheading", { required: true })} placeholder={"Enter your SubHeading"} defaultValue={update.is && update.data.subheading} />
+          <input type="text" {...register("subheading", { required: true })} placeholder={"Enter your SubHeading"} defaultValue={update.is ? update.data.subheading : null} />
         </div>
         <div className="item">
           <p>Paragraph</p>
-          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={update.is && update.data.subtext} />
+          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={update.is ? update.data.subtext : null} />
         </div>
         <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
           <h3>Save</h3>
