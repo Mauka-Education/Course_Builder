@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation,useUpdateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 
@@ -58,7 +58,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
-        updateSlide({ id: update?.id, data: { question: subText,options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
+        updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
             onSlideUpdateHandler(update?.id, res.data)
             toast.success("Slide updated")
         }).catch((err) => {
@@ -69,16 +69,16 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={ !isUpdate ?  onSubmitHandler : onUpdateHandler}>
+            <form className="course__builder-temp1" onSubmit={!isUpdate ? onSubmitHandler : onUpdateHandler}>
                 <div className="item quil_small" >
                     <p>Question/Prompt</p>
-                    <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update?.data?.question : null }  />
+                    <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update?.data?.question : null} />
                 </div>
                 <div className="item">
                     <MCQ isMulti={false} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} />
                 </div>
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>Save</h3>
+                    <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>
             </form>
             <Preview type={2} data={{ question: subText, option: option.filter((item) => item.val !== ""), correct: correctOpt.filter((item) => item !== undefined)[0], isTest }} />

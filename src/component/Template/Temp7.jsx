@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation ,useUpdateSlideMutation} from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
@@ -17,48 +17,50 @@ const tabItem = [
     },
 ]
 
-const Temp7 = ({ lessonId, toast, onAddSlide,order,update,onSlideUpdateHandler }) => {
+const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     const [addSlide] = useCreateSlideMutation()
     const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
 
     const [activeTab, setActiveTab] = useState(0)
-    const [updateSlide] = useUpdateSlideMutation()
-    const isUpdate=update.is
+    const [updateSlide] = useUpdateMediaSlideMutation()
 
-    
+    const [isNewMedia, setIsNewMedia] = useState(false)
+    const isUpdate = update.is
+
+
     useEffect(() => {
-        if (selectedFile.url !== "") {
-            setSelectedFile({ url: "", type: "", name: "" })
-        }
+        if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
+        
+        if(isUpdate) setIsNewMedia(true)
     }, [watch("video_url")])
 
-    useEffect(()=>{
-        if(isUpdate){
-            if(update?.data?.image_url){
-                setSelectedFile({url: update?.data?.image_url,type:"image",name:"Image"})
-            }else{
-                setSelectedFile({url: update?.data?.video_url,type:"video",name:"Video"})
+    useEffect(() => {
+        if (isUpdate) {
+            if (update?.data?.image_url) {
+                setSelectedFile({ url: update?.data?.image_url, type: "image", name: "Image" })
+            } else {
+                setSelectedFile({ url: update?.data?.video_url, type: "video", name: "Video" })
             }
         }
-    },[])
+    }, [])
 
-    
+
     const onSubmitHandler = (data) => {
-        if (selectedFile.url.length===0 && watch("video_url") === undefined) {
+        if (selectedFile.url.length === 0 && watch("video_url") === undefined) {
             return toast.error("Please Select Image/Video")
         }
         if (selectedFile.type === "image") {
-            addSlide({ id: lessonId, data: { ...data,order, builderslideno:6 ,type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading } }).unwrap().then((res) => {
-                onAddSlide({...res.data,slideno: 6})
+            addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading } }).unwrap().then((res) => {
+                onAddSlide({ ...res.data, slideno: 6 })
                 toast.success("Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
                 console.log("Err", err)
             })
         } else {
-            addSlide({ id: lessonId, data: { ...data, order,builderslideno:6 ,type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
-                onAddSlide({...res.data,slideno: 6})
+            addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
+                onAddSlide({ ...res.data, slideno: 6 })
                 toast.success("Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -69,6 +71,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide,order,update,onSlideUpdateHandler }
     }
     const onChangeHandler = async (e) => {
         if (e.target.files.length === 1) {
+            setIsNewMedia(true)
             setValue("video_url", null)
             const Image_Url = await convertToBase64(e.target.files[0])
             let match = Image_Url.match(/^data:([^/]+)\/([^;]+);/) || [];
@@ -78,25 +81,26 @@ const Temp7 = ({ lessonId, toast, onAddSlide,order,update,onSlideUpdateHandler }
     }
 
     const onUpdateHandler = (data) => {
-        if(selectedFile.type==="image"){
-            updateSlide({ id: update?.id, data:{...data,image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name },video_url:null} }).unwrap().then((res) => {
+        if (selectedFile.type === "image") {
+            updateSlide({ id: update?.id, data: { heading:data.heading, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name,isNewMedia } } }).unwrap().then((res) => {
                 onSlideUpdateHandler(update?.id, res.data)
                 toast.success("Slide updated")
             }).catch((err) => {
                 toast.error("Error Occured")
                 console.log("Err", err)
             })
-        }else{
-            updateSlide({ id: update?.id, data:{...data,video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url,image_url:null} }).unwrap().then((res) => {
+        } else {
+            updateSlide({ id: update?.id, data: { heading:data.heading, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name ,isNewMedia} : {youtube:data.video_url,isNewMedia} } }).unwrap().then((res) => {
                 onSlideUpdateHandler(update?.id, res.data)
                 toast.success("Slide updated")
             }).catch((err) => {
                 toast.error("Error Occured")
                 console.log("Err", err)
             })
-            
+
         }
     }
+    
 
     function renderer(no) {
         switch (no) {
@@ -122,14 +126,14 @@ const Temp7 = ({ lessonId, toast, onAddSlide,order,update,onSlideUpdateHandler }
                 break;
         }
     }
-    console.log({update})
+    
 
     return (
         <>
             <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
                 <div className="item">
                     <p>Heading</p>
-                    <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={isUpdate ? update?.data?.heading : null}  />
+                    <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={isUpdate ? update?.data?.heading : null} />
                 </div>
                 {renderer(activeTab)}
                 <div className="item tab">
@@ -141,7 +145,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide,order,update,onSlideUpdateHandler }
                 </div>
 
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>Save</h3>
+                    <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>
             </form>
             <Preview type={6} data={{ title: watch("heading"), url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null }} />

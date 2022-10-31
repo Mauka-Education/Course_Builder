@@ -9,6 +9,19 @@
   &.preview {
     height: auto;
     display: block;
+    padding: 3rem 5rem;
+
+    .nav{
+      @include center_elem;
+      padding: .8rem 1rem;
+      margin-bottom: 2rem;
+      background: black;
+      color: white;
+      width: 13rem;
+      justify-content: space-between;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   }
 
   .upper {
@@ -156,6 +169,7 @@
       }
     }
   }
+
 
   .slides {
     display: grid;

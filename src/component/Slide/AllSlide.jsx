@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Preview } from "../../shared"
 
 import { RiDeleteBinLine,RiEditCircleFill } from "react-icons/ri"
+import {IoMdArrowBack} from "react-icons/io"
 
 import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
@@ -37,7 +38,6 @@ const AllSlide = ({ id: key, type }) => {
         } else if (test && type === "test") {
             setAllSlides(test)
         }
-        
     }, [])
 
 
@@ -152,11 +152,20 @@ const AllSlide = ({ id: key, type }) => {
         dispatch(setUpdateSlide({is:true,data:item,id:item._id}))
         router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
     }
+    
+    const onBackHandler=()=>{
+        dispatch(setUpdateSlide({is:false,data:null,id:null}))
+        router.push("/addcourse")
+    }
 
     
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />
+            <motion.div className="nav" whileTap={{scale:.97}} onClick={onBackHandler}>
+                <IoMdArrowBack size={20} />
+                <p>Back to Lessons</p>
+            </motion.div>
             <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
                 <div className="left">
                     <h2 style={{ textTransform: "capitalize" }}>{type === "lesson" ? "Lesson" : "Test"}  : &nbsp;</h2>
