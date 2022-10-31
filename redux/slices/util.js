@@ -81,7 +81,17 @@ const utilSlice = createSlice({
         state.slide[index]=data
         
       }      
-    }
+    },
+    updateTestSlides:(state,action)=>{
+      const {id,data}=action.payload
+      const index=state?.test?.findIndex(obj=>obj._id===id)
+      
+      
+      if(index>=0){
+        state.test[index]=data
+        
+      }      
+    },
   },
 });
 
@@ -97,7 +107,8 @@ export const {
   setTestData,
   clearCourse,
   setUpdateSlide,
-  updateSlides
+  updateSlides,
+  updateTestSlides
   
 } = utilSlice.actions;
 

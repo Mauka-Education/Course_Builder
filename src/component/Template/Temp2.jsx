@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 
 const QullEditor = dynamic(import("react-quill"), {
@@ -14,13 +14,20 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
   const [addSlide] = useCreateSlideMutation()
   const [addTestSlide] = useCreateTestSlideMutation()
+  const [updateSlide] = useUpdateSlideMutation()
+  const [updateTestSlide]=useUpdateTestSlideMutation()
 
   const [mark, setMark] = useState(0)
 
-  const [updateSlide] = useUpdateSlideMutation()
   const isUpdate = update?.is
 
   useEffect(() => {
+
+    if(isTest && isUpdate){
+      setIdealAns(update?.data?.model_answer)
+      setSubText(update?.data?.question)
+      setMark(update?.data?.mark)
+    }
 
   }, [])
 
@@ -49,14 +56,26 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }
   }
 
-  const onUpdateHandler = () => {
-    updateSlide({ id: update?.id, data: { question: subText } }).unwrap().then((res) => {
-      onSlideUpdateHandler(update?.id, res.data)
-      toast.success("Slide updated")
-    }).catch((err) => {
-      toast.error("Error Occured")
-      console.log("Err", err)
-    })
+  const onUpdateHandler = (e) => {
+    e.preventDefault()
+    if(!isTest){
+      updateSlide({ id: update?.id, data: { question: subText } }).unwrap().then((res) => {
+        onSlideUpdateHandler(update?.id, res.data)
+        toast.success("Slide updated")
+      }).catch((err) => {
+        toast.error("Error Occured")
+        console.log("Err", err)
+      })
+    }else{
+      updateTestSlide({ id: update?.id, data: { question: subText,model_answer:idealAns,mark } }).unwrap().then((res) => {
+        onSlideUpdateHandler(update?.id, res.data)
+        toast.success("Slide updated")
+      }).catch((err) => {
+        toast.error("Error Occured")
+        console.log("Err", err)
+      })
+
+    }
   }
 
 
@@ -65,18 +84,18 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
       <form className="course__builder-temp1" onSubmit={!isUpdate ? onSubmitHandler : onUpdateHandler}>
         <div className="item quil_small">
           <p>Question/Prompt</p>
-          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={update.is ? update.data.question : null} />
+          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update.data.question : null} />
         </div>
         {
           isTest && (
             <>
               <div className="item">
                 <p>Sample Answer</p>
-                <QullEditor onChange={(data) => setIdealAns(data)} theme="snow" placeholder='Enter Ideal Answer for this Question' />
+                <QullEditor onChange={(data) => setIdealAns(data)} theme="snow" placeholder='Enter Ideal Answer for this Question' defaultValue={isUpdate ? update.data.model_answer : null}  />
               </div>
               <div className="item mark">
                 <p>Mark</p>
-                <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={1} />
+                <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={isUpdate ? update.data.mark : 1} />
               </div>
             </>
           )

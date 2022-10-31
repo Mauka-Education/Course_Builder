@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
@@ -34,6 +34,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
     const [addSlide] = useCreateSlideMutation()
     const [addTestSlide] = useCreateTestSlideMutation()
     const [updateSlide] = useUpdateMediaSlideMutation()
+    const [updateTestSlide] = useUpdateMediaTestSlideMutation()
     
     const isUpdate = update?.is
 
@@ -45,12 +46,14 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
                 setSelectedFile({ url: update?.data?.video_url, type: "video", name: "Video" })
             }
             setSubText(update?.data?.question)
+            if(isTest) setMark(update?.data?.mark)
         }
     }, [])
+
+    
+
     useEffect(() => {
         if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
-        
-        if(isUpdate) setIsNewMedia(true)
     }, [watch("video_url")])
 
 
@@ -138,7 +141,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
                 return (
                     <div className="item">
                         <span>Youtube URL</span>
-                        <input type="text" {...register("video_url", { required: true })} placeholder={"Enter Youtube Url"}  />
+                        <input type="text" {...register("video_url", { required: true,onChange:()=>{setIsNewMedia(true)} })} placeholder={"Enter Youtube Url"}  />
                     </div>
                 )
             default:
@@ -163,15 +166,35 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
                 toast.error("Error Occured")
                 console.log("Err", err)
             })
+        }
+    }
 
+    const onTestUpdateHandler = (data) => {
+        if (selectedFile.type === "image") {
+            updateTestSlide({ id: update?.id, data: { question: subText, mark, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        } else {
+            updateTestSlide({ id: update?.id, data: { question: subText,mark, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } : { youtube: data.video_url, isNewMedia } } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
         }
     }
 
     const handler=!isUpdate ? onSubmitHandler : onUpdateHandler
+    const testHandler=!isUpdate ? onTestSubmitHandler : onTestUpdateHandler
 
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={handleSubmit(isTest ?  onTestSubmitHandler :  handler)}>
+            <form className="course__builder-temp1" onSubmit={handleSubmit(isTest ?  testHandler :  handler)}>
                 <div className="item">
                     <p>Question/Prompt</p>
                     <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update.data.question : null} />
@@ -188,7 +211,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
                     isTest && (
                         <div className="item mark">
                             <p>Mark</p>
-                            <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={1} />
+                            <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={isUpdate ? update?.data?.mark : 1} />
                         </div>
 
                     )

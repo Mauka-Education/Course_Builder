@@ -7,12 +7,46 @@ import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
 import { Temp10, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setTestData } from "../../../redux/slices/util"
+import { setTestData, setUpdateSlide, updateTestSlides } from "../../../redux/slices/util"
 import { useGetTestSlideMutation } from "../../../redux/slices/slide"
+import { useRouter } from "next/router"
 
+const templateType = [
 
+    {
+        id: 0,
+        name: "Short Answer Only",
+        slideno: 1
+    },
+    {
+        id: 1,
+        name: "SCQ Only",
+        slideno: 2
+    },
+    {
+        id: 2,
+        name: "MCQ Only",
+        slideno: 3
+    },
+
+    {
+        id: 3,
+        name: "Media + Short Answer",
+        slideno: 7
+    },
+    {
+        id: 4,
+        name: "Media + SCQ",
+        slideno: 8
+    },
+    {
+        id: 5,
+        name: "Media + MCQ",
+        slideno: 9
+    }
+]
 const Test = ({ title, id, no, lessonId }) => {
-    const { course, test } = useSelector(state => state.util)
+    const { course, test,updateSlide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -20,6 +54,7 @@ const Test = ({ title, id, no, lessonId }) => {
     const [totalSlideAdded, setTotalSlideAdded] = useState([])
     const dispatch = useDispatch()
     const [getTestSlide] = useGetTestSlideMutation()
+    const router=useRouter()
 
     useEffect(() => {
         if (test) {
@@ -34,10 +69,17 @@ const Test = ({ title, id, no, lessonId }) => {
                 console.log("Error Occured", err)
             })
         }
+        if (updateSlide?.is) {
+            const temp = templateType.find((item) => item.slideno=== updateSlide.data.builderslideno)
+            setCurrentTemplate({ id: temp.id, name:temp.name })
+        }
     }, [])
+
+
+
     useEffect(() => {
 
-    }, [dispatch])
+    }, [dispatch,test])
 
     useEffect(() => {
         dispatch(setTestData(totalSlideAdded))
@@ -50,43 +92,16 @@ const Test = ({ title, id, no, lessonId }) => {
     }
 
     const onAddSlide = (data) => {
-        console.log("runn", data)
+        setCurrentTemplate({id:null,name:null})
         setTotalSlideAdded(item => [...item, { ...data }])
     }
-    const templateType = [
 
-        {
-            id: 0,
-            name: "Short Answer Only",
-            slideno: 1
-        },
-        {
-            id: 1,
-            name: "SCQ Only",
-            slideno: 2
-        },
-        {
-            id: 2,
-            name: "MCQ Only",
-            slideno: 3
-        },
+    const onSlideUpdateHandler = (id, data) => {
+        dispatch(updateTestSlides({id,data}))
+        dispatch(setUpdateSlide({id:null,is:false,data:null}))
+        router.back()
+    }
 
-        {
-            id: 3,
-            name: "Media + Short Answer",
-            slideno: 7
-        },
-        {
-            id: 4,
-            name: "Media + SCQ",
-            slideno: 8
-        },
-        {
-            id: 5,
-            name: "Media + MCQ",
-            slideno: 9
-        }
-    ]
 
     const onPrevClick = () => {
         const lastSlide = test[test.length - 1]
@@ -105,7 +120,9 @@ const Test = ({ title, id, no, lessonId }) => {
             toast,
             onAddSlide,
             order: test.length,
-            isTest: true
+            isTest: true,
+            update: updateSlide,
+            onSlideUpdateHandler
         }
 
         switch (id) {
@@ -190,9 +207,9 @@ const Test = ({ title, id, no, lessonId }) => {
                     {
                         test.length !== 0 && (
                             <Link href={`/slide?key=${lessonId}&type=test`}>
-                                <div className="all">
+                                <motion.div className="all" whileTap={{scale:.97}}>
                                     <p>All Slides</p>
-                                </div>
+                                </motion.div>
                             </Link>
                         )
                     }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 import { RiArrowUpSLine } from 'react-icons/ri'
@@ -38,6 +38,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
     const [isNewMedia, setIsNewMedia] = useState(false)
 
     const [updateSlide] = useUpdateMediaSlideMutation()
+    const [updateTestSlide] = useUpdateMediaTestSlideMutation()
 
     const isUpdate = update?.is
 
@@ -54,7 +55,6 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
     useEffect(() => {
         if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
 
-        if (isUpdate) setIsNewMedia(true)
     }, [watch("video_url")])
 
     const onSubmitHandler = (data) => {
@@ -143,7 +143,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
                 return (
                     <div className="item">
                         <span>Youtube URL</span>
-                        <input type="text" {...register("video_url", { required: true })} placeholder={"Enter Youtube Url"} />
+                        <input type="text" {...register("video_url", { required: true,onChange:()=>setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
                     </div>
                 )
             default:
@@ -187,7 +187,28 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
         }
     }
 
-    const handler = !isUpdate ? onSubmitHandler : onUpdateHandler
+    const onTestUpdateHandler = (data) => {
+        if (selectedFile.type === "image") {
+            updateTestSlide({ id: update?.id, data: { question: subText,options: option, correct_options: correctOpt.filter(item => item !== undefined) , mark, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        } else {
+            updateTestSlide({ id: update?.id, data: { question: subText,mark,options: option, correct_options: correctOpt.filter(item => item !== undefined) , video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } : { youtube: data.video_url, isNewMedia } } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        }
+    }
+
+    const handler = !isUpdate ? onSubmitHandler : !isTest ?  onUpdateHandler : onTestUpdateHandler
+
     return (
         <>
             <form className="course__builder-temp1" onSubmit={handleSubmit(handler)}>
