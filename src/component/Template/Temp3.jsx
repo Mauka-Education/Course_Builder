@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
+import { useEffect } from 'react'
 
 const QullEditor = dynamic(import("react-quill"), {
     ssr: false,
@@ -21,6 +22,14 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [mark, setMark] = useState(0)
 
     const [updateSlide] = useUpdateSlideMutation()
+    const [updateTestSlide] = useUpdateTestSlideMutation()
+
+    useEffect(() => {
+        if (isTest && isUpdate) {
+            setMark(update?.data?.mark)
+            setSubText(update?.data?.question)
+        }
+    }, [])
 
     const onSubmitHandler = (e) => {
         e.preventDefault()
@@ -58,13 +67,24 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
-        updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-            onSlideUpdateHandler(update?.id, res.data)
-            toast.success("Slide updated")
-        }).catch((err) => {
-            toast.error("Error Occured")
-            console.log("Err", err)
-        })
+
+        if (!isTest) {
+            updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        } else {
+            updateTestSlide({ id: update?.id, data: { question: subText, mark,options: option, correct_options: correctOpt.filter(item => item !== undefined)  } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        }
     }
 
     return (

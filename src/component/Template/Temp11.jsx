@@ -36,9 +36,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
 
 
   useEffect(() => {
-    if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
-
-    if (isUpdate) setIsNewMedia(true)
+    if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })    
   }, [watch("video_url")])
 
   useEffect(() => {
@@ -108,7 +106,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
         return (
           <div className="item">
             <span>Youtube URL</span>
-            <input type="text" {...register("video_url", { required: true })} placeholder={"Enter Youtube Url"} />
+            <input type="text" {...register("video_url", { required: true,onChange:()=>setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
           </div>
         )
       default:

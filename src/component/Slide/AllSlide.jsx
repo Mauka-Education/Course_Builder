@@ -148,9 +148,16 @@ const AllSlide = ({ id: key, type }) => {
         setShowSlideOpt({ id: null, show: false })
     }
     
+    console.log({Test,lesson})
     const editSlide=(item)=>{
         dispatch(setUpdateSlide({is:true,data:item,id:item._id}))
-        router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
+        if(type==="test"){
+            router.push(`/slide/test?title=${Test.heading}&key=${Test.id}`)
+
+        }else{
+            router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
+
+        }
     }
     
     const onBackHandler=()=>{

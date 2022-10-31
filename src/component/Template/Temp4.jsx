@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 
@@ -22,6 +22,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [correctOpt, setCorrectOpt] = useState([])
 
     const [updateSlide] = useUpdateSlideMutation()
+    const [updateTestSlide] = useUpdateTestSlideMutation()
 
     const onSubmitHandler = (e) => {
         e.preventDefault()
@@ -60,13 +61,23 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
-        updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-            onSlideUpdateHandler(update?.id, res.data)
-            toast.success("Slide updated")
-        }).catch((err) => {
-            toast.error("Error Occured")
-            console.log("Err", err)
-        })
+        if (!isTest) {
+            updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        } else {
+            updateTestSlide({ id: update?.id, data: { question: subText, mark, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+        }
     }
 
     return (

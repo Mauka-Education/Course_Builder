@@ -48,7 +48,7 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
     }
   }, [])
 
-  console.log({questArray})
+  
   useEffect(() => {
 
     setAnswer(questArray.map((item) => {
@@ -85,7 +85,7 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
           isTest && (
             <div className="lower__left">
               <p>Marks</p>
-              <input type="number" defaultValue={1} onChange={(e) => setMark(e.target.value)} />
+              <input type="number" defaultValue={(update?.is && isTest) ? update?.data?.mark : 1} onChange={(e) => setMark(e.target.value)}  />
             </div>
 
           )

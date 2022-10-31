@@ -56,6 +56,20 @@ export const slideApi = createApi({
         body: data,
       }),
     }),
+    updateTestSlide: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/updatetestslide/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
+    updateMediaTestSlide: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/updatemediatestslide/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
     changeSlideOrder: builder.mutation({
       query: ({ id1,id2,order }) => ({
         url: `/changeslideorder/${id1}/${id2}?order=${order}`,
@@ -93,5 +107,7 @@ export const {
   useUpdateSlideMutation,
   useChangeSlideOrderMutation,
   useChangeTestSlideOrderMutation,
-  useUpdateMediaSlideMutation
+  useUpdateMediaSlideMutation,
+  useUpdateTestSlideMutation,
+  useUpdateMediaTestSlideMutation
 } = slideApi;
