@@ -811,6 +811,20 @@ input::-webkit-inner-spin-button {
 .course__builder-slide.preview {
   height: auto;
   display: block;
+  padding: 3rem 5rem;
+}
+.course__builder-slide.preview .nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  margin-bottom: 2rem;
+  background: black;
+  color: white;
+  width: 13rem;
+  justify-content: space-between;
+  border-radius: 5px;
+  cursor: pointer;
 }
 .course__builder-slide .upper {
   width: 100%;

@@ -1,24 +1,30 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 
 
-const Temp4 = ({ lessonId, toast, onAddSlide,order }) => {
+const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler }) => {
+
+    const isUpdate=update?.is
     const [previewImg, setPreviewImg] = useState([])
 
     const [addSlide] = useCreateSlideMutation()
+    const [updateSlide]=useUpdateSlideMutation()
+
+    const [allNew, setAllNew] = useState(false)
+    
     const onSubmitHandler = (e) => {
         e.preventDefault()
 
-        if(previewImg.length===0){
+        if (previewImg.length === 0) {
             return toast.error("Please Select Image")
         }
 
-        addSlide({ id: lessonId, data:{images: previewImg,type:8,builderslideno:5,order} }).unwrap().then((res) => {
-            onAddSlide({...res.data,slideno: 5})
+        addSlide({ id: lessonId, data: { images: previewImg, type: 8, builderslideno: 5, order } }).unwrap().then((res) => {
+            onAddSlide({ ...res.data, slideno: 5 })
             toast.success("Slide Added")
         }).catch((err) => {
             toast.error("Error Occured")
@@ -26,39 +32,58 @@ const Temp4 = ({ lessonId, toast, onAddSlide,order }) => {
         })
     }
     useEffect(()=>{
+        if(isUpdate && update?.data?.images?.length!==0){
+            setPreviewImg(update.data.images)
+        }
+    },[])
+    useEffect(() => {
 
-    },[previewImg])
+    }, [previewImg])
 
-    const onChangeHandler=async (e)=>{
-        if(e.target.files.length > 1){
-            for(let i=0;i<e.target.files.length; i++){
+    const onChangeHandler = async (e) => {
+        console.log({hs:e.target.files})
+        if (e.target.files.length > 1) {
+            for (let i = 0; i < e.target.files.length; i++) {
                 console.log("runn")
-                const Image_Url=await convertToBase64(e.target.files[i])
-                setPreviewImg(item=>[...item,{url: Image_Url,type: e.target.files[i].type}])
+                const Image_Url = await convertToBase64(e.target.files[i])
+                setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[i].type,name:e.target.files[i]?.name,update: isUpdate }])
             }
-        }else if(e.target.files.length===1){
-            const Image_Url=await convertToBase64(e.target.files[0])
-            setPreviewImg(item=>[...item,{ url: Image_Url,type: e.target.files[0].type}])
+        } else if (e.target.files.length === 1) {
+            const Image_Url = await convertToBase64(e.target.files[0])
+            setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[0].type,name:e.target.files[0]?.name,update: isUpdate }])
         }
     }
-    
+
+    const onUpdateHandler = (e) => {
+        e.preventDefault()
+        updateSlide({ id: update?.id, data: { images:{ files: previewImg.filter((item)=>item?.update===true),isAllNew: allNew} } }).unwrap().then((res) => {
+            onSlideUpdateHandler(update?.id, res.data)
+            toast.success("Slide updated")
+        }).catch((err) => {
+            toast.error("Error Occured")
+            console.log("Err", err)
+        })
+    }
 
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={onSubmitHandler}>
+            <form className="course__builder-temp1" onSubmit={ !isUpdate ? onSubmitHandler : onUpdateHandler }>
                 <div className="item image">
                     <span>Media</span>
                     <div className="image__inner">
-                        <input type="file" className='upload' id='upload' accept='image/*' multiple onChange={(e)=>onChangeHandler(e)}  />
+                        <input type="file" className='upload' id='upload' accept='image/*' multiple onChange={(e) => onChangeHandler(e)} />
                         <label htmlFor="upload">Upload <RiArrowUpSLine size={25} /> </label>
-                        <motion.span whileTap={{scale:.98}} onClick={()=>setPreviewImg([])} >Clear All</motion.span>
+                        <motion.span whileTap={{ scale: .98 }} onClick={() => {
+                             setPreviewImg([])
+                             setAllNew(true)
+                        }} >Clear All</motion.span>
                     </div>
                 </div>
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>Save</h3>
+                    <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>
             </form>
-            <Preview type={5} data={{ images: previewImg}} />
+            <Preview type={5} data={{ images: previewImg }} />
         </>
     )
 }

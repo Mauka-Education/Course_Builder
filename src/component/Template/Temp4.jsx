@@ -80,7 +80,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                     <MCQ isMulti={true} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} />
                 </div>
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>Save</h3>
+                    <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>
             </form>
             <Preview type={3} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined), isTest }} />

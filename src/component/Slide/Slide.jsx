@@ -108,6 +108,7 @@ const Slide = ({ title, id, no, lessonId }) => {
         }
 
     }, [])
+    
     useEffect(() => {
     }, [dispatch, slide])
 
@@ -122,6 +123,7 @@ const Slide = ({ title, id, no, lessonId }) => {
     }
 
     const onAddSlide = (data) => {
+        setCurrentTemplate({id:null,name:null})
         setTotalSlideAdded(item => [...item, { ...data }])
     }
 
@@ -248,9 +250,9 @@ const Slide = ({ title, id, no, lessonId }) => {
                     {
                         slide.length !== 0 && (
                             <Link href={`/slide?key=${lessonId}&type=lesson`}>
-                                <div className="all" onClick={()=>setUpdateSlide({id:null,is:false,data:null})}>
+                                <motion.div className="all" onClick={()=>setUpdateSlide({id:null,is:false,data:null})} whileTap={{scale:.97}}>
                                     <p>All Slides</p>
-                                </div>
+                                </motion.div>
                             </Link>
                         )
                     }

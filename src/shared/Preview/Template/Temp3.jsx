@@ -33,10 +33,12 @@ const Temp3 = ({ data }) => {
         }
     }
     const option=data?.option?.length!==0 ? data?.option  : initialValue
+
+    const isQuestion = (data?.question!=="" || data?.question) ? true : false
     return (
         <div className="temp2">
             <div className="question">
-                <h4 dangerouslySetInnerHTML={{ __html: data?.question ?? dummyText }} />
+                <h4 dangerouslySetInnerHTML={{ __html: isQuestion ? data?.question : dummyText }} />
                 <span>(You can only choose one)</span>
             </div>
             {

@@ -61,7 +61,7 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
           <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={update.is ? update.data.subtext : null} />
         </div>
         <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-          <h3>Save</h3>
+          <h3>{isUpdate ? "Update" : "Save"}</h3>
         </motion.button>
       </form>
       <Preview type={0} data={{ title: watch("heading"), subheading: watch("subheading"), para: subText }} />
