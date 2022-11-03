@@ -6,11 +6,6 @@ import { setAdmin } from '../../../redux/slices/util'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
-const initialUser={
-  email:"admin@maukaeducation.com",
-  password:"Mauka@Education1234"
-}
-
 const Login = () => {
   const {register,handleSubmit}=useForm()
   const dispatch=useDispatch()
@@ -22,13 +17,17 @@ const Login = () => {
   
   const onSubmitHandler=async(data)=>{
     
-    if(data.email===initialUser.email && data.password===initialUser.password ){
-      dispatch(setAdmin({email:data.email,password: data.password}))
-      toast.success("Admin LoggedIn")
+    
+      axios.post(process.env.NODE_ENV==="development" ? "http://localhost:3000/api/admin/login" : "https://lms.maukaeducation.com/api/admin/login",{email: data.email,password:data.password} ).then((res)=>{
+        console.log({res})
+        toast.success("Admin LoggedIn")
+        dispatch(setAdmin({...res.data}))
+      }).catch((err)=>{
+        console.log({err})
+        toast.error("Sign in Failed")
+      })
+
       
-    }else{
-      toast.error("Wrong Email/Password")
-    }
   }
   return (
     <div className="course__builder-login" >
@@ -42,7 +41,7 @@ const Login = () => {
         </div>
         <div className="modal__item">
           <span>Password</span>
-          <input type="text" {...register("password",{required:true})}  placeholder={"Password"} />
+          <input type="password" {...register("password",{required:true})}  placeholder={"Password"} />
         </div>
 
         <motion.button type="submit" className="modal__submit" whileTap={{scale:.98}}>

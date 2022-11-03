@@ -1,16 +1,17 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const url = "http://localhost:3000/api/admin";
-const prodUrl = "https://lms.maukaeducation.com/api/admin";
+// const url = "http://localhost:3000/api/admin";
+// const prodUrl = "https://lms.maukaeducation.com/api/admin";
+const url=process.env.NODE_ENV==="development" ? "http://localhost:3000/api/admin" : "https://lms.maukaeducation.com/api/admin"
 
 export const courseApi = createApi({
   reducerPath: "course",
   baseQuery: fetchBaseQuery({
-    baseUrl: prodUrl,
+    baseUrl: url,
     prepareHeaders: (headers, { getState }) => {
       headers.set(
         "Authorization",
-        `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MzNlNmFhMTc5YjBjYWUwNjBmNzhlZjMiLCJpYXQiOjE2NjYxNzIwNzZ9.5GM6sfq5NvO384VjywFKaUTO2QpSkWwHUi3nnPk6M6c`
+        `Bearer ${getState().util.user.token}`
       );
       return headers;
     },
