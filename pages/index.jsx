@@ -7,7 +7,7 @@ const Index = () => {
   
   const {user}=useSelector(state=>state.util)
 
-  if(!user?.email || !user?.password ){
+  if(!user?.data?.email || !user?.token ){
     return <Login />
   }
   

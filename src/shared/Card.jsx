@@ -23,14 +23,22 @@ const Card = ({ title, subtitle, duration, lesson, img,id }) => {
             console.log({err})
         })
     }
+
+    function renderString(string,len=23){
+        if(string.length>=len){
+            return `${string.slice(0,len)}...`
+        }else{
+            return string
+        }
+    }
     return (
         <div className="mauka__builder-card">
             <img src={img} style={{ width: "100%", height: "200px", objectFit: "cover" }} />
             <div className="mauka__builder-card__content">
                 <div className="title">
-                    <h2>{title}</h2>
+                    <h2>{renderString(title)}</h2>
                     {/* <p>{subtitle.length>10 ? subtitle.slice(0,100) :{} }</p> */}
-                    <p>{subtitle}</p>
+                    <p>{(subtitle)}</p>
                 </div>
                 <div className="info">
                     <div className="info__time">
