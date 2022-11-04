@@ -189,6 +189,10 @@ input::-webkit-inner-spin-button {
   padding-top: 6rem;
 }
 .mauka__builder-home__title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -876,6 +880,21 @@ input::-webkit-inner-spin-button {
 .course__builder-slide__template {
   width: 100%;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+}
+.course__builder-slide__template .right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+}
+.course__builder-slide__template .left {
+  position: relative;
 }
 .course__builder-slide__template .button {
   cursor: pointer;
@@ -893,7 +912,8 @@ input::-webkit-inner-spin-button {
 }
 .course__builder-slide__template .option {
   width: 25rem;
-  height: 17rem;
+  min-height: 3rem;
+  max-height: 17rem;
   overflow-y: scroll;
   /* Track */
   /* Handle */
@@ -1063,6 +1083,23 @@ input::-webkit-inner-spin-button {
 }
 .course__builder-temp1 .item {
   margin-bottom: 1.5rem;
+}
+.course__builder-temp1 .item .logic_jump-option {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
+}
+.course__builder-temp1 .item .logic_jump-option h3 {
+  cursor: pointer;
+  padding: 0.7rem 2rem;
+  border-radius: 4px;
+  box-shadow: 0 0.125rem 0.5rem -0.25rem rgba(31, 27, 45, 0.12), 0 0.25rem 1rem rgba(31, 27, 45, 0.12) !important;
+  margin-right: 2rem;
+}
+.course__builder-temp1 .item .logic_jump-option h3.corr {
+  background: #4cb777;
+  color: white;
 }
 .course__builder-temp1 .item.mark {
   width: 5rem;

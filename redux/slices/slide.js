@@ -96,6 +96,13 @@ export const slideApi = createApi({
         method: "DELETE",
       }),
     }),
+    addSlideInLogic:builder.mutation({
+      query:({id,logicId,data})=>({
+        url:`/addslideinlogic/${id}?logic_id=${logicId}`,
+        body:data,
+        method:"POST"
+      })
+    })
   }),
 });
 
@@ -111,5 +118,6 @@ export const {
   useChangeTestSlideOrderMutation,
   useUpdateMediaSlideMutation,
   useUpdateTestSlideMutation,
-  useUpdateMediaTestSlideMutation
+  useUpdateMediaTestSlideMutation,
+  useAddSlideInLogicMutation
 } = slideApi;

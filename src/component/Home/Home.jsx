@@ -43,13 +43,15 @@ const Home = ({ data }) => {
         )
       }
       <div className={`mauka__builder-home ${initiated?.once && "pad"}`}>
-        <div className="mauka__builder-home__title">
-          {
-            !initiated?.once && (
+        {
+          !initiated?.once && (
+            <div className="mauka__builder-home__title">
+
+              <Image src={"/logo.png"} width={100} height={90} objectFit="contain" />
               <h1>Course Builder</h1>
-            )
-          }
-        </div>
+            </div>
+          )
+        }
         <div className="astrodivider"><div className="astrodividermask"></div><span><i>&#10038;</i></span></div>
         <div className="mauka__builder-home__content">
           <Link href={"/addcourse"} passHref>

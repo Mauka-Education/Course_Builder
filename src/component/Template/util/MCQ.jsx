@@ -23,8 +23,8 @@ const initialValue = [
     isCorrect: false
   },
 ]
-const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false, update }) => {
-  const [questArray, setQuestArray] = useState( !update?.is ? initialValue : [])
+const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false, update, isLogicJump }) => {
+  const [questArray, setQuestArray] = useState(!update?.is ? initialValue : [])
 
   const onChangeHandler = (id, value) => {
     setQuestArray(item => item.map(p => p.id === id ? { ...p, val: value } : p))
@@ -33,12 +33,12 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
 
   useEffect(() => {
     if (update?.is) {
-      update.data.options.forEach((item,i)=>{
-        if(isMulti){
-          const isCorrect= update.data.correct_options.find(ans=>ans.val===item.val)
-          setQuestArray(prev=>[...prev,{id:i,val: item.val,_id:item._id,isCorrect: isCorrect ? true : false}])
-        }else{
-          setQuestArray(prev=>[...prev,{id:i,val: item.val,_id:item._id,isCorrect: update.data.correct_options[0]?.val===item.val ? true :false}])
+      update.data.options.forEach((item, i) => {
+        if (isMulti) {
+          const isCorrect = update.data.correct_options.find(ans => ans.val === item.val)
+          setQuestArray(prev => [...prev, { id: i, val: item.val, _id: item._id, isCorrect: isCorrect ? true : false }])
+        } else {
+          setQuestArray(prev => [...prev, { id: i, val: item.val, _id: item._id, isCorrect: update.data.correct_options[0]?.val === item.val ? true : false }])
         }
       })
     } else {
@@ -48,7 +48,7 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
     }
   }, [])
 
-  
+
   useEffect(() => {
 
     setAnswer(questArray.map((item) => {
@@ -80,25 +80,31 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
           ))
         }
       </div>
-      <div className="lower">
-        {
-          isTest && (
-            <div className="lower__left">
-              <p>Marks</p>
-              <input type="number" defaultValue={(update?.is && isTest) ? update?.data?.mark : 1} onChange={(e) => setMark(e.target.value)}  />
-            </div>
 
-          )
-        }
-        <div className="lower__right">
-          <p>Correct Option</p>
-          <div className="lower__answer">
-            {questArray.map((item) => (
-              <h3 key={item.id} className={item.isCorrect ? "corr" : ""} onClick={() => onAnsSelectHandler(item.id, item.isCorrect ? false : true)}>Option {item.id + 1}</h3>
-            ))}
+      {
+        !isLogicJump && (
+
+          <div className="lower">
+            {
+              isTest && (
+                <div className="lower__left">
+                  <p>Marks</p>
+                  <input type="number" defaultValue={(update?.is && isTest) ? update?.data?.mark : 1} onChange={(e) => setMark(e.target.value)} />
+                </div>
+
+              )
+            }
+            <div className="lower__right">
+              <p>Correct Option</p>
+              <div className="lower__answer">
+                {questArray.map((item) => (
+                  <h3 key={item.id} className={item.isCorrect ? "corr" : ""} onClick={() => onAnsSelectHandler(item.id, item.isCorrect ? false : true)}>Option {item.id + 1}</h3>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )
+      }
     </div>
   )
 }

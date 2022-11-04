@@ -79,6 +79,18 @@
   &__template {
     width: 100%;
     position: relative;
+    @include center_elem;
+    justify-content: space-between;
+    .right{
+      @include center_elem;
+      flex-direction: column;
+      align-items: flex-end;
+      position:relative;
+    }
+    .left{
+      position: relative;
+    }
+
     .button {
       cursor: pointer;
       margin-top: 0.5rem;
@@ -94,10 +106,12 @@
     }
     .option {
       width: 25rem;
-      height: 17rem;
+      min-height: 3rem;
+      max-height: 17rem;
       overflow-y: scroll;
       @include custom__track;
     }
+
   }
   &__form {
     margin-top: 3rem;

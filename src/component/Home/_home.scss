@@ -32,6 +32,8 @@
 
   }
   &__title {
+    @include center_elem;
+    justify-content: space-between;
     font-size: 1.5rem;
     @include heading_font;
   }

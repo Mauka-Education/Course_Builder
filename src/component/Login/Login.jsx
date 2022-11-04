@@ -16,8 +16,6 @@ const Login = () => {
   },[dispatch])
   
   const onSubmitHandler=async(data)=>{
-    
-    
       axios.post(process.env.NODE_ENV==="development" ? "http://localhost:3000/api/admin/login" : "https://lms.maukaeducation.com/api/admin/login",{email: data.email,password:data.password} ).then((res)=>{
         console.log({res})
         toast.success("Admin LoggedIn")
