@@ -121,7 +121,6 @@ const AllSlide = ({ id: key, type }) => {
 
         return arr
     }
-    // const orderArr = Array.from(Array( type==="lesson" ?  slide.length : test.length).keys())
 
     const onOrderSelectHandler = ({ id, order }) => {
         if (type === "lesson") {
@@ -148,7 +147,6 @@ const AllSlide = ({ id: key, type }) => {
         setShowSlideOpt({ id: null, show: false })
     }
     
-    console.log({Test,lesson})
     const editSlide=(item)=>{
         dispatch(setUpdateSlide({is:true,data:item,id:item._id}))
         if(type==="test"){

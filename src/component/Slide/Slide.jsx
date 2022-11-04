@@ -6,9 +6,9 @@ import { useRouter } from "next/router"
 import { MdOutlineArrowBackIos } from "react-icons/md"
 import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
-import { Temp1, Temp10, Temp11, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9 } from "../Template"
+import { Temp1, Temp10, Temp11, Temp12, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setSlideData, setUpdateSlide,updateSlides } from "../../../redux/slices/util"
+import { setSlideData, setUpdateSlide, updateSlides } from "../../../redux/slices/util"
 import { useGetSlideMutation } from "../../../redux/slices/slide"
 
 const templateType = [
@@ -69,25 +69,29 @@ const templateType = [
         name: "Media + Text",
         slideno: 10
     },
-    // {
-    //     id: 11,
-    //     name: "Media + Short Answer + Text",
-    //     slideno: 0,
-    //     comp: <Temp1 />
-    // },
+    {
+        id: 11,
+        name: "Logic Jump",
+        slideno: 11,
+        comp: <Temp12 />
+    },
 ]
 
 const Slide = ({ title, id, no, lessonId }) => {
-    const { course, slide, updateSlide } = useSelector(state => state.util)
+    const { course, slide, updateSlide, logicJump } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
+
+    const [showLogicOpt, setShowLogicOpt] = useState(false)
+    const [currentLogicJump, setCurrentLogicJump] = useState({ id: null, name: null })
 
     const [totalSlideAdded, setTotalSlideAdded] = useState([])
     const dispatch = useDispatch()
     const router = useRouter()
 
     const [getSlides] = useGetSlideMutation()
+    const { isLogicJump, logicJumpId } = router.query
 
     useEffect(() => {
         if (slide) {
@@ -106,12 +110,17 @@ const Slide = ({ title, id, no, lessonId }) => {
             const name = templateType.find((item) => item.id === updateSlide.data.builderslideno).name
             setCurrentTemplate({ id: updateSlide.data.builderslideno, name })
         }
+        if (logicJump.length !== 0) {
+            setCurrentLogicJump({ id: logicJump[0]._id, name: "Logic Jump 1" })
+        }
 
     }, [])
-    
-    useEffect(() => {
-    }, [dispatch, slide])
 
+    useEffect(() => {
+        if (logicJump.length !== 0) {
+            setCurrentLogicJump({ id: logicJump[0]._id, name: "Logic Jump 1" })
+        }
+    }, [dispatch, slide, logicJump])
 
     useEffect(() => {
         dispatch(setSlideData(totalSlideAdded))
@@ -122,18 +131,17 @@ const Slide = ({ title, id, no, lessonId }) => {
         setShowTemplateOpt(false)
     }
 
-    const onAddSlide = (data) => {
-        setCurrentTemplate({id:null,name:null})
+    const onAddSlide = (data, isLogicJump = false) => {
+        setCurrentTemplate({ id: null, name: null })
         setTotalSlideAdded(item => [...item, { ...data }])
+        if (isLogicJump) router.push(`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${data?._id}`)
     }
 
     const onSlideUpdateHandler = (id, data) => {
-        dispatch(updateSlides({id,data}))
-        dispatch(setUpdateSlide({id:null,is:false,data:null}))
+        dispatch(updateSlides({ id, data }))
+        dispatch(setUpdateSlide({ id: null, is: false, data: null }))
         router.back()
     }
-
-
 
     const onPrevClick = () => {
         const lastSlide = slide[slide.length - 1]
@@ -146,6 +154,12 @@ const Slide = ({ title, id, no, lessonId }) => {
     }
 
 
+    const logicJumpArr = logicJump ? logicJump.map((item, index) => {
+        return { id: item._id, name: `Logic Jump ${index + 1}` }
+    }) : []
+
+
+
     function renderer(id) {
         const config = {
             lessonId: lessonId,
@@ -153,7 +167,8 @@ const Slide = ({ title, id, no, lessonId }) => {
             onAddSlide: onAddSlide,
             order: slide.length,
             update: updateSlide,
-            onSlideUpdateHandler
+            onSlideUpdateHandler,
+            isLogicJump: { is: isLogicJump ?? false, logicJumpId, option: logicJumpArr }
         }
 
         switch (id) {
@@ -179,6 +194,8 @@ const Slide = ({ title, id, no, lessonId }) => {
                 return <Temp10 {...config} />
             case 10:
                 return <Temp11 {...config} />
+            case 11:
+                return <Temp12 {...config} />
             default:
                 return <Temp1 {...config} />
         }
@@ -213,27 +230,60 @@ const Slide = ({ title, id, no, lessonId }) => {
                     </AnimatePresence>
                 </div>
                 <div className="course__builder-slide__template">
-
-                    <h3>Template</h3>
-                    <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
-                        <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
-                        <BsChevronDown size={20} />
+                    <div className="left">
+                        <h3>Template</h3>
+                        <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
+                            <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
+                            <BsChevronDown size={20} />
+                        </div>
+                        <AnimatePresence>
+                            {
+                                showTemplateOpt && (
+                                    <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                        {
+                                            templateType.map(item => (
+                                                <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
+                                                    <p>{item.name}</p>
+                                                </div>
+                                            ))
+                                        }
+                                    </motion.div>
+                                )
+                            }
+                        </AnimatePresence>
                     </div>
-                    <AnimatePresence>
-                        {
-                            showTemplateOpt && (
-                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                    {
+                        logicJump.length !== 0 && (
+                            <div className="right">
+                                <h3>Logic Jump</h3>
+                                <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
+                                    <h3>{currentLogicJump.name} </h3>
+                                    <BsChevronDown size={20} />
+                                </div>
+                                <AnimatePresence>
                                     {
-                                        templateType.map(item => (
-                                            <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
-                                                <p>{item.name}</p>
-                                            </div>
-                                        ))
+                                        showLogicOpt && (
+                                            <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                                {
+                                                    logicJumpArr.map(item => (
+                                                        <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?.id}`}>
+                                                            <div className="option__item" key={item.id} onClick={() => {
+                                                                setCurrentLogicJump({ id: item.id, name: item.name })
+                                                                setShowLogicOpt(false)
+                                                            }}
+                                                            >
+                                                                <p>{item.name}</p>
+                                                            </div>
+                                                        </Link>
+                                                    ))
+                                                }
+                                            </motion.div>
+                                        )
                                     }
-                                </motion.div>
-                            )
-                        }
-                    </AnimatePresence>
+                                </AnimatePresence>
+                            </div>
+                        )
+                    }
                 </div>
                 {
                     currentTemplate.name && (
@@ -244,13 +294,13 @@ const Slide = ({ title, id, no, lessonId }) => {
                 }
             </div>
 
-            
+
             <div className="course__builder-slide__navigation">
                 <div className="main__btn">
                     {
                         slide.length !== 0 && (
                             <Link href={`/slide?key=${lessonId}&type=lesson`}>
-                                <motion.div className="all" onClick={()=>setUpdateSlide({id:null,is:false,data:null})} whileTap={{scale:.97}}>
+                                <motion.div className="all" onClick={() => setUpdateSlide({ id: null, is: false, data: null })} whileTap={{ scale: .97 }}>
                                     <p>All Slides</p>
                                 </motion.div>
                             </Link>
