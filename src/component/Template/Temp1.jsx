@@ -32,9 +32,9 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
       return toast.error("Please Add Paragraph")
     }
 
-    
-    if (isLogicJump.is==="true") {
-      addSlideInLogic({ id: isLogicJump.logicJumpId,logicId: logicJumpId, data: { ...data, subtext: subText, type: 0, builderslideno: 0, order } }).unwrap().then((res) => {
+
+    if (isLogicJump.is === "true") {
+      addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, type: 0, builderslideno: 0, order } }).unwrap().then((res) => {
         toast.success("Slide Added")
       }).catch((err) => {
         toast.error("Error Occured")
@@ -63,7 +63,7 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
   }
 
   const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
-  console.log({isLogicJumpArr})
+  console.log({ isLogicJumpArr })
 
   return (
     <>
@@ -81,14 +81,18 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
           <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={update.is ? update.data.subtext : null} />
         </div>
 
-        <div className="item logic_jump">
-          <p>Select where to add this slide in Logic Jump Option </p>
-          <div className="logic_jump-option">
-            {isLogicJumpArr?.logic_jump.map((item) => (
-              <h3 onClick={()=>setLogicJumpId(item._id )}  className={item._id===logicJumpId ? "corr" : ""} >{item.val}</h3>
-            ))}
-          </div>
-        </div>
+        {
+          isLogicJump.is && (
+            <div className="item logic_jump">
+              <p>Select where to add this slide in Logic Jump Option </p>
+              <div className="logic_jump-option">
+                {isLogicJumpArr?.logic_jump.map((item) => (
+                  <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                ))}
+              </div>
+            </div>
+          )
+        }
 
         <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
           <h3>{isUpdate ? "Update" : "Save"}</h3>

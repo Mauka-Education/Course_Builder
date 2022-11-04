@@ -266,7 +266,7 @@ const Slide = ({ title, id, no, lessonId }) => {
                                             <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                                                 {
                                                     logicJumpArr.map(item => (
-                                                        <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?.id}`}>
+                                                        <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?.id}`} key={item.id}>
                                                             <div className="option__item" key={item.id} onClick={() => {
                                                                 setCurrentLogicJump({ id: item.id, name: item.name })
                                                                 setShowLogicOpt(false)
