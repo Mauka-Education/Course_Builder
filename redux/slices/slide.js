@@ -18,6 +18,13 @@ export const slideApi = createApi({
     },
   }),
   endpoints: (builder) => ({
+    adminUpload:builder.mutation({
+      query:(file)=>({
+        url:`/upload`,
+        method:"POST",
+        body:file
+      })
+    }),
     getSlide: builder.mutation({
       query: (id) => ({
         url: `/getslide/${id}`,
@@ -119,5 +126,6 @@ export const {
   useUpdateMediaSlideMutation,
   useUpdateTestSlideMutation,
   useUpdateMediaTestSlideMutation,
-  useAddSlideInLogicMutation
+  useAddSlideInLogicMutation,
+  useAdminUploadMutation
 } = slideApi;

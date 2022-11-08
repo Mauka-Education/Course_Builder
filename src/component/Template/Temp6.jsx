@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 
 
-const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler }) => {
+const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,isLogicJump }) => {
 
     const isUpdate=update?.is
     const [previewImg, setPreviewImg] = useState([])
@@ -15,12 +16,28 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler 
     const [updateSlide]=useUpdateSlideMutation()
 
     const [allNew, setAllNew] = useState(false)
+
+    const [addSlideInLogic] = useAddSlideInLogicMutation()
+    const { logicJump } = useSelector(state => state.util)
+
+    const [logicJumpId, setLogicJumpId] = useState(null)
     
     const onSubmitHandler = (e) => {
         e.preventDefault()
 
         if (previewImg.length === 0) {
             return toast.error("Please Select Image")
+        }
+
+        if (isLogicJump.is === "true") {
+            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { images: previewImg, type: 8, builderslideno: 5, order} }).unwrap().then((res) => {
+                onAddSlide({ ...res.data, slideno: 1 })
+                toast.success("Slide Added")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+            return
         }
 
         addSlide({ id: lessonId, data: { images: previewImg, type: 8, builderslideno: 5, order } }).unwrap().then((res) => {
@@ -65,6 +82,8 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler 
         })
     }
 
+    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+
     return (
         <>
             <form className="course__builder-temp1" onSubmit={ !isUpdate ? onSubmitHandler : onUpdateHandler }>
@@ -79,6 +98,18 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler 
                         }} >Clear All</motion.span>
                     </div>
                 </div>
+                {
+                    isLogicJump.is && (
+                        <div className="item logic_jump">
+                            <p>Select where to add this slide in Logic Jump Option </p>
+                            <div className="logic_jump-option">
+                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
                     <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>

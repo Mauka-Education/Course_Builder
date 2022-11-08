@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation,useAddSlideInLogicMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
+import { useSelector } from 'react-redux'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 import dynamic from 'next/dynamic'
 
@@ -22,7 +23,7 @@ const tabItem = [
     },
 ]
 
-const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onSlideUpdateHandler }) => {
+const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onSlideUpdateHandler,isLogicJump }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     
     const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
@@ -37,6 +38,11 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
     const [updateTestSlide] = useUpdateMediaTestSlideMutation()
     
     const isUpdate = update?.is
+
+    const [addSlideInLogic] = useAddSlideInLogicMutation()
+    const { logicJump } = useSelector(state => state.util)
+
+    const [logicJumpId, setLogicJumpId] = useState(null)
 
     useEffect(() => {
         if (isUpdate) {
@@ -66,6 +72,17 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
         }
 
         if (selectedFile.type === "image") {
+            if (isLogicJump.is === "true") {
+                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, order, builderslideno: 7, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name  }} }).unwrap().then((res) => {
+                    onAddSlide({ ...res.data, slideno: 1 })
+                    toast.success("Slide Added")
+                }).catch((err) => {
+                    toast.error("Error Occured")
+                    console.log("Err", err)
+                })
+                return
+            }
+            
             addSlide({ id: lessonId, data: { question: subText, order, builderslideno: 7, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 7 })
                 toast.success("Slide Added")
@@ -74,6 +91,18 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
                 console.log("Err", err)
             })
         } else {
+
+            if (isLogicJump.is === "true") {
+                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, order, builderslideno: 7, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
+                    onAddSlide({ ...res.data, slideno: 1 })
+                    toast.success("Slide Added")
+                }).catch((err) => {
+                    toast.error("Error Occured")
+                    console.log("Err", err)
+                })
+                return
+            }
+            
             addSlide({ id: lessonId, data: { question: subText, order, builderslideno: 7, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 7 })
                 toast.success("Slide Added")
@@ -191,6 +220,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
 
     const handler=!isUpdate ? onSubmitHandler : onUpdateHandler
     const testHandler=!isUpdate ? onTestSubmitHandler : onTestUpdateHandler
+    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
     return (
         <>
@@ -214,6 +244,18 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
                             <input type="number" onChange={(e) => setMark(e.target.value)} defaultValue={isUpdate ? update?.data?.mark : 1} />
                         </div>
 
+                    )
+                }
+                {
+                    (isLogicJump.is && !isTest) && (
+                        <div className="item logic_jump">
+                            <p>Select where to add this slide in Logic Jump Option </p>
+                            <div className="logic_jump-option">
+                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                                ))}
+                            </div>
+                        </div>
                     )
                 }
 

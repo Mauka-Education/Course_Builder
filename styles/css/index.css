@@ -64,6 +64,10 @@ input::-webkit-inner-spin-button {
   color: #0a1e32;
 }
 
+.toastContainer {
+  z-index: 10000 !important;
+}
+
 .mauka__builder-nav {
   display: flex;
   justify-content: center;

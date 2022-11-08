@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation,useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useAddSlideInLogicMutation, useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
+import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
@@ -22,7 +23,7 @@ const tabItem = [
   },
 ]
 
-const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler }) => {
+const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
   const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
   const [addSlide] = useCreateSlideMutation()
 
@@ -34,9 +35,14 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
   const [isNewMedia, setIsNewMedia] = useState(false)
   const isUpdate = update.is
 
+  const [addSlideInLogic] = useAddSlideInLogicMutation()
+  const { logicJump } = useSelector(state => state.util)
+
+  const [logicJumpId, setLogicJumpId] = useState(null)
+
 
   useEffect(() => {
-    if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })    
+    if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
   }, [watch("video_url")])
 
   useEffect(() => {
@@ -60,6 +66,16 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
       return toast.error("Please Add Quetion")
     }
     if (selectedFile.type === "image") {
+      if (isLogicJump.is === "true") {
+        addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, builderslideno: 10, order, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } } }).unwrap().then((res) => {
+          onAddSlide({ ...res.data, slideno: 1 })
+          toast.success("Slide Added")
+        }).catch((err) => {
+          toast.error("Error Occured")
+          console.log("Err", err)
+        })
+        return
+      }
       addSlide({ id: lessonId, data: { ...data, subtext: subText, builderslideno: 10, order, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } } }).unwrap().then((res) => {
         onAddSlide({ ...res.data, slideno: 10 })
         toast.success("Slide Added")
@@ -68,6 +84,16 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
         console.log("Err", err)
       })
     } else {
+      if (isLogicJump.is === "true") {
+        addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, builderslideno: 10, order, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
+          onAddSlide({ ...res.data, slideno: 1 })
+          toast.success("Slide Added")
+        }).catch((err) => {
+          toast.error("Error Occured")
+          console.log("Err", err)
+        })
+        return
+      }
       addSlide({ id: lessonId, data: { ...data, subtext: subText, builderslideno: 10, order, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
         onAddSlide({ ...res.data, slideno: 10 })
         toast.success("Slide Added")
@@ -106,7 +132,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
         return (
           <div className="item">
             <span>Youtube URL</span>
-            <input type="text" {...register("video_url", { required: true,onChange:()=>setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
+            <input type="text" {...register("video_url", { required: true, onChange: () => setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
           </div>
         )
       default:
@@ -116,7 +142,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
 
   const onUpdateHandler = (data) => {
     if (selectedFile.type === "image") {
-      updateSlide({ id: update?.id, data: { heading: data.heading,subheading: data?.subheading,subtext: subText, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } } }).unwrap().then((res) => {
+      updateSlide({ id: update?.id, data: { heading: data.heading, subheading: data?.subheading, subtext: subText, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } } }).unwrap().then((res) => {
         onSlideUpdateHandler(update?.id, res.data)
         toast.success("Slide updated")
       }).catch((err) => {
@@ -124,7 +150,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
         console.log("Err", err)
       })
     } else {
-      updateSlide({ id: update?.id, data: { heading: data.heading,subheading: data?.subheading,subtext: subText, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } : { youtube: data.video_url, isNewMedia } } }).unwrap().then((res) => {
+      updateSlide({ id: update?.id, data: { heading: data.heading, subheading: data?.subheading, subtext: subText, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } : { youtube: data.video_url, isNewMedia } } }).unwrap().then((res) => {
         onSlideUpdateHandler(update?.id, res.data)
         toast.success("Slide updated")
       }).catch((err) => {
@@ -134,14 +160,14 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
 
     }
   }
-
+  const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
   return (
     <>
       <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
         <div className="item">
           <p>Heading</p>
-          <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={isUpdate ? update.data.heading : null}  />
+          <input type="text" {...register("heading", { required: true })} placeholder={"Enter your Heading"} defaultValue={isUpdate ? update.data.heading : null} />
         </div>
         <div className="item">
           <p>Sub Heading</p>
@@ -149,8 +175,20 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler
         </div>
         <div className="item">
           <p>Paragraph</p>
-          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={isUpdate ? update.data.subtext : null}  />
+          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={isUpdate ? update.data.subtext : null} />
         </div>
+        {
+          isLogicJump.is && (
+            <div className="item logic_jump">
+              <p>Select where to add this slide in Logic Jump Option </p>
+              <div className="logic_jump-option">
+                {isLogicJumpArr?.logic_jump.map((item) => (
+                  <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                ))}
+              </div>
+            </div>
+          )
+        }
         {renderer(activeTab)}
         <div className="item tab">
           {
