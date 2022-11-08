@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useAddSlideInLogicMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation } from '../../../redux/slices/slide'
+import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 import { RiArrowUpSLine } from 'react-icons/ri'
@@ -22,7 +23,7 @@ const tabItem = [
     },
 ]
 
-const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpdateHandler }) => {
+const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpdateHandler, isLogicJump }) => {
 
     const [subText, setSubText] = useState(null)
     const [addSlide] = useCreateSlideMutation()
@@ -42,6 +43,11 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
 
     const isUpdate = update?.is
 
+    const [addSlideInLogic] = useAddSlideInLogicMutation()
+    const { logicJump } = useSelector(state => state.util)
+
+    const [logicJumpId, setLogicJumpId] = useState(null)
+
     useEffect(() => {
         if (isUpdate) {
             if (update?.data?.image_url) {
@@ -54,7 +60,6 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
     }, [])
     useEffect(() => {
         if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
-
     }, [watch("video_url")])
 
     const onSubmitHandler = (data) => {
@@ -75,6 +80,16 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
 
         if (!isTest) {
             if (selectedFile.type === "image") {
+                if (isLogicJump.is === "true") {
+                    addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, builderslideno: 8, order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
+                        onAddSlide({ ...res.data, slideno: 1 })
+                        toast.success("Slide Added")
+                    }).catch((err) => {
+                        toast.error("Error Occured")
+                        console.log("Err", err)
+                    })
+                    return
+                }
                 addSlide({ id: lessonId, data: { question: subText, builderslideno: 8, order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 8 })
                     toast.success("Slide Added")
@@ -83,6 +98,16 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
                     console.log("Err", err)
                 })
             } else {
+                if (isLogicJump.is === "true") {
+                    addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, builderslideno: 8, order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
+                        onAddSlide({ ...res.data, slideno: 1 })
+                        toast.success("Slide Added")
+                    }).catch((err) => {
+                        toast.error("Error Occured")
+                        console.log("Err", err)
+                    })
+                    return
+                }
                 addSlide({ id: lessonId, data: { question: subText, builderslideno: 8, order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 8 })
                     toast.success("Slide Added")
@@ -143,7 +168,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
                 return (
                     <div className="item">
                         <span>Youtube URL</span>
-                        <input type="text" {...register("video_url", { required: true,onChange:()=>setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
+                        <input type="text" {...register("video_url", { required: true, onChange: () => setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
                     </div>
                 )
             default:
@@ -189,7 +214,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
 
     const onTestUpdateHandler = (data) => {
         if (selectedFile.type === "image") {
-            updateTestSlide({ id: update?.id, data: { question: subText,options: option, correct_options: correctOpt.filter(item => item !== undefined) , mark, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } } }).unwrap().then((res) => {
+            updateTestSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined), mark, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } } }).unwrap().then((res) => {
                 onSlideUpdateHandler(update?.id, res.data)
                 toast.success("Slide updated")
             }).catch((err) => {
@@ -197,7 +222,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
                 console.log("Err", err)
             })
         } else {
-            updateTestSlide({ id: update?.id, data: { question: subText,mark,options: option, correct_options: correctOpt.filter(item => item !== undefined) , video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } : { youtube: data.video_url, isNewMedia } } }).unwrap().then((res) => {
+            updateTestSlide({ id: update?.id, data: { question: subText, mark, options: option, correct_options: correctOpt.filter(item => item !== undefined), video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name, isNewMedia } : { youtube: data.video_url, isNewMedia } } }).unwrap().then((res) => {
                 onSlideUpdateHandler(update?.id, res.data)
                 toast.success("Slide updated")
             }).catch((err) => {
@@ -207,7 +232,8 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
         }
     }
 
-    const handler = !isUpdate ? onSubmitHandler : !isTest ?  onUpdateHandler : onTestUpdateHandler
+    const handler = !isUpdate ? onSubmitHandler : !isTest ? onUpdateHandler : onTestUpdateHandler
+    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
     return (
         <>
@@ -219,6 +245,18 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
                 <div className="item">
                     <MCQ isMulti={false} setQuestion={setOption} setAnswer={setCorrectOpt} isTest={isTest} setMark={setMark} update={update} />
                 </div>
+                {
+                    isLogicJump.is && (
+                        <div className="item logic_jump">
+                            <p>Select where to add this slide in Logic Jump Option </p>
+                            <div className="logic_jump-option">
+                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
                 {renderer(activeTab)}
                 <div className="item tab">
                     {

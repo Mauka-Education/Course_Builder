@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Preview } from '../../shared'
+import { useSelector } from 'react-redux'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation,useAddSlideInLogicMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 
@@ -9,7 +10,7 @@ const QullEditor = dynamic(import("react-quill"), {
     ssr: false,
 })
 
-const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false }) => {
+const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false,isLogicJump }) => {
 
     const isUpdate = update?.is
     const [subText, setSubText] = useState(isUpdate ? update.data.question : "")
@@ -24,6 +25,11 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [updateSlide] = useUpdateSlideMutation()
     const [updateTestSlide] = useUpdateTestSlideMutation()
 
+    const [addSlideInLogic] = useAddSlideInLogicMutation()
+    const { logicJump } = useSelector(state => state.util)
+
+    const [logicJumpId, setLogicJumpId] = useState(null)
+
     const onSubmitHandler = (e) => {
         e.preventDefault()
 
@@ -36,6 +42,17 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             return toast.error("Please Add All Option")
         } else if (removeUndifined?.length === 0) {
             return toast.error("Please Select Correct Option")
+        }
+
+        if (isLogicJump.is === "true") {
+            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark, builderslideno: 3, order } }).unwrap().then((res) => {
+                onAddSlide({ ...res.data, slideno: 1 })
+                toast.success("Slide Added")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+            return
         }
 
         if (!isTest) {
@@ -79,6 +96,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             })
         }
     }
+    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
     return (
         <>
@@ -90,6 +108,18 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                 <div className="item">
                     <MCQ isMulti={true} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} />
                 </div>
+                {
+                    isLogicJump.is && (
+                        <div className="item logic_jump">
+                            <p>Select where to add this slide in Logic Jump Option </p>
+                            <div className="logic_jump-option">
+                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
                     <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>

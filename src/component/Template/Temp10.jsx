@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation,useAddSlideInLogicMutation, useCreateTestSlideMutation, useUpdateMediaSlideMutation, useUpdateMediaTestSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
+import { useSelector } from 'react-redux'
 import MCQ from "./util/MCQ"
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { useForm } from 'react-hook-form'
@@ -22,7 +23,7 @@ const tabItem = [
     },
 ]
 
-const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onSlideUpdateHandler }) => {
+const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onSlideUpdateHandler, isLogicJump }) => {
 
     const [subText, setSubText] = useState(null)
     const [addSlide] = useCreateSlideMutation()
@@ -41,6 +42,11 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
     const [updateTestSlide] = useUpdateMediaTestSlideMutation()
 
     const isUpdate = update?.is
+
+    const [addSlideInLogic] = useAddSlideInLogicMutation()
+    const { logicJump } = useSelector(state => state.util)
+
+    const [logicJumpId, setLogicJumpId] = useState(null)
 
     useEffect(() => {
         if (isUpdate) {
@@ -75,6 +81,16 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
 
         if (!isTest) {
             if (selectedFile.type === "image") {
+                if (isLogicJump.is === "true") {
+                    addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, builderslideno: 9, order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox" } }).unwrap().then((res) => {
+                        onAddSlide({ ...res.data, slideno: 1 })
+                        toast.success("Slide Added")
+                    }).catch((err) => {
+                        toast.error("Error Occured")
+                        console.log("Err", err)
+                    })
+                    return
+                }
                 addSlide({ id: lessonId, data: { question: subText, builderslideno: 9, order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 9 })
                     toast.success("Slide Added")
@@ -83,6 +99,16 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
                     console.log("Err", err)
                 })
             } else {
+                if (isLogicJump.is === "true") {
+                    addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, builderslideno: 9, order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox" } }).unwrap().then((res) => {
+                        onAddSlide({ ...res.data, slideno: 1 })
+                        toast.success("Slide Added")
+                    }).catch((err) => {
+                        toast.error("Error Occured")
+                        console.log("Err", err)
+                    })
+                    return
+                }
                 addSlide({ id: lessonId, data: { question: subText, builderslideno: 9, order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "chechbox" } }).unwrap().then((res) => {
                     onAddSlide({ ...res.data, slideno: 9 })
                     toast.success("Slide Added")
@@ -210,6 +236,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
     }
 
     const handler = !isUpdate ? onSubmitHandler : !isTest ? onUpdateHandler : onTestUpdateHandler
+    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
     return (
         <>
             <form className="course__builder-temp1" onSubmit={handleSubmit(handler)}>
@@ -220,6 +247,18 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
                 <div className="item">
                     <MCQ isMulti={true} setQuestion={setOption} setAnswer={setCorrectOpt} isTest={isTest} setMark={setMark} update={update} />
                 </div>
+                {
+                    isLogicJump.is && (
+                        <div className="item logic_jump">
+                            <p>Select where to add this slide in Logic Jump Option </p>
+                            <div className="logic_jump-option">
+                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
                 {renderer(activeTab)}
                 <div className="item tab">
                     {

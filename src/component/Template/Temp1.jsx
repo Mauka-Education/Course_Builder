@@ -63,7 +63,6 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
   }
 
   const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
-  console.log({ isLogicJumpArr })
 
   return (
     <>

@@ -119,3 +119,7 @@ input::-webkit-inner-spin-button {
     background: #555;
   }
 }
+
+.toastContainer{
+  z-index: 10000 !important;
+}

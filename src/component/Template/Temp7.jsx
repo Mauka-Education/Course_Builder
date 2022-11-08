@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
+import { useSelector } from 'react-redux'
+import { useCreateSlideMutation, useUpdateMediaSlideMutation,useAddSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
@@ -17,7 +18,7 @@ const tabItem = [
     },
 ]
 
-const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler }) => {
+const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler,isLogicJump }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     const [addSlide] = useCreateSlideMutation()
     const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
@@ -27,6 +28,11 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     const [isNewMedia, setIsNewMedia] = useState(false)
     const isUpdate = update.is
+
+    const [addSlideInLogic] = useAddSlideInLogicMutation()
+    const { logicJump } = useSelector(state => state.util)
+
+    const [logicJumpId, setLogicJumpId] = useState(null)
 
 
     useEffect(() => {
@@ -49,7 +55,18 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         if (selectedFile.url.length === 0 && watch("video_url") === undefined) {
             return toast.error("Please Select Image/Video")
         }
+        
         if (selectedFile.type === "image") {
+            if (isLogicJump.is === "true") {
+                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading  } }).unwrap().then((res) => {
+                    onAddSlide({ ...res.data, slideno: 1 })
+                    toast.success("Slide Added")
+                }).catch((err) => {
+                    toast.error("Error Occured")
+                    console.log("Err", err)
+                })
+                return
+            }
             addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 6 })
                 toast.success("Slide Added")
@@ -58,6 +75,17 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                 console.log("Err", err)
             })
         } else {
+            if (isLogicJump.is === "true") {
+                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
+                    onAddSlide({ ...res.data, slideno: 1 })
+                    toast.success("Slide Added")
+                }).catch((err) => {
+                    toast.error("Error Occured")
+                    console.log("Err", err)
+                })
+                return
+            }
+            
             addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 6 })
                 toast.success("Slide Added")
@@ -126,6 +154,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         }
     }
     
+    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
     return (
         <>
@@ -142,6 +171,18 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                         ))
                     }
                 </div>
+                {
+                    isLogicJump.is && (
+                        <div className="item logic_jump">
+                            <p>Select where to add this slide in Logic Jump Option </p>
+                            <div className="logic_jump-option">
+                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                }
 
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
                     <h3>{isUpdate ? "Update" : "Save"}</h3>

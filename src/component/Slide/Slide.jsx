@@ -73,7 +73,7 @@ const templateType = [
         id: 11,
         name: "Logic Jump",
         slideno: 11,
-        comp: <Temp12 />
+        // comp: <Temp12 />
     },
 ]
 
@@ -267,12 +267,12 @@ const Slide = ({ title, id, no, lessonId }) => {
                                                 {
                                                     logicJumpArr.map(item => (
                                                         <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?.id}`} key={item.id}>
-                                                            <div className="option__item" key={item.id} onClick={() => {
+                                                            <div className="option__item" style={{justifyContent:"space-between"}} key={item.id} onClick={() => {
                                                                 setCurrentLogicJump({ id: item.id, name: item.name })
                                                                 setShowLogicOpt(false)
-                                                            }}
-                                                            >
-                                                                <p>{item.name}</p>
+                                                            }}>
+                                                                <b>{item.name}</b>
+                                                                {/* <span>#{item.id}</span> */}
                                                             </div>
                                                         </Link>
                                                     ))
