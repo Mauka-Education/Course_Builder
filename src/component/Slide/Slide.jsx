@@ -8,7 +8,7 @@ import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
 import { Temp1, Temp10, Temp11, Temp12, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setSlideData, setUpdateSlide, updateSlides } from "../../../redux/slices/util"
+import { setLogicJump, setSlideData, setUpdateSlide, updateSlides } from "../../../redux/slices/util"
 import { useGetSlideMutation } from "../../../redux/slices/slide"
 
 const templateType = [
@@ -114,6 +114,14 @@ const Slide = ({ title, id, no, lessonId }) => {
             setCurrentLogicJump({ id: logicJump[0]._id, name: "Logic Jump 1" })
         }
 
+        const isLogicJumpSlide=slide.find((item)=>item.builderslideno===11)
+
+
+        if(isLogicJumpSlide && logicJump.length===0){
+            dispatch(setLogicJump(isLogicJumpSlide))
+        }
+        console.log({isLogicJumpSlide,logicJump,slide})
+
     }, [])
 
     useEffect(() => {
@@ -159,6 +167,7 @@ const Slide = ({ title, id, no, lessonId }) => {
     }) : []
 
 
+    
 
     function renderer(id) {
         const config = {
@@ -168,7 +177,7 @@ const Slide = ({ title, id, no, lessonId }) => {
             order: slide.length,
             update: updateSlide,
             onSlideUpdateHandler,
-            isLogicJump: { is: isLogicJump ?? false, logicJumpId, option: logicJumpArr }
+            isLogicJump: { is: isLogicJump ?? false, logicJumpId }
         }
 
         switch (id) {
@@ -268,6 +277,7 @@ const Slide = ({ title, id, no, lessonId }) => {
                                                     logicJumpArr.map(item => (
                                                         <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?.id}`} key={item.id}>
                                                             <div className="option__item" style={{justifyContent:"space-between"}} key={item.id} onClick={() => {
+                                                            {console.log({item})}
                                                                 setCurrentLogicJump({ id: item.id, name: item.name })
                                                                 setShowLogicOpt(false)
                                                             }}>

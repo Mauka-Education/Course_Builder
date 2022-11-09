@@ -1,30 +1,30 @@
 import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation,useAddSlideInLogicMutation ,useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 import { useEffect } from 'react'
-import { setLogicJump } from '../../../redux/slices/util'
+import { setLogicJump,updateLogicJump } from '../../../redux/slices/util'
 import { useDispatch, useSelector } from 'react-redux'
 
 const QullEditor = dynamic(import("react-quill"), {
     ssr: false,
 })
 
-const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false,isLogicJump }) => {
+const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false, isLogicJump }) => {
 
     const isUpdate = update?.is
     const [subText, setSubText] = useState(isUpdate ? update.data.question : "")
     const [addSlide] = useCreateSlideMutation()
-    const [addTestSlide] = useCreateTestSlideMutation()
+
 
     const [option, setOption] = useState([])
     const [correctOpt, setCorrectOpt] = useState([])
-    const [mark, setMark] = useState(0)
+    
 
     const [updateSlide] = useUpdateSlideMutation()
-    const [updateTestSlide] = useUpdateTestSlideMutation()
+    
     const dispatch = useDispatch()
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
@@ -33,10 +33,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     const [logicJumpId, setLogicJumpId] = useState(null)
 
     useEffect(() => {
-        if (isTest && isUpdate) {
-            setMark(update?.data?.mark)
-            setSubText(update?.data?.question)
-        }
+        
     }, [])
 
     const onSubmitHandler = (e) => {
@@ -50,8 +47,9 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
         }
 
         if (isLogicJump.is === "true") {
-            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 9, logic_jump: option, mcq_type: "radio", builderslideno: 11, order} }).unwrap().then((res) => {
-                onAddSlide({ ...res.data, slideno: 1 })
+            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 9, logic_jump: {arr:option,level:logicJump.length+1}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
+                dispatch(setLogicJump(res.data))
+                onAddSlide({ ...res.data, slideno: 11 })
                 toast.success("Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -60,7 +58,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
             return
         }
 
-        addSlide({ id: lessonId, data: { question: subText, type: 9, logic_jump: option, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then(async (res) => {
+        addSlide({ id: lessonId, data: { question: subText, type: 9, logic_jump: {arr:option,level:0}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then(async (res) => {
             dispatch(setLogicJump(res.data))
             toast.success("Slide Added")
             onAddSlide({ ...res.data, slideno: 11 }, true)
@@ -72,24 +70,15 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
+        updateSlide({ id: update?.id, data: { question: subText, logic_jump:{arr:option,level: update.data.logic_jump.level}, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
+            dispatch(updateLogicJump({id:update?.id,data:res.data}))
+            onSlideUpdateHandler(update?.id, res.data)
+            toast.success("Slide updated")
+        }).catch((err) => {
+            toast.error("Error Occured")
+            console.log("Err", err)
+        })
 
-        if (!isTest) {
-            updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-                onSlideUpdateHandler(update?.id, res.data)
-                toast.success("Slide updated")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
-        } else {
-            updateTestSlide({ id: update?.id, data: { question: subText, mark, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-                onSlideUpdateHandler(update?.id, res.data)
-                toast.success("Slide updated")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
-        }
     }
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
@@ -101,14 +90,14 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
                     <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update?.data?.question : null} />
                 </div>
                 <div className="item">
-                    <MCQ isMulti={false} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} isLogicJump={true} />
+                    <MCQ isMulti={false} setQuestion={setOption} setAnswer={setCorrectOpt} isTest={isTest} update={update} isLogicJump={true} />
                 </div>
                 {
                     isLogicJump.is && (
                         <div className="item logic_jump">
                             <p>Select where to add this slide in Logic Jump Option </p>
                             <div className="logic_jump-option">
-                                {isLogicJumpArr?.logic_jump.map((item) => (
+                                {isLogicJumpArr?.logic_jump.arr.map((item) => (
                                     <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
                                 ))}
                             </div>
@@ -119,7 +108,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
                     <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>
             </form>
-            <Preview type={2} data={{ question: subText, option: option.filter((item) => item.val !== ""), correct: correctOpt.filter((item) => item !== undefined)[0], isTest }} />
+            <Preview type={11} data={{ question: subText, option: option.filter((item) => item.val !== ""), correct: correctOpt.filter((item) => item !== undefined)[0], isTest }} />
         </>
     )
 }

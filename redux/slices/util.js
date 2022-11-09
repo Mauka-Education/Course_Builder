@@ -94,9 +94,15 @@ const utilSlice = createSlice({
         
       }      
     },
-    setLogicJump:(state,action)=>{
-      
+    setLogicJump:(state,action)=>{ 
       state.logicJump.push({...action.payload})
+    },
+    updateLogicJump:(state,action)=>{
+      const {id,data}=action.payload
+      const index=state.logicJump.findIndex(obj=>obj._id===id)
+      
+      if(index>=0) state.logicJump[index]=data
+      
     }
   },
 });
@@ -115,7 +121,8 @@ export const {
   setUpdateSlide,
   updateSlides,
   updateTestSlides,
-  setLogicJump
+  setLogicJump,
+  updateLogicJump
   
 } = utilSlice.actions;
 

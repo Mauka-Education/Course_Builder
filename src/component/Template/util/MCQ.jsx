@@ -33,14 +33,21 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
 
   useEffect(() => {
     if (update?.is) {
-      update.data.options.forEach((item, i) => {
-        if (isMulti) {
-          const isCorrect = update.data.correct_options.find(ans => ans.val === item.val)
-          setQuestArray(prev => [...prev, { id: i, val: item.val, _id: item._id, isCorrect: isCorrect ? true : false }])
-        } else {
+      if (update.data.builderslideno === 11) {
+        update.data.logic_jump.arr.forEach((item, i) => {
           setQuestArray(prev => [...prev, { id: i, val: item.val, _id: item._id, isCorrect: update.data.correct_options[0]?.val === item.val ? true : false }])
-        }
-      })
+        })
+
+      } else {
+        update.data.options.forEach((item, i) => {
+          if (isMulti) {
+            const isCorrect = update.data.correct_options.find(ans => ans.val === item.val)
+            setQuestArray(prev => [...prev, { id: i, val: item.val, _id: item._id, isCorrect: isCorrect ? true : false }])
+          } else {
+            setQuestArray(prev => [...prev, { id: i, val: item.val, _id: item._id, isCorrect: update.data.correct_options[0]?.val === item.val ? true : false }])
+          }
+        })
+      }
     } else {
       setQuestion((questArray.map((item, i) => {
         return `Option ${i + 1}`
