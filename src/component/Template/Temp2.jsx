@@ -123,7 +123,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             <div className="item logic_jump">
               <p>Select where to add this slide in Logic Jump Option </p>
               <div className="logic_jump-option">
-                {isLogicJumpArr?.logic_jump.map((item) => (
+                {isLogicJumpArr?.logic_jump.arr.map((item) => (
                   <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
                 ))}
               </div>

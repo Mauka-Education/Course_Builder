@@ -6,12 +6,12 @@ import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { Preview } from "../../shared"
 
-import { RiDeleteBinLine,RiEditCircleFill } from "react-icons/ri"
-import {IoMdArrowBack} from "react-icons/io"
+import { RiDeleteBinLine, RiEditCircleFill } from "react-icons/ri"
+import { IoMdArrowBack } from "react-icons/io"
 
 import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
-import { setSlideData, setTestData,setUpdateSlide } from "../../../redux/slices/util"
+import { setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
 
 const AllSlide = ({ id: key, type }) => {
@@ -21,14 +21,14 @@ const AllSlide = ({ id: key, type }) => {
     const { course, slide, test } = useSelector(state => state.util)
 
 
-    const router=useRouter()
+    const router = useRouter()
     const [deleteSlide] = useDeleteSlideMutation()
     const [deleteTestSlide] = useDeleteTestSlideMutation()
 
     const [changeSlideOrder] = useChangeSlideOrderMutation()
     const [changeTestSlideOrder] = useChangeTestSlideOrderMutation()
 
-    
+
 
     const dispatch = useDispatch()
 
@@ -51,7 +51,7 @@ const AllSlide = ({ id: key, type }) => {
     }, [allSlides])
 
     useEffect(() => {
-    }, [dispatch,slide])
+    }, [dispatch, slide])
 
 
     const lesson = course?.structure?.find(item => item?.isSaved === key)
@@ -86,6 +86,8 @@ const AllSlide = ({ id: key, type }) => {
                 return { question: item?.question, option: item?.options, correct: item?.correct_options, url: item?.video_url ? item?.video_url : null, image_url: item?.image_url ? item?.image_url : null, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
             case 10:
                 return { title: item?.heading, subheading: item?.subheading, para: item?.subtext, url: item?.video_url ? item?.video_url : null, image_url: item?.image_url ? item?.image_url : null, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
+            case 11:
+                return { question: item?.question, option: item?.logic_jump.arr, isTest: type === "lesson" ? false : true, slideno: item?.builderslideno }
             default:
                 return { title: item?.heading, subheading: item?.subheading, para: item?.subtext }
         }
@@ -115,7 +117,9 @@ const AllSlide = ({ id: key, type }) => {
         let arr = []
         const item = type === "lesson" ? slide : test
         for (let i = 0; i < item.length; i++) {
-            console.log({ idl: item[i] })
+            if(item[i].builderslideno===11){
+                continue
+            }
             arr.push(item[i]?.order)
         }
 
@@ -146,28 +150,28 @@ const AllSlide = ({ id: key, type }) => {
         }
         setShowSlideOpt({ id: null, show: false })
     }
-    
-    const editSlide=(item)=>{
-        dispatch(setUpdateSlide({is:true,data:item,id:item._id}))
-        if(type==="test"){
+
+    const editSlide = (item) => {
+        dispatch(setUpdateSlide({ is: true, data: item, id: item._id }))
+        if (type === "test") {
             router.push(`/slide/test?title=${Test.heading}&key=${Test.id}`)
 
-        }else{
+        } else {
             router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
 
         }
     }
-    
-    const onBackHandler=()=>{
-        dispatch(setUpdateSlide({is:false,data:null,id:null}))
+
+    const onBackHandler = () => {
+        dispatch(setUpdateSlide({ is: false, data: null, id: null }))
         router.push("/addcourse")
     }
 
-    
+
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />
-            <motion.div className="nav" whileTap={{scale:.97}} onClick={onBackHandler}>
+            <motion.div className="nav" whileTap={{ scale: .97 }} onClick={onBackHandler}>
                 <IoMdArrowBack size={20} />
                 <p>Back to Lessons</p>
             </motion.div>
@@ -177,7 +181,7 @@ const AllSlide = ({ id: key, type }) => {
                     <h2>{type === "lesson" ? lesson?.name : Test?.heading}</h2>
                 </div>
                 <BsChevronDown size={30} />
-                
+
                 <AnimatePresence>
                     {
                         showOpt && type === "lesson" ? (
@@ -218,7 +222,7 @@ const AllSlide = ({ id: key, type }) => {
                 {
                     lessonSlides?.sort((a, b) => a.order - b.order)?.map((item, id) => (
                         <div className="slides__item" key={id}>
-                            <motion.div className="update" whileTap={{scale:.97}} onClick={()=>editSlide(item)}>
+                            <motion.div className="update" whileTap={{ scale: .97 }} onClick={() => editSlide(item)}>
                                 <RiEditCircleFill size={40} cursor="pointer" />
                             </motion.div>
                             <div className="preview">
@@ -226,12 +230,19 @@ const AllSlide = ({ id: key, type }) => {
                             </div>
                             <div className="edit">
                                 <div className="edit__order">
-                                    <p>Slide no</p>
-                                    <div className="title" onClick={() => setShowSlideOpt(item => ({ id: id, show: item.id === id ? !item.show : true }))}>
-                                        <p>{item?.order} </p>
-                                        {/* <p>{id}</p> */}
-                                        <BsChevronDown size={15} />
-                                    </div>
+                                    {
+                                        !item?.logic_jump?.level ? (
+                                            <>
+                                                <p>Slide no</p>
+                                                <div className="title" onClick={() => setShowSlideOpt(item => ({ id: id, show: item.id === id ? !item.show : true }))}>
+                                                    <p>{item?.order} </p>
+                                                    {/* <p>{id}</p> */}
+                                                    <BsChevronDown size={15} />
+                                                </div>
+                                            </>
+
+                                        ) : null
+                                    }
 
                                     <AnimatePresence>
                                         {

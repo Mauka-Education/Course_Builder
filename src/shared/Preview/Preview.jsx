@@ -2,7 +2,7 @@ import React from 'react'
 import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
 
 
-import { Temp1, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9, Temp10, Temp11 } from './Template';
+import { Temp1, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9, Temp10, Temp11, Temp12 } from './Template';
 
 const Preview = ({ type, data, allSlide }) => {
     
@@ -30,12 +30,14 @@ const Preview = ({ type, data, allSlide }) => {
                 return <Temp10 data={data} />
             case 10:
                 return <Temp11 data={data} />
+            case 11:
+                return <Temp12 data={data} />
             default:
                 break;
         }
     }
 
-    const centerElem = (type === 1 || type === 7 || type === 2 || type === 3) ? true : false
+    const centerElem = (type === 1 || type === 7 || type === 2 || type === 3 || type===11 ) ? true : false
     return (
         <div className="course__builder-preview" style={{ marginTop: allSlide && 0 }}>
             {
