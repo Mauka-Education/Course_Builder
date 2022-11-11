@@ -44,7 +44,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     if(isLogicJump.is==="true"){
       addSlideInLogic({ id: isLogicJump.logicJumpId,logicId: logicJumpId, data: { question: subText, type: 5, builderslideno: 1, order } }).unwrap().then((res) => {
-        onAddSlide({ ...res.data, slideno: 1 })
+        isLogicJump.handler(res.data)
         toast.success("Slide Added")
       }).catch((err) => {
         toast.error("Error Occured")

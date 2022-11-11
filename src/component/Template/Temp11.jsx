@@ -68,7 +68,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     if (selectedFile.type === "image") {
       if (isLogicJump.is === "true") {
         addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, builderslideno: 10, order, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } } }).unwrap().then((res) => {
-          onAddSlide({ ...res.data, slideno: 1 })
+          isLogicJump.handler(res.data)
           toast.success("Slide Added")
         }).catch((err) => {
           toast.error("Error Occured")
@@ -86,7 +86,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     } else {
       if (isLogicJump.is === "true") {
         addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, builderslideno: 10, order, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url } }).unwrap().then((res) => {
-          onAddSlide({ ...res.data, slideno: 1 })
+          isLogicJump.handler(res.data)
           toast.success("Slide Added")
         }).catch((err) => {
           toast.error("Error Occured")

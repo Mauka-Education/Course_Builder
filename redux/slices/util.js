@@ -23,7 +23,15 @@ const utilSlice = createSlice({
       id:null,
       data:null
     },
-    logicJump:[]
+    logicJump:[],
+    logicJumpSlides:[],
+    updateLogicSlide:{
+      is:false,
+      id:null,
+      logic_jump_id:null,
+      arrno:null,
+      data:null
+    }
   },
   reducers: {
     setWinWidth: (state, action) => {
@@ -66,7 +74,8 @@ const utilSlice = createSlice({
         id:null,
         data:null
       },
-      state.logicJump=[]
+      state.logicJump=[],
+      state.logicJumpSlides=[]
     },
     setIsPreview: (state,action)=>{
       state.isPreview= {  ...state.isPreview,...action.payload}
@@ -78,7 +87,6 @@ const utilSlice = createSlice({
       const {id,data}=action.payload
       const index=state?.slide?.findIndex(obj=>obj._id===id)
       
-      console.log({action})
       if(index>=0){
         state.slide[index]=data
         
@@ -100,9 +108,13 @@ const utilSlice = createSlice({
     updateLogicJump:(state,action)=>{
       const {id,data}=action.payload
       const index=state.logicJump.findIndex(obj=>obj._id===id)
-      
-      if(index>=0) state.logicJump[index]=data
-      
+      if(index>=0) state.logicJump[index]=data      
+    },
+    setLogicJumpSlides:(state,action)=>{
+      state.logicJumpSlides.push({...action.payload})
+    },
+    setUpdateLogicSlide:(state,action)=>{
+      state.updateLogicSlide={...state.updateLogicSlide,...action.payload}
     }
   },
 });
@@ -122,8 +134,9 @@ export const {
   updateSlides,
   updateTestSlides,
   setLogicJump,
-  updateLogicJump
-  
+  updateLogicJump,
+  setLogicJumpSlides,
+  setUpdateLogicSlide  
 } = utilSlice.actions;
 
 export default utilSlice;

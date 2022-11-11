@@ -1032,7 +1032,12 @@ input::-webkit-inner-spin-button {
   z-index: 2;
   cursor: pointer;
 }
+.course__builder-slide .slides__item .update.logic_jump {
+  right: -2rem;
+  top: -0.5rem;
+}
 .course__builder-slide .slides__item .preview {
+  position: relative;
   width: 35rem;
   padding: 1rem;
 }
@@ -1056,6 +1061,19 @@ input::-webkit-inner-spin-button {
 }
 .course__builder-slide .slides__item .edit__order .title p {
   margin-right: 1rem;
+}
+.course__builder-slide .slides__item .edit__order .title.logic_jump {
+  padding: 1rem;
+  width: 9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #8560A8;
+  color: white;
+}
+.course__builder-slide .slides__item .edit__order .title.logic_jump p {
+  margin-right: 0;
+  margin-left: 0.5rem;
 }
 .course__builder-slide .slides__item .edit__delete {
   margin-top: 2rem;

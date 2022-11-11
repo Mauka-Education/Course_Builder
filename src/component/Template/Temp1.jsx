@@ -23,7 +23,6 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
   useEffect(() => {
 
   }, [])
-
   const isUpdate = update?.is
 
   const onSubmitHandler = (data) => {
@@ -35,6 +34,7 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     if (isLogicJump.is === "true") {
       addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, type: 0, builderslideno: 0, order } }).unwrap().then((res) => {
+        isLogicJump.handler(res.data,logicJumpId)
         toast.success("Slide Added")
       }).catch((err) => {
         toast.error("Error Occured")

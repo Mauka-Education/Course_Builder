@@ -104,10 +104,17 @@ export const slideApi = createApi({
       }),
     }),
     addSlideInLogic:builder.mutation({
-      query:({id,logicId,data})=>({
-        url:`/addslideinlogic/${id}?logic_id=${logicId}`,
+      query:({id,logicId,data,level={is:false,lesson:null}})=>({
+        url:`/addslideinlogic/${id}?logic_id=${logicId}&level=${level.is}&lesson=${level.lesson}`,
         body:data,
         method:"POST"
+      })
+    }),
+    updateSlideInLogic: builder.mutation({
+      query:({id,logic_jump_id,arrno,data})=>({
+        url:`/updatelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}`,
+        method:"PATCH",
+        body:data
       })
     })
   }),
@@ -127,5 +134,6 @@ export const {
   useUpdateTestSlideMutation,
   useUpdateMediaTestSlideMutation,
   useAddSlideInLogicMutation,
-  useAdminUploadMutation
+  useAdminUploadMutation,
+  useUpdateSlideInLogicMutation
 } = slideApi;

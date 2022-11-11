@@ -47,9 +47,10 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
         }
 
         if (isLogicJump.is === "true") {
-            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 9, logic_jump: {arr:option,level:logicJump.length+1}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
+            addSlideInLogic({ id: isLogicJump.logicJumpId,level:{is:true,lesson:lessonId}, logicId: logicJumpId, data: { question: subText, type: 9, logic_jump: {arr:option,level:logicJump.length+1}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
                 dispatch(setLogicJump(res.data))
                 onAddSlide({ ...res.data, slideno: 11 })
+                isLogicJump.handler(res.data)
                 toast.success("Slide Added")
             }).catch((err) => {
                 toast.error("Error Occured")
@@ -58,7 +59,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
             return
         }
 
-        addSlide({ id: lessonId, data: { question: subText, type: 9, logic_jump: {arr:option,level:0}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then(async (res) => {
+        addSlide({ id: lessonId, data: { question: subText, type: 9, logic_jump: {arr:option,level:1}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then(async (res) => {
             dispatch(setLogicJump(res.data))
             toast.success("Slide Added")
             onAddSlide({ ...res.data, slideno: 11 }, true)
