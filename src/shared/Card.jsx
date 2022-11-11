@@ -5,35 +5,53 @@ import { useDispatch } from "react-redux"
 import { clearCourse, setCourseData, setInitiated, setIsPreview } from "../../redux/slices/util"
 import { useRouter } from "next/router"
 import { useGetCourseByIdMutation } from "../../redux/slices/course"
+import { useEffect, useState } from "react"
+import axios from "axios"
+import { getPreSignedUrl } from "../util/getPreSignedUrl"
 
-const Card = ({ title, subtitle, duration, lesson, img,id }) => {
+const Card = ({ title, subtitle, duration, lesson, img, id }) => {
     const dispatch = useDispatch()
-    const [run]=useGetCourseByIdMutation()
+    const [run] = useGetCourseByIdMutation()
 
-    const router=useRouter()
-    const onPreviewHandler=()=>{
+    const [imgUrl, setImgUrl] = useState("")
+
+    const router = useRouter()
+
+    useEffect(() => {
+        getPreSignedUrl(img).then((res)=>{
+            setImgUrl(res)
+        })
+
+        return ()=>{
+            getPreSignedUrl()
+        }
+        
+    }, [])
+    const onPreviewHandler = () => {
         dispatch(clearCourse())
-        dispatch(setIsPreview({is:true,id}))
+        dispatch(setIsPreview({ is: true, id }))
 
-        run(id).unwrap().then((res)=>{
-            dispatch(setCourseData({id:res?.data._id,name:res?.data?.name,time_to_finish:res?.data?.time_to_finish,short_desc: res?.data?.short_desc ,image_url: res?.data.img_url}))
-            dispatch(setInitiated({once:true,refactor:true}))
+        run(id).unwrap().then((res) => {
+            dispatch(setCourseData({ id: res?.data._id, name: res?.data?.name, time_to_finish: res?.data?.time_to_finish, short_desc: res?.data?.short_desc, image_url: res?.data.img_url }))
+            dispatch(setInitiated({ once: true, refactor: true }))
             router.push(`/addcourse?preview=true`)
-        }).catch((err)=>{
-            console.log({err})
+        }).catch((err) => {
+            console.log({ err })
         })
     }
 
-    function renderString(string,len=23){
-        if(string.length>=len){
-            return `${string.slice(0,len)}...`
-        }else{
+    function renderString(string, len = 23) {
+        if (string.length >= len) {
+            return `${string.slice(0, len)}...`
+        } else {
             return string
         }
     }
+
+
     return (
         <div className="mauka__builder-card">
-            <img src={img} style={{ width: "100%", height: "200px", objectFit: "cover" }} />
+            <img src={imgUrl} style={{ width: "100%", height: "200px", objectFit: "cover" }} />
             <div className="mauka__builder-card__content">
                 <div className="title">
                     <h2>{renderString(title)}</h2>

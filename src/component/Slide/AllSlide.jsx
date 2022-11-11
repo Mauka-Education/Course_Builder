@@ -13,6 +13,7 @@ import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDelete
 import { toast, ToastContainer } from "react-toast"
 import { setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
+import { FaListAlt } from "react-icons/fa"
 
 const AllSlide = ({ id: key, type }) => {
     const [showOpt, setShowOpt] = useState(false)
@@ -56,11 +57,12 @@ const AllSlide = ({ id: key, type }) => {
 
     const lesson = course?.structure?.find(item => item?.isSaved === key)
 
-    const lessonSlides = allSlides?.filter(item => item._id !== lesson?.isSaved)
+    const lessonSlides = allSlides?.filter(item => item.lesson === lesson?.isSaved)
 
     const Test = course?.test?.find((item) => item?.id === key)
     // if (!lesson) return null
 
+    console.log({ lesson, allSlides })
 
     function previewData(item, no) {
         switch (no) {
@@ -117,7 +119,7 @@ const AllSlide = ({ id: key, type }) => {
         let arr = []
         const item = type === "lesson" ? slide : test
         for (let i = 0; i < item.length; i++) {
-            if(item[i].builderslideno===11){
+            if (item[i].builderslideno === 11) {
                 continue
             }
             arr.push(item[i]?.order)
@@ -167,7 +169,10 @@ const AllSlide = ({ id: key, type }) => {
         router.push("/addcourse")
     }
 
-
+    const onAllLogicSlideShowHandler=({id,data})=>{
+        dispatch(setUpdateSlide({is:true,data,id}))
+        router.push(`/slide/logic?id=${id}`)
+    }
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -218,7 +223,6 @@ const AllSlide = ({ id: key, type }) => {
                 )
             }
             <div className="slides">
-
                 {
                     lessonSlides?.sort((a, b) => a.order - b.order)?.map((item, id) => (
                         <div className="slides__item" key={id}>
@@ -236,12 +240,18 @@ const AllSlide = ({ id: key, type }) => {
                                                 <p>Slide no</p>
                                                 <div className="title" onClick={() => setShowSlideOpt(item => ({ id: id, show: item.id === id ? !item.show : true }))}>
                                                     <p>{item?.order} </p>
-                                                    {/* <p>{id}</p> */}
                                                     <BsChevronDown size={15} />
                                                 </div>
                                             </>
 
-                                        ) : null
+                                        ) : (
+                                            <>
+                                                <motion.div className="title logic_jump" onClick={()=>onAllLogicSlideShowHandler({id:item._id,data:item,is:true})} whileTap={{scale:.98}}>
+                                                    <FaListAlt size={20} cursor="pointer" />
+                                                    <p>All Slides</p>
+                                                </motion.div>
+                                            </>
+                                        )
                                     }
 
                                     <AnimatePresence>

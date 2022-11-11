@@ -82,7 +82,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
             if (selectedFile.type === "image") {
                 if (isLogicJump.is === "true") {
                     addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, builderslideno: 8, order, type: 5, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
-                        onAddSlide({ ...res.data, slideno: 1 })
+                        isLogicJump.handler(res.data)
                         toast.success("Slide Added")
                     }).catch((err) => {
                         toast.error("Error Occured")
@@ -100,7 +100,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
             } else {
                 if (isLogicJump.is === "true") {
                     addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, builderslideno: 8, order, type: 5, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio" } }).unwrap().then((res) => {
-                        onAddSlide({ ...res.data, slideno: 1 })
+                        isLogicJump.handler(res.data)
                         toast.success("Slide Added")
                     }).catch((err) => {
                         toast.error("Error Occured")

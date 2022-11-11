@@ -199,8 +199,14 @@
         position: absolute;
         z-index: 2;
         cursor: pointer;
+
+        &.logic_jump{
+          right:-2rem;
+          top: -.5rem;
+        }
       }
       .preview {
+        position: relative;
         width: 35rem;
         padding: 1rem;
       }
@@ -220,8 +226,21 @@
             cursor: pointer;
             justify-content: space-between;
 
+            
             p {
               margin-right: 1rem;
+            }
+            
+            &.logic_jump{
+              padding: 1rem;
+              width: 9rem;
+              @include center_elem;
+              background: $safe_color;
+              color: white;
+              p {
+                margin-right: 0;
+                margin-left: .5rem;
+              }
             }
           }
 

@@ -59,7 +59,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         if (selectedFile.type === "image") {
             if (isLogicJump.is === "true") {
                 addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading  } }).unwrap().then((res) => {
-                    onAddSlide({ ...res.data, slideno: 1 })
+                    isLogicJump.handler(res.data)
                     toast.success("Slide Added")
                 }).catch((err) => {
                     toast.error("Error Occured")
@@ -77,7 +77,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         } else {
             if (isLogicJump.is === "true") {
                 addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
-                    onAddSlide({ ...res.data, slideno: 1 })
+                    isLogicJump.handler(res.data)
                     toast.success("Slide Added")
                 }).catch((err) => {
                     toast.error("Error Occured")
