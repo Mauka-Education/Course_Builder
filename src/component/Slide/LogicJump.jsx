@@ -2,11 +2,12 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { IoMdArrowBack } from 'react-icons/io'
-import { setUpdateLogicSlide, setUpdateSlide } from '../../../redux/slices/util'
+import { setUpdateSlide } from '../../../redux/slices/util'
 import { useRouter } from 'next/router'
 import { RiDeleteBinLine, RiEditCircleFill } from 'react-icons/ri'
 import { Preview } from '../../shared'
 import { BsChevronDown } from 'react-icons/bs'
+import { FaListAlt } from 'react-icons/fa'
 
 const LogicJump = ({ id }) => {
     const dispatch = useDispatch()
