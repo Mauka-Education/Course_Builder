@@ -8,7 +8,7 @@ import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
 import { Temp1, Temp10, Temp11, Temp12, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setLogicJump, setLogicJumpSlides, setSlideData, setUpdateSlide, updateSlides } from "../../../redux/slices/util"
+import { setLogicJump, setLogicJumpSlides, setSlideData, setUpdateLogicSlide, setUpdateSlide, updateSlides } from "../../../redux/slices/util"
 import { useGetSlideMutation } from "../../../redux/slices/slide"
 
 const templateType = [
@@ -78,7 +78,7 @@ const templateType = [
 ]
 
 const Slide = ({ title, id, no, lessonId }) => {
-    const { course, slide, updateSlide, logicJump, logicJumpSlides } = useSelector(state => state.util)
+    const { course, slide, updateSlide, logicJump, updateLogicSlide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -121,9 +121,13 @@ const Slide = ({ title, id, no, lessonId }) => {
         }
 
 
+        if(updateLogicSlide.is){
+            const name = templateType.find((item) => item.id === updateLogicSlide.data.builderslideno).name
+            setCurrentTemplate({ id: updateLogicSlide.data.builderslideno, name })
+        }
     }, [])
 
-    console.log({ logicJumpSlides })
+    
     useEffect(() => {
         if (logicJump.length !== 0) {
             setCurrentLogicJump({ id: logicJump[0]._id, name: "Logic Jump 1" })
@@ -166,13 +170,16 @@ const Slide = ({ title, id, no, lessonId }) => {
         return { id: item._id, name: `Logic Jump ${index + 1}` }
     }) : []
 
-    const onLogicJumpSLideAddHandler = (data) => {
-        setCurrentTemplate({ id: null, name: null })
+    const onLogicJumpSLideAddHandler = (data,update=false) => {
         dispatch(setLogicJumpSlides(data))
         setTotalSlideAdded((prev) => prev.map((obj) => obj._id === data._id ? { ...obj, ...data } : obj ))
+        if(update) {
+            router.back()
+            dispatch(setUpdateLogicSlide({is:false,data:null,logic_jump_id:null,arrno:null}))
+        }
+        
+        setCurrentTemplate({ id: null, name: null })
     }
-
-    console.log({ totalSlideAdded })
 
     function renderer(id) {
         const config = {
@@ -180,7 +187,7 @@ const Slide = ({ title, id, no, lessonId }) => {
             toast: toast,
             onAddSlide: onAddSlide,
             order: slide.length,
-            update: updateSlide,
+            update:!updateSlide.is ?  updateLogicSlide : updateSlide,
             onSlideUpdateHandler,
             isLogicJump: { is: isLogicJump ?? false, logicJumpId, handler: onLogicJumpSLideAddHandler }
         }

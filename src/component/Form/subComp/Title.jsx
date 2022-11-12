@@ -4,21 +4,14 @@ import { useFormContext } from "react-hook-form"
 import { useDispatch, useSelector } from 'react-redux'
 import { setInitiated } from '../../../../redux/slices/util'
 import { convertToBase64 } from '../../../util/ConvertImageToBase64'
-import { getPreSignedUrl } from '../../../util/getPreSignedUrl'
 
 const Title = ({ setCourseImage,isPreview,data }) => {
     const dispatch=useDispatch()
     const [inputText, setInputText] = useState("")
     const {course}=useSelector(state=>state.util)
     const { register } = useFormContext()
-    const [previewImg, setpreviewImg] = useState("")
+    const [previewImg, setpreviewImg] = useState(course?.image_url ?? "")
 
-    useEffect(()=>{
-        getPreSignedUrl(course?.img_url ?? course?.image_url).then((res)=>{
-            setpreviewImg(res)
-        })
-        
-    },[])
 
     const onChangeHandler = async (e) => {
         setInputText(e.target.files[0]?.name)

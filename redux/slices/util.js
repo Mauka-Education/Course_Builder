@@ -76,6 +76,7 @@ const utilSlice = createSlice({
       },
       state.logicJump=[],
       state.logicJumpSlides=[]
+      state.updateLogicSlide
     },
     setIsPreview: (state,action)=>{
       state.isPreview= {  ...state.isPreview,...action.payload}

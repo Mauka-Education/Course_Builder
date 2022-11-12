@@ -164,6 +164,7 @@ const AllSlide = ({ id: key, type }) => {
         }
     }
 
+    
     const onBackHandler = () => {
         dispatch(setUpdateSlide({ is: false, data: null, id: null }))
         router.push("/addcourse")

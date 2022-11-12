@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import { useSelector } from 'react-redux'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation,useAddSlideInLogicMutation, useUpdateSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation,useAddSlideInLogicMutation, useUpdateSlideMutation, useUpdateTestSlideMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 
@@ -26,9 +26,10 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [updateTestSlide] = useUpdateTestSlideMutation()
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump } = useSelector(state => state.util)
+    const { logicJump,updateLogicSlide } = useSelector(state => state.util)
 
     const [logicJumpId, setLogicJumpId] = useState(null)
+    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
     const onSubmitHandler = (e) => {
         e.preventDefault()
@@ -78,6 +79,18 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
+
+        if (updateLogicSlide.is) {
+            updateSlideInLogic({ id: updateLogicSlide.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+                isLogicJump.handler(res.data, true)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                console.log({ err })
+            })
+
+            return
+        }
+
         if (!isTest) {
             updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
                 onSlideUpdateHandler(update?.id, res.data)

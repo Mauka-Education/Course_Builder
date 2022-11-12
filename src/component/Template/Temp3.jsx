@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import { useSelector } from 'react-redux'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation, useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation, useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 import { useEffect } from 'react'
@@ -26,7 +26,8 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [updateTestSlide] = useUpdateTestSlideMutation()
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump } = useSelector(state => state.util)
+    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
+    const { logicJump, updateLogicSlide } = useSelector(state => state.util)
 
     const [logicJumpId, setLogicJumpId] = useState(null)
 
@@ -41,7 +42,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         e.preventDefault()
         const removeUndifined = correctOpt.filter((item) => item !== undefined)
         const isAllOption = option.filter((item) => item.val === "")
-        
+
 
         if (!subText) {
             return toast.error("Please Add Paragraph")
@@ -84,6 +85,17 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
+
+        if (updateLogicSlide.is) {
+            updateSlideInLogic({ id: updateLogicSlide.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+                isLogicJump.handler(res.data, true)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                console.log({ err })
+            })
+
+            return
+        }
 
         if (!isTest) {
             updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
