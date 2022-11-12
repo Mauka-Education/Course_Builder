@@ -32,7 +32,7 @@ const Card = ({ title, subtitle, duration, lesson, img, id }) => {
         dispatch(setIsPreview({ is: true, id }))
 
         run(id).unwrap().then((res) => {
-            dispatch(setCourseData({ id: res?.data._id, name: res?.data?.name, time_to_finish: res?.data?.time_to_finish, short_desc: res?.data?.short_desc, image_url: res?.data.img_url }))
+            dispatch(setCourseData({ id: res?.data._id, name: res?.data?.name, time_to_finish: res?.data?.time_to_finish, short_desc: res?.data?.short_desc, image_url: imgUrl }))
             dispatch(setInitiated({ once: true, refactor: true }))
             router.push(`/addcourse?preview=true`)
         }).catch((err) => {

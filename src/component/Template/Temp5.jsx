@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { useForm } from "react-hook-form"
 import { useSelector } from 'react-redux'
@@ -20,7 +20,9 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [subText, setSubText] = useState(isUpdate ? update.data.question : "")
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump } = useSelector(state => state.util)
+    const { logicJump,updateLogicSlide } = useSelector(state => state.util)
+
+    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
     const [logicJumpId, setLogicJumpId] = useState(null)
 
@@ -51,6 +53,16 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }
 
     const onUpdateHandler = (data) => {
+        if (updateLogicSlide.is) {
+            updateSlideInLogic({ id: updateLogicSlide.id, data: { ...data, heading: subText }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+                isLogicJump.handler(res.data, true)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                console.log({ err })
+            })
+
+            return
+        }
 
         updateSlide({ id: update?.id, data: { ...data, heading: subText } }).unwrap().then((res) => {
             onSlideUpdateHandler(update?.id, res.data)

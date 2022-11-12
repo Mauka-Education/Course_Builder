@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation,useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useCreateTestSlideMutation, useUpdateSlideMutation, useUpdateTestSlideMutation,useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { useSelector } from 'react-redux'
 
@@ -11,7 +11,7 @@ const QullEditor = dynamic(import("react-quill"), {
 
 const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false,isLogicJump }) => {
   const [subText, setSubText] = useState(null)
-  const [idealAns, setIdealAns] = useState(null)
+  const [idealAns, setIdealAns] = useState( update?.data?.subtext ?? null)
 
   const [addSlide] = useCreateSlideMutation()
   const [addTestSlide] = useCreateTestSlideMutation()
@@ -23,9 +23,10 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
   const isUpdate = update?.is
 
   const [addSlideInLogic] = useAddSlideInLogicMutation()
-  const { logicJump } = useSelector(state => state.util)
+  const { logicJump,updateLogicSlide } = useSelector(state => state.util)
 
   const [logicJumpId, setLogicJumpId] = useState(null)
+  const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
   useEffect(() => {
     if (isTest && isUpdate) {
@@ -75,6 +76,18 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
   const onUpdateHandler = (e) => {
     e.preventDefault()
+
+    if(updateLogicSlide.is){
+      updateSlideInLogic({ id: updateLogicSlide.id, data: { question: subText }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+        isLogicJump.handler(res.data,true)
+        toast.success("Slide updated")
+      }).catch((err) => {
+        console.log({ err })
+      })
+
+      return
+    }
+
     if (!isTest) {
       updateSlide({ id: update?.id, data: { question: subText } }).unwrap().then((res) => {
         onSlideUpdateHandler(update?.id, res.data)

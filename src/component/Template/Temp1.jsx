@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
 import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -12,17 +12,20 @@ const QullEditor = dynamic(import("react-quill"), {
 
 const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
   const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
-  const [subText, setSubText] = useState(null)
+  const [subText, setSubText] = useState(update?.data?.subtext ?? null)
+  const { logicJump, updateLogicSlide } = useSelector(state => state.util)
+
+  const [logicJumpId, setLogicJumpId] = useState(null)
+
   const [addSlide] = useCreateSlideMutation()
   const [updateSlide] = useUpdateSlideMutation()
   const [addSlideInLogic] = useAddSlideInLogicMutation()
-  const { logicJump } = useSelector(state => state.util)
-
-  const [logicJumpId, setLogicJumpId] = useState(null)
+  const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
   useEffect(() => {
 
   }, [])
+
   const isUpdate = update?.is
 
   const onSubmitHandler = (data) => {
@@ -34,7 +37,7 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
     if (isLogicJump.is === "true") {
       addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, subtext: subText, type: 0, builderslideno: 0, order } }).unwrap().then((res) => {
-        isLogicJump.handler(res.data,logicJumpId)
+        isLogicJump.handler(res.data)
         toast.success("Slide Added")
       }).catch((err) => {
         toast.error("Error Occured")
@@ -53,15 +56,25 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
   }
 
   const onUpdateHandler = (data) => {
-    updateSlide({ id: update?.id, data: { ...data, subtext: subText } }).unwrap().then((res) => {
-      onSlideUpdateHandler(update?.id, res.data)
-      toast.success("Slide updated")
-    }).catch((err) => {
-      toast.error("Error Occured")
-      console.log("Err", { err })
-    })
+    if (!updateLogicSlide.is) {
+      updateSlide({ id: update?.id, data: { ...data, subtext: subText } }).unwrap().then((res) => {
+        onSlideUpdateHandler(update?.id, res.data)
+        toast.success("Slide updated")
+      }).catch((err) => {
+        toast.error("Error Occured")
+        console.log("Err", { err })
+      })
+    } else {
+      updateSlideInLogic({ id: updateLogicSlide.id, data: { ...data, subtext: subText }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+        isLogicJump.handler(res.data,true)
+        toast.success("Slide updated")
+      }).catch((err) => {
+        console.log({ err })
+      })
+    }
   }
 
+  console.log({subText})
   const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
   return (

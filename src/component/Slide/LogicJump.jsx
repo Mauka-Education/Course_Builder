@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { IoMdArrowBack } from 'react-icons/io'
-import { setUpdateSlide } from '../../../redux/slices/util'
+import { setUpdateSlide,setUpdateLogicSlide } from '../../../redux/slices/util'
 import { useRouter } from 'next/router'
 import { RiDeleteBinLine, RiEditCircleFill } from 'react-icons/ri'
 import { Preview } from '../../shared'
@@ -17,11 +17,10 @@ const LogicJump = ({ id }) => {
 
     }, [dispatch])
 
-    const { slide, logicJumpSlides } = useSelector(state => state.util)
+    const { slide,logicJumpSlides } = useSelector(state => state.util)
 
-    // const isSlideExist = logicJumpSlides.filter((obj) => obj.lesson === id)
-    const mainSlide=slide.find((obj)=>  obj._id===id)
-    const AllLogicJumpSlides=[ ...mainSlide.logic_jump.arr[0].next,...mainSlide.logic_jump.arr[1].next,...mainSlide.logic_jump.arr[2].next,...mainSlide.logic_jump.arr[3].next]
+    const mainSlide = slide.find((obj) => obj._id === id)
+    const AllLogicJumpSlides = [...mainSlide.logic_jump.arr[0].next, ...mainSlide.logic_jump.arr[1].next, ...mainSlide.logic_jump.arr[2].next, ...mainSlide.logic_jump.arr[3].next]
 
     const onBackHandler = () => {
         dispatch(setUpdateSlide({ is: false, data: null, id: null }))
@@ -59,15 +58,21 @@ const LogicJump = ({ id }) => {
         }
     }
 
+
     const editSlide = (item) => {
-        const MainLogicSlide=slide.find(obj=>obj._id===id)
-        // const arrNo=MainLogicSlide.logic_jump.arr.findIndex(())
-        console.log({item,MainLogicSlide})
-        // dispatch(setUpdateLogicSlide({ is: true, data: item, id: item._id}))
-        // router.push(`/slide/lesson?title=Logic Jump&key=${id}`)
+        const MainLogicSlide = slide.find(obj => obj._id === id)
+        let arrno = null
+        for (let i = 0; i < 4; i++) {
+            const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj._id === item._id)
+            arrno = i
+            if (index > -1) break
+        }
+        dispatch(setUpdateSlide({is:false,data:null,id:null}))
+        dispatch(setUpdateLogicSlide({ is: true, data: item, id,arrno,logic_jump_id:item._id}))
+        router.push(`/slide/lesson?title=${item.heading}&key=${id}`)
     }
 
-    console.log({AllLogicJumpSlides})
+
     return (
         <div className="course__builder-slide preview">
             <motion.div className="nav" whileTap={{ scale: .97 }} onClick={onBackHandler}>
@@ -79,7 +84,7 @@ const LogicJump = ({ id }) => {
                 {
                     AllLogicJumpSlides?.sort((a, b) => a.order - b.order)?.map((item, id) => (
                         <div className="slides__item" key={id}>
-                            <motion.div className="update" whileTap={{ scale: .97 }} onClick={()=>editSlide(item)} >
+                            <motion.div className="update" whileTap={{ scale: .97 }} onClick={() => editSlide(item)} >
                                 <RiEditCircleFill size={40} cursor="pointer" />
                             </motion.div>
                             <div className="preview">
