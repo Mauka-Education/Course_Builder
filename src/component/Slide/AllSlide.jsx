@@ -11,7 +11,7 @@ import { IoMdArrowBack } from "react-icons/io"
 
 import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
-import { setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
+import { deleteLogicJumpSlides, setLogicJumpSlides, setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
 import { FaListAlt } from "react-icons/fa"
 
@@ -19,7 +19,7 @@ const AllSlide = ({ id: key, type }) => {
     const [showOpt, setShowOpt] = useState(false)
     const [showSlideOpt, setShowSlideOpt] = useState({ id: null, show: false })
     const [allSlides, setAllSlides] = useState([])
-    const { course, slide, test } = useSelector(state => state.util)
+    const { course, slide, test, logicJump } = useSelector(state => state.util)
 
 
     const router = useRouter()
@@ -30,8 +30,9 @@ const AllSlide = ({ id: key, type }) => {
     const [changeTestSlideOrder] = useChangeTestSlideOrderMutation()
 
 
-
     const dispatch = useDispatch()
+
+    console.log({ key })
 
     useEffect(() => {
         if (slide && type === "lesson") {
@@ -57,12 +58,12 @@ const AllSlide = ({ id: key, type }) => {
 
     const lesson = course?.structure?.find(item => item?.isSaved === key)
 
-    const lessonSlides = allSlides?.filter(item => item.lesson === lesson?.isSaved)
 
     const Test = course?.test?.find((item) => item?.id === key)
-    // if (!lesson) return null
 
-    console.log({ lesson, allSlides })
+    const lessonSlides = allSlides?.filter(item => type === "lesson" ? item.lesson === lesson?.isSaved : item.test === Test?.id)
+
+
 
     function previewData(item, no) {
         switch (no) {
@@ -95,10 +96,13 @@ const AllSlide = ({ id: key, type }) => {
         }
     }
 
-    const deleteHandler = (id) => {
+    const deleteHandler = (id, isLogicJump) => {
 
         if (type === "lesson") {
             deleteSlide(id).unwrap().then(() => {
+                if (isLogicJump) {
+                    dispatch(deleteLogicJumpSlides({id}))
+                }
                 toast.success("Item Deleted")
                 setAllSlides(item => item.filter((item) => item?._id !== id))
             }).catch((err) => {
@@ -157,23 +161,23 @@ const AllSlide = ({ id: key, type }) => {
         dispatch(setUpdateSlide({ is: true, data: item, id: item._id }))
         if (type === "test") {
             router.push(`/slide/test?title=${Test.heading}&key=${Test.id}`)
-
         } else {
             router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
-
         }
     }
 
-    
+
     const onBackHandler = () => {
         dispatch(setUpdateSlide({ is: false, data: null, id: null }))
         router.push("/addcourse")
     }
 
-    const onAllLogicSlideShowHandler=({id,data})=>{
-        dispatch(setUpdateSlide({is:true,data,id}))
+    const onAllLogicSlideShowHandler = ({ id, data }) => {
+        dispatch(setUpdateSlide({ is: true, data, id }))
         router.push(`/slide/logic?id=${id}`)
     }
+
+    console.log({ logicJump })
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -247,7 +251,7 @@ const AllSlide = ({ id: key, type }) => {
 
                                         ) : (
                                             <>
-                                                <motion.div className="title logic_jump" onClick={()=>onAllLogicSlideShowHandler({id:item._id,data:item,is:true})} whileTap={{scale:.98}}>
+                                                <motion.div className="title logic_jump" onClick={() => onAllLogicSlideShowHandler({ id: item._id, data: item, is: true })} whileTap={{ scale: .98 }}>
                                                     <FaListAlt size={20} cursor="pointer" />
                                                     <p>All Slides</p>
                                                 </motion.div>
@@ -271,7 +275,7 @@ const AllSlide = ({ id: key, type }) => {
                                         }
                                     </AnimatePresence>
                                 </div>
-                                <motion.div className="edit__delete" onClick={() => deleteHandler(item?._id)} whileTap={{ scale: .98 }}>
+                                <motion.div className="edit__delete" onClick={() => deleteHandler(item._id, item.builderslideno === 11 ? true : false)} whileTap={{ scale: .98 }}>
                                     <RiDeleteBinLine size={25} />
                                 </motion.div>
                             </div>

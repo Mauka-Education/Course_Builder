@@ -43,7 +43,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
       return toast.error("Please Add Paragraph")
     }
 
-    if(isLogicJump.is==="true"){
+    if(isLogicJump?.is==="true"){
       addSlideInLogic({ id: isLogicJump.logicJumpId,logicId: logicJumpId, data: { question: subText, type: 5, builderslideno: 1, order } }).unwrap().then((res) => {
         isLogicJump.handler(res.data)
         toast.success("Slide Added")
@@ -108,7 +108,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }
   }
 
-  const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+  const isLogicJumpArr = !isTest && logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
   return (
     <>
@@ -132,7 +132,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
           )
         }
         {
-          isLogicJump.is && (
+          isLogicJump?.is && (
             <div className="item logic_jump">
               <p>Select where to add this slide in Logic Jump Option </p>
               <div className="logic_jump-option">

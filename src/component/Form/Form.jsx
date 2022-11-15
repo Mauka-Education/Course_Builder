@@ -7,6 +7,7 @@ import { useCreateCourseMutation, useGetLessonMutation, useUpdateCourseMutation 
 import { useSelector, useDispatch } from 'react-redux'
 import { setActiveStep, setCourseData, setInitiated, setPreRequisite } from '../../../redux/slices/util'
 import { toast, ToastContainer } from 'react-toast'
+import { uploadMediaToS3 } from '../../util/uploadMedia'
 
 
 const Form = () => {
@@ -16,7 +17,7 @@ const Form = () => {
     const [createCourseTitle] = useCreateCourseMutation()
     const [updateCourseTitle] = useUpdateCourseMutation()
     const [courseImage, setCourseImage] = useState({ url: null, type: null })
-    const { activeStep, initiated, course, isPreview } = useSelector(state => state.util)
+    const { activeStep, initiated, course, isPreview ,user} = useSelector(state => state.util)
 
     const [getLessons] = useGetLessonMutation()
 
@@ -64,7 +65,7 @@ const Form = () => {
     console.log({ course })
 
 
-    const onSubmitHandler = (data) => {
+    const onSubmitHandler = async(data) => {
         switch (activeStep) {
             case 0:
                 if (!initiated.once) {
@@ -88,7 +89,15 @@ const Form = () => {
                             toast.error("Error Occured")
                         })
                     } else {
-                        updateCourseTitle({ data: { ...data, image_url: courseImage.url, type: courseImage.type, update_img: true }, id: course?.id }).unwrap().then((res) => {
+                        let url
+                        await uploadMediaToS3(courseImage.url,user.token).then((res)=>{
+                            url=res.data.data
+                        })
+
+                        console.log({url})
+                        if(!url) toast.error("Error Occurred, While Upload Image")
+
+                        updateCourseTitle({ data: { ...data, img_url: url }, id: course?.id }).unwrap().then((res) => {
                             dispatch(setCourseData({ ...data, ...res.data }))
                             dispatch(setActiveStep(activeStep + 1))
                         }).catch((err) => {

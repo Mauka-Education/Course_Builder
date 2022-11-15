@@ -22,7 +22,8 @@ export const slideApi = createApi({
       query:(file)=>({
         url:`/upload`,
         method:"POST",
-        body:file
+        body:file,
+        
       })
     }),
     getSlide: builder.mutation({
@@ -116,6 +117,12 @@ export const slideApi = createApi({
         method:"PATCH",
         body:data
       })
+    }),
+    deleteSlideInLogic: builder.mutation({
+      query:({id,logic_jump_id,arrno})=>({
+        url:`/updatelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}`,
+        method:"DELETE",
+      })
     })
   }),
 });
@@ -135,5 +142,6 @@ export const {
   useUpdateMediaTestSlideMutation,
   useAddSlideInLogicMutation,
   useAdminUploadMutation,
-  useUpdateSlideInLogicMutation
+  useUpdateSlideInLogicMutation,
+  useDeleteSlideInLogicMutation
 } = slideApi;

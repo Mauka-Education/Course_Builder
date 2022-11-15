@@ -45,7 +45,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             return toast.error("Please Select Correct Option")
         }
 
-        if (isLogicJump.is === "true") {
+        if (isLogicJump?.is === "true") {
             addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark, builderslideno: 3, order } }).unwrap().then((res) => {
                 isLogicJump.handler(res.data)
                 toast.success("Slide Added")
@@ -109,7 +109,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             })
         }
     }
-    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+    const isLogicJumpArr = !isTest && logicJump.find((item) => item._id === isLogicJump?.logicJumpId)
 
     return (
         <>
@@ -122,7 +122,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                     <MCQ isMulti={true} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} />
                 </div>
                 {
-                    isLogicJump.is && (
+                    isLogicJump?.is && (
                         <div className="item logic_jump">
                             <p>Select where to add this slide in Logic Jump Option </p>
                             <div className="logic_jump-option">

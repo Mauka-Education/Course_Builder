@@ -1,8 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { getPreSignedUrl } from '../../../util/getPreSignedUrl'
 import ReactPlayer from 'react-player'
 import Temp4 from './Temp4'
 
 const Temp10 = ({ data }) => {
+    const [fileUrl, setFileUrl] = useState(null)
+
+    useEffect(() => {
+        if (!data?.editor) {
+            if (data.image_url) {
+                getPreSignedUrl(data?.image_url).then(res => {
+                    console.log({res})
+                    setFileUrl(res)
+                })
+            } else {
+                getPreSignedUrl(data?.url).then(res => {
+                    console.log({res})
+                    setFileUrl(res)
+                })
+            }
+        } else {
+            if (data.image_url) {
+                
+                setFileUrl(data.image_url)
+            } else {
+                
+                setFileUrl(data.url)
+            }
+        }
+    })
     return (
         <div className="temp8">
             <div className="left">
@@ -12,13 +38,13 @@ const Temp10 = ({ data }) => {
                 {
                     data?.image_url && (
                         <div className="image">
-                            <img src={data?.image_url} alt="" />
+                            <img src={fileUrl} alt="" />
                         </div>
                     )
                 }
                 {
                     (data?.url && data?.url !== "") && (
-                        <ReactPlayer url={data?.url} controls width={ data?.allSlide ?  "100%" : "27rem"} height={ !data?.allSlide && "17rem"} />
+                        <ReactPlayer url={fileUrl} controls width={ data?.allSlide ?  "100%" : "27rem"} height={ !data?.allSlide && "17rem"} />
                     )
                 }
                 {

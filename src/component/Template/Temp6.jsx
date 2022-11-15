@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
@@ -18,16 +18,20 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
     const [allNew, setAllNew] = useState(false)
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump } = useSelector(state => state.util)
+    const { logicJump,updateLogicSlide } = useSelector(state => state.util)
 
+    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
+    
     const [logicJumpId, setLogicJumpId] = useState(null)
     
-    const onSubmitHandler = (e) => {
+    const onSubmitHandler = async(e) => {
         e.preventDefault()
 
         if (previewImg.length === 0) {
             return toast.error("Please Select Image")
         }
+
+        // const {}=await 
 
         if (isLogicJump.is === "true") {
             addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { images: previewImg, type: 8, builderslideno: 5, order} }).unwrap().then((res) => {
@@ -73,6 +77,18 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
+
+        if (updateLogicSlide.is) {
+            updateSlideInLogic({ id: updateLogicSlide.id, data: { ...data, heading: subText }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+                isLogicJump.handler(res.data, true)
+                toast.success("Slide updated")
+            }).catch((err) => {
+                console.log({ err })
+            })
+
+            return
+        }
+
         updateSlide({ id: update?.id, data: { images:{ files: previewImg.filter((item)=>item?.update===true),isAllNew: allNew} } }).unwrap().then((res) => {
             onSlideUpdateHandler(update?.id, res.data)
             toast.success("Slide updated")

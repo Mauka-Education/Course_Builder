@@ -41,18 +41,19 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const onSubmitHandler = (e) => {
         e.preventDefault()
         const removeUndifined = correctOpt.filter((item) => item !== undefined)
-        const isAllOption = option.filter((item) => item.val === "")
+        const isAllOption = option.filter((item) => item.val !== "")
+        console.log({isAllOption})
 
 
         if (!subText) {
             return toast.error("Please Add Paragraph")
-        } else if (isAllOption?.length !== 0) {
+        } else if (isAllOption.length === 0) {
             return toast.error("Please Add All Option")
-        } else if (removeUndifined?.length === 0) {
+        } else if (removeUndifined.length === 0) {
             return toast.error("Please Select Correct Option")
         }
 
-        if (isLogicJump.is === "true") {
+        if (isLogicJump?.is === "true") {
             addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark, builderslideno: 2, order } }).unwrap().then((res) => {
                 isLogicJump.handler(res.data)
                 toast.success("Slide Added")
@@ -117,7 +118,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }
 
 
-    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+    const isLogicJumpArr = !isTest && logicJump.find((item) => item._id === isLogicJump.logicJumpId)
     return (
         <>
             <form className="course__builder-temp1" onSubmit={!isUpdate ? onSubmitHandler : onUpdateHandler}>
@@ -129,7 +130,7 @@ const Temp3 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                     <MCQ isMulti={false} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} />
                 </div>
                 {
-                    isLogicJump.is && (
+                    isLogicJump?.is && (
                         <div className="item logic_jump">
                             <p>Select where to add this slide in Logic Jump Option </p>
                             <div className="logic_jump-option">

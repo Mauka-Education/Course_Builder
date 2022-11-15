@@ -46,7 +46,7 @@ const templateType = [
     }
 ]
 const Test = ({ title, id, no, lessonId }) => {
-    const { course, test,updateSlide } = useSelector(state => state.util)
+    const { course, test, updateSlide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -54,7 +54,7 @@ const Test = ({ title, id, no, lessonId }) => {
     const [totalSlideAdded, setTotalSlideAdded] = useState([])
     const dispatch = useDispatch()
     const [getTestSlide] = useGetTestSlideMutation()
-    const router=useRouter()
+    const router = useRouter()
 
     useEffect(() => {
         if (test) {
@@ -70,8 +70,8 @@ const Test = ({ title, id, no, lessonId }) => {
             })
         }
         if (updateSlide?.is) {
-            const temp = templateType.find((item) => item.slideno=== updateSlide.data.builderslideno)
-            setCurrentTemplate({ id: temp.id, name:temp.name })
+            const temp = templateType.find((item) => item.slideno === updateSlide.data.builderslideno)
+            setCurrentTemplate({ id: temp.id, name: temp.name })
         }
     }, [])
 
@@ -79,26 +79,26 @@ const Test = ({ title, id, no, lessonId }) => {
 
     useEffect(() => {
 
-    }, [dispatch,test])
+    }, [dispatch, test])
 
     useEffect(() => {
         dispatch(setTestData(totalSlideAdded))
     }, [totalSlideAdded])
 
 
-    const onTempSelectHandler = (id,name) => {
+    const onTempSelectHandler = (id, name) => {
         setCurrentTemplate({ id, name })
         setShowTemplateOpt(false)
     }
 
     const onAddSlide = (data) => {
-        setCurrentTemplate({id:null,name:null})
+        setCurrentTemplate({ id: null, name: null })
         setTotalSlideAdded(item => [...item, { ...data }])
     }
 
     const onSlideUpdateHandler = (id, data) => {
-        dispatch(updateTestSlides({id,data}))
-        dispatch(setUpdateSlide({id:null,is:false,data:null}))
+        dispatch(updateTestSlides({ id, data }))
+        dispatch(setUpdateSlide({ id: null, is: false, data: null }))
         router.back()
     }
 
@@ -173,26 +173,29 @@ const Test = ({ title, id, no, lessonId }) => {
                     </AnimatePresence>
                 </div>
                 <div className="course__builder-slide__template">
-                    <h3>Template</h3>
-                    <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
-                        <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
-                        <BsChevronDown size={20} />
+                    <div className="left">
+
+                        <h3>Template</h3>
+                        <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
+                            <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
+                            <BsChevronDown size={20} />
+                        </div>
+                        <AnimatePresence>
+                            {
+                                showTemplateOpt && (
+                                    <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                        {
+                                            templateType.map(item => (
+                                                <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
+                                                    <p>{item.name}</p>
+                                                </div>
+                                            ))
+                                        }
+                                    </motion.div>
+                                )
+                            }
+                        </AnimatePresence>
                     </div>
-                    <AnimatePresence>
-                        {
-                            showTemplateOpt && (
-                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                    {
-                                        templateType.map(item => (
-                                            <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
-                                                <p>{item.name}</p>
-                                            </div>
-                                        ))
-                                    }
-                                </motion.div>
-                            )
-                        }
-                    </AnimatePresence>
                 </div>
                 {
                     currentTemplate.name && (
@@ -207,7 +210,7 @@ const Test = ({ title, id, no, lessonId }) => {
                     {
                         test.length !== 0 && (
                             <Link href={`/slide?key=${lessonId}&type=test`}>
-                                <motion.div className="all" whileTap={{scale:.97}}>
+                                <motion.div className="all" whileTap={{ scale: .97 }}>
                                     <p>All Slides</p>
                                 </motion.div>
                             </Link>

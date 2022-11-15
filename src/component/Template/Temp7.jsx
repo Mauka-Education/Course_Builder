@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Preview } from '../../shared'
 import { useSelector } from 'react-redux'
-import { useCreateSlideMutation, useUpdateMediaSlideMutation,useAddSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateMediaSlideMutation, useAddSlideInLogicMutation, useAdminUploadMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
+import { uploadMediaToS3 } from '../../util/uploadMedia'
+import { getPreSignedUrl } from '../../util/getPreSignedUrl'
 
 const tabItem = [
     {
@@ -18,10 +20,10 @@ const tabItem = [
     },
 ]
 
-const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler,isLogicJump }) => {
+const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
     const { register, handleSubmit, watch, setValue } = useForm({ mode: "onChange" })
     const [addSlide] = useCreateSlideMutation()
-    const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "" })
+    const [selectedFile, setSelectedFile] = useState({ url: "", type: "", name: "", format: "",preview:"" })
 
     const [activeTab, setActiveTab] = useState(0)
     const [updateSlide] = useUpdateMediaSlideMutation()
@@ -30,35 +32,56 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const isUpdate = update.is
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump } = useSelector(state => state.util)
+    const { logicJump, user,updateLogicSlide } = useSelector(state => state.util)
+    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
     const [logicJumpId, setLogicJumpId] = useState(null)
 
 
     useEffect(() => {
-        if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "" })
-        
+        if (selectedFile.url !== "") setSelectedFile({ url: "", type: "", name: "",preview:"" })
+
     }, [watch("video_url")])
 
     useEffect(() => {
         if (isUpdate) {
             if (update?.data?.image_url) {
-                setSelectedFile({ url: update?.data?.image_url, type: "image", name: "Image" })
+                getPreSignedUrl(update?.data?.image_url).then(res=>{
+                    setSelectedFile({ url: update?.data?.image_url, type: "image", name: "Image",preview:res })
+                })
+                
             } else {
-                setSelectedFile({ url: update?.data?.video_url, type: "video", name: "Video" })
+                
+                getPreSignedUrl(update?.data?.video_url).then(res=>{
+                    setSelectedFile({ url: update?.data?.video_url, type: "video", name: "Video",preview:res })
+                })
             }
         }
     }, [])
 
 
-    const onSubmitHandler = (data) => {
-        if (selectedFile.url.length === 0 && watch("video_url") === undefined) {
+    const onSubmitHandler = async (data) => {
+        if (!selectedFile.url && watch("video_url") === undefined) {
             return toast.error("Please Select Image/Video")
         }
+
+        let url
+
+        if (!watch("video_url")) {
+            await uploadMediaToS3(selectedFile.url, user.token).then((res) => {
+                console.log({ res })
+                url = res.data.data
+            }).catch((err) => {
+                console.log({ err })
+                toast.error("Image Not Uploaded, Try Again")
+            })
+        }
+
+        if (!url && !watch("video_url")) return
         
         if (selectedFile.type === "image") {
             if (isLogicJump.is === "true") {
-                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading  } }).unwrap().then((res) => {
+                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, image_url: url, heading: data?.heading } }).unwrap().then((res) => {
                     isLogicJump.handler(res.data)
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -67,7 +90,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                 })
                 return
             }
-            addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name }, heading: data?.heading } }).unwrap().then((res) => {
+            addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, image_url: url, heading: data?.heading } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 6 })
                 toast.success("Slide Added")
             }).catch((err) => {
@@ -76,7 +99,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             })
         } else {
             if (isLogicJump.is === "true") {
-                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
+                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { ...data, order, builderslideno: 6, type: 1, video_url: url ? url : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
                     isLogicJump.handler(res.data)
                     toast.success("Slide Added")
                 }).catch((err) => {
@@ -85,8 +108,8 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                 })
                 return
             }
-            
-            addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name } : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
+
+            addSlide({ id: lessonId, data: { ...data, order, builderslideno: 6, type: 1, video_url: url ? url : data.video_url, heading: data?.heading } }).unwrap().then((res) => {
                 onAddSlide({ ...res.data, slideno: 6 })
                 toast.success("Slide Added")
             }).catch((err) => {
@@ -103,21 +126,56 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             const Image_Url = await convertToBase64(e.target.files[0])
             let match = Image_Url.match(/^data:([^/]+)\/([^;]+);/) || [];
             let type = match[1];
-            setSelectedFile(item => ({ ...item, url: Image_Url, type, name: e.target.files[0]?.name, format: e.target.files[0]?.type }))
+            setSelectedFile(item => ({ ...item, url: e.target.files[0], type,preview: Image_Url }))
         }
     }
+    
+    
+    const onUpdateHandler = async(data) => {
+        let url
+        if (!watch("video_url") && isNewMedia) {
+            await uploadMediaToS3(selectedFile.url, user.token).then((res) => {
+                console.log({ res })
+                url = res.data.data
+            }).catch((err) => {
+                console.log({ err })
+                toast.error("Image Not Uploaded, Try Again")
+            })
+        }
+    
+        if (!url && !watch("video_url") && isNewMedia) return
 
-    const onUpdateHandler = (data) => {
+        
         if (selectedFile.type === "image") {
-            updateSlide({ id: update?.id, data: { heading:data.heading, image_url: { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name,isNewMedia } } }).unwrap().then((res) => {
-                onSlideUpdateHandler(update?.id, res.data)
+            if (updateLogicSlide.is) {
+                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { ...data, order, builderslideno: 6, type: 1, image_url: url, heading: data?.heading} }).unwrap().then((res) => {
+                    isLogicJump.handler(res.data, true)
+                    toast.success("Slide updated")
+                }).catch((err) => {
+                    console.log({ err })
+                })
+    
+                return
+            }
+            updateSlide({ id: update?.id, data: { ...data, order, builderslideno: 6, type: 1, image_url: url, heading: data?.heading,isNewMedia } }).unwrap().then((res) => {
+                onSlideUpdateHandler(update?.id, res.data)  
                 toast.success("Slide updated")
             }).catch((err) => {
                 toast.error("Error Occured")
                 console.log("Err", err)
             })
         } else {
-            updateSlide({ id: update?.id, data: { heading:data.heading, video_url: selectedFile.url !== "" ? { url: selectedFile.url, type: selectedFile.format, name: selectedFile.name ,isNewMedia} : {youtube:data.video_url,isNewMedia} } }).unwrap().then((res) => {
+            if (updateLogicSlide.is) {
+                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno ,data: { ...data, order, builderslideno: 6, type: 1, video_url: url ? url : data.video_url, heading: data?.heading} }).unwrap().then((res) => {
+                    isLogicJump.handler(res.data, true)
+                    toast.success("Slide updated")
+                }).catch((err) => {
+                    console.log({ err })
+                })
+    
+                return
+            }
+            updateSlide({ id: update?.id, data: { ...data, order, builderslideno: 6, type: 1, video_url: url ? url : data.video_url, heading: data?.heading,isNewMedia} }).unwrap().then((res) => {
                 onSlideUpdateHandler(update?.id, res.data)
                 toast.success("Slide updated")
             }).catch((err) => {
@@ -127,7 +185,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
 
         }
     }
-    
+
 
     function renderer(no) {
         switch (no) {
@@ -146,14 +204,14 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                 return (
                     <div className="item">
                         <span>Youtube URL</span>
-                        <input type="text" {...register("video_url", { required: true,onChange:()=>setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
+                        <input type="text" {...register("video_url", { required: true, onChange: () => setIsNewMedia(true) })} placeholder={"Enter Youtube Url"} />
                     </div>
                 )
             default:
                 break;
         }
     }
-    
+
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
     return (
@@ -188,7 +246,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                     <h3>{isUpdate ? "Update" : "Save"}</h3>
                 </motion.button>
             </form>
-            <Preview type={6} data={{ title: watch("heading"), url: selectedFile.type === "video" ? selectedFile.url : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.url : null }} />
+            <Preview type={6} data={{ title: watch("heading"), url: selectedFile.type === "video" ? selectedFile.preview : watch("video_url"), image_url: selectedFile.type === "image" ? selectedFile.preview : null,editor:true }} />
         </>
     )
 }
