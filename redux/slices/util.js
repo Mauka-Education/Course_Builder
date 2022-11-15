@@ -114,6 +114,9 @@ const utilSlice = createSlice({
     setLogicJumpSlides:(state,action)=>{
       state.logicJumpSlides.push({...action.payload})
     },
+    deleteLogicJumpSlides:(state,action)=>{
+      state.logicJump=state.logicJump.filter((item)=>item._id!==action.payload.id)
+    },
     setUpdateLogicSlide:(state,action)=>{
       state.updateLogicSlide={...state.updateLogicSlide,...action.payload}
     }
@@ -137,7 +140,8 @@ export const {
   setLogicJump,
   updateLogicJump,
   setLogicJumpSlides,
-  setUpdateLogicSlide  
+  setUpdateLogicSlide,
+  deleteLogicJumpSlides
 } = utilSlice.actions;
 
 export default utilSlice;

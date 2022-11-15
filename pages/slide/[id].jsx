@@ -12,7 +12,7 @@ const Slide = ({ id, title,no , lessonId }) => {
           </>
         ) : (
           <>
-            <Test title={title} id={id}  lessonId={key} />
+            <Test title={title} id={id}  lessonId={lessonId} />
           </>
         )
       }
