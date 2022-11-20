@@ -7,7 +7,7 @@ import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 
 
-const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,isLogicJump }) => {
+const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,isLogicJump }) => {
 
     const isUpdate=update?.is
     const [previewImg, setPreviewImg] = useState([])
@@ -79,7 +79,7 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
         e.preventDefault()
 
         if (updateLogicSlide.is) {
-            updateSlideInLogic({ id: updateLogicSlide.id, data: { ...data, heading: subText }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+            updateSlide({ id: updateLogicSlide.logic_jump_id, data: { ...data, heading: subText }}).unwrap().then((res) => {
                 isLogicJump.handler(res.data, true)
                 toast.success("Slide updated")
             }).catch((err) => {
@@ -135,4 +135,4 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
     )
 }
 
-export default Temp4
+export default Temp6

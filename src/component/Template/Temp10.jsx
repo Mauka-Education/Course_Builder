@@ -217,7 +217,8 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
         if (selectedFile.type === "image") {
 
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { question: subText,
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { question: subText,
+                    isNewMedia,
                     image_url: url,
                     options: option,
                     correct_options: correctOpt.filter(item => item !== undefined),} }).unwrap().then((res) => {
@@ -248,7 +249,8 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, on
         } else {
             
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { question: subText,
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { question: subText,
+                    isNewMedia,
                     video_url: url ? url : data.video_url,
                     options: option,
                     correct_options: correctOpt.filter(item => item !== undefined)} }).unwrap().then((res) => {

@@ -120,7 +120,7 @@ export const slideApi = createApi({
     }),
     deleteSlideInLogic: builder.mutation({
       query:({id,logic_jump_id,arrno})=>({
-        url:`/updatelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}`,
+        url:`/deletelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}`,
         method:"DELETE",
       })
     })

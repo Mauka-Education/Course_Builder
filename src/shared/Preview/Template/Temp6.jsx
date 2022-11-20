@@ -7,14 +7,27 @@ import "swiper/css/navigation";
 
 // import required modules
 import { Navigation, Pagination } from "swiper";
+import { useState,useEffect } from "react";
+import { getPreSignedUrl } from "../../../util/getPreSignedUrl";
 
 const Temp5 = ({ data }) => {
+  const [filesUrl, setFilesUrl] = useState([])
+
   if (!data?.images) {
-    console.log(data)
     return null
   }
-  console.log({ data })
 
+  useEffect(() => {
+    if (data?.images) {
+      data.images.forEach((item) => {
+        getPreSignedUrl(item).then(res => {
+          setFilesUrl(prev=>[...prev,res])
+        })
+      })
+    }
+  },[])
+
+  console.log({filesUrl})
   return (
     <div className="temp5">
       <div className="slider">
@@ -34,7 +47,7 @@ const Temp5 = ({ data }) => {
               </>
             )
           }
-          {data?.images?.map((item,index) => (
+          {filesUrl?.map((item, index) => (
             <SwiperSlide key={index}>
               <img src={item?.url ? item?.url : item} alt="" />
             </SwiperSlide>
