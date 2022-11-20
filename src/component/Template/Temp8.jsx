@@ -228,7 +228,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
         if (selectedFile.type === "image") {
 
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { question:subText, order, image_url: url} }).unwrap().then((res) => {
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { isNewMedia,question:subText, order, image_url: url} }).unwrap().then((res) => {
                     isLogicJump.handler(res.data, true)
                     toast.success("Slide updated")
                 }).catch((err) => {
@@ -247,7 +247,7 @@ const Temp8 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, onS
             })
         } else {
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { question:subText, order, video_url: url ? url : data.video_url} }).unwrap().then((res) => {
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { isNewMedia,question:subText, order, video_url: url ? url : data.video_url} }).unwrap().then((res) => {
                     isLogicJump.handler(res.data, true)
                     toast.success("Slide updated")
                 }).catch((err) => {

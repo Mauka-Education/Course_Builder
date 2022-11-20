@@ -178,11 +178,10 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     if (selectedFile.type === "image") {
 
       if (updateLogicSlide.is) {
-        updateSlideInLogic({
-          id: updateLogicSlide.id,
-          logic_jump_id: updateLogicSlide.logic_jump_id,
-          arrno: updateLogicSlide.arrno,
+        updateSlide({
+          id: updateLogicSlide.logic_jump_id,
           data: {
+            isNewMedia,
             heading: data.heading,
             subheading: data?.subheading,
             subtext: subText,
@@ -206,11 +205,10 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
       })
     } else {
       if (updateLogicSlide.is) {
-        updateSlideInLogic({
-          id: updateLogicSlide.id,
-          logic_jump_id: updateLogicSlide.logic_jump_id,
-          arrno: updateLogicSlide.arrno,
+        updateSlide({
+          id: updateLogicSlide.logic_jump_id,
           data: {
+            isNewMedia,
             heading: data.heading,
             subheading: data?.subheading,
             subtext: subText,

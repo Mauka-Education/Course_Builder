@@ -78,7 +78,7 @@ const Temp2 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     e.preventDefault()
 
     if(updateLogicSlide.is){
-      updateSlideInLogic({ id: updateLogicSlide.id, data: { question: subText }, logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno }).unwrap().then((res) => {
+      updateSlide({ id: updateLogicSlide.logic_jump_id, data: { question: subText } }).unwrap().then((res) => {
         isLogicJump.handler(res.data,true)
         toast.success("Slide updated")
       }).catch((err) => {

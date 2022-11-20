@@ -144,7 +144,7 @@ const Slide = ({ title, id, no, lessonId }) => {
     }
 
     const onAddSlide = (data, isLogicJump = false) => {
-        // setCurrentTemplate({ id: null, name: null })
+        setCurrentTemplate({ id: null, name: null })
         setTotalSlideAdded(item => [...item, { ...data }])
         if (isLogicJump) router.push(`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${data?._id}`)
     }

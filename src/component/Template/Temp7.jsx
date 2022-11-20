@@ -148,7 +148,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         
         if (selectedFile.type === "image") {
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { ...data, order, builderslideno: 6, type: 1, image_url: url, heading: data?.heading} }).unwrap().then((res) => {
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { ...data, order, builderslideno: 6, type: 1, image_url: url, heading: data?.heading,isNewMedia} }).unwrap().then((res) => {
                     isLogicJump.handler(res.data, true)
                     toast.success("Slide updated")
                 }).catch((err) => {
@@ -166,7 +166,7 @@ const Temp7 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             })
         } else {
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno ,data: { ...data, order, builderslideno: 6, type: 1, video_url: url ? url : data.video_url, heading: data?.heading} }).unwrap().then((res) => {
+                updateSlide({ id: updateLogicSlide.logic_jump_id,data: { ...data, order, builderslideno: 6, type: 1, video_url: url ? url : data.video_url, heading: data?.heading,isNewMedia} }).unwrap().then((res) => {
                     isLogicJump.handler(res.data, true)
                     toast.success("Slide updated")
                 }).catch((err) => {

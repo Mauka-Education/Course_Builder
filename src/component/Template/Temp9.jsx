@@ -211,7 +211,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
         
         if (selectedFile.type === "image") {
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { question: subText,options: option,correct_options: correctOpt.filter(item => item !== undefined), image_url: url} }).unwrap().then((res) => {
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { isNewMedia,question: subText,options: option,correct_options: correctOpt.filter(item => item !== undefined), image_url: url} }).unwrap().then((res) => {
                     isLogicJump.handler(res.data, true)
                     toast.success("Slide updated")
                 }).catch((err) => {
@@ -238,7 +238,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, onSlideUpda
             })
         } else {
             if (updateLogicSlide.is) {
-                updateSlideInLogic({ id: updateLogicSlide.id,logic_jump_id: updateLogicSlide.logic_jump_id, arrno: updateLogicSlide.arrno, data: { question: subText,options: option,correct_options: correctOpt.filter(item => item !== undefined), video_url: url ? url : data.video_url} }).unwrap().then((res) => {
+                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { isNewMedia,question: subText,options: option,correct_options: correctOpt.filter(item => item !== undefined), video_url: url ? url : data.video_url} }).unwrap().then((res) => {
                     isLogicJump.handler(res.data, true)
                     toast.success("Slide updated")
                 }).catch((err) => {
