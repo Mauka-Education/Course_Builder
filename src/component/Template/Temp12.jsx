@@ -28,7 +28,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     const dispatch = useDispatch()
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump } = useSelector(state => state.util)
+    const { logicJump,updateLogicSlide } = useSelector(state => state.util)
 
     const [logicJumpId, setLogicJumpId] = useState(null)
 
@@ -47,9 +47,10 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
         }
 
         if (isLogicJump.is === "true") {
-            addSlideInLogic({ id: isLogicJump.logicJumpId,level:{is:true,lesson:lessonId}, logicId: logicJumpId, data: { question: subText, type: 9, logic_jump: {arr:option,level:logicJump.length+1}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
-                dispatch(setLogicJump(res.data))
-                // onAddSlide({ ...res.data, slideno: 11 })
+            const mainId=logicJump.find((item)=>parseInt(item.logic_jump.level)===1)
+            addSlideInLogic({ id: isLogicJump.logicJumpId,level:{is:true,lesson:mainId._id}, logicId: logicJumpId, data: { question: subText, type: 9, logic_jump: {arr:option,level:logicJump.length+1}, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
+                dispatch(setLogicJump(res.slide))
+                onAddSlide({ ...res.slide, slideno: 11 })
                 isLogicJump.handler(res.slide)
                 toast.success("Slide Added")
             }).catch((err) => {
@@ -71,7 +72,8 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
 
     const onUpdateHandler = (e) => {
         e.preventDefault()
-        updateSlide({ id: update?.id, data: { question: subText, logic_jump:{arr:option,level: update.data.logic_jump.level}, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
+        
+        updateSlide({ id: updateLogicSlide.is ? updateLogicSlide.logic_jump_id : update?.id, data: { question: subText, logic_jump:{arr:option,level: update.data.logic_jump.level}, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
             dispatch(updateLogicJump({id:update?.id,data:res.data}))
             onSlideUpdateHandler(update?.id, res.data)
             toast.success("Slide updated")
@@ -82,6 +84,8 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
 
     }
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+
+    console.log({logicJump,isLogicJump})
 
     return (
         <>

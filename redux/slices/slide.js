@@ -32,6 +32,12 @@ export const slideApi = createApi({
         method: "GET",
       }),
     }),
+    getSlideById: builder.mutation({
+      query: (id) => ({
+        url: `/getslidebyid/${id}`,
+        method: "GET",
+      }),
+    }),
     getTestSlide: builder.mutation({
       query: (id) => ({
         url: `/testslide/${id}`,
@@ -119,8 +125,8 @@ export const slideApi = createApi({
       })
     }),
     deleteSlideInLogic: builder.mutation({
-      query:({id,logic_jump_id,arrno})=>({
-        url:`/deletelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}`,
+      query:({id,logic_jump_id,arrno,logic_jump})=>({
+        url:`/deletelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}&islogicjump=${logic_jump}`,
         method:"DELETE",
       })
     })
@@ -143,5 +149,6 @@ export const {
   useAddSlideInLogicMutation,
   useAdminUploadMutation,
   useUpdateSlideInLogicMutation,
-  useDeleteSlideInLogicMutation
+  useDeleteSlideInLogicMutation,
+  useGetSlideByIdMutation
 } = slideApi;
