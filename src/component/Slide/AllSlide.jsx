@@ -32,8 +32,6 @@ const AllSlide = ({ id: key, type }) => {
 
     const dispatch = useDispatch()
 
-    console.log({ key })
-
     useEffect(() => {
         if (slide && type === "lesson") {
             setAllSlides(slide)
@@ -177,7 +175,6 @@ const AllSlide = ({ id: key, type }) => {
         router.push(`/slide/logic?id=${id}`)
     }
 
-    console.log({ logicJump })
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />

@@ -114,10 +114,14 @@ const utilSlice = createSlice({
       const index = state.logicJump.findIndex((obj) => obj._id === id);
       if (index >= 0) state.logicJump[index] = data;
     },
+    clearLogicJump:(state,action)=>{
+      state.logicJump=[]
+    },
     setLogicJumpSlides: (state, action) => {
       state.logicJumpSlides.push({ ...action.payload });
     },
     deleteLogicJumpSlides: (state, action) => {
+      state.slide=state.slide.filter(item=>item._id!==action.payload.id)
       state.logicJump = state.logicJump.filter(
         (item) => item._id !== action.payload.id
       );

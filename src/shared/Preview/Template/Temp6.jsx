@@ -12,11 +12,7 @@ import { getPreSignedUrl } from "../../../util/getPreSignedUrl";
 
 const Temp5 = ({ data }) => {
   const [filesUrl, setFilesUrl] = useState([])
-
-  if (!data?.images) {
-    return null
-  }
-
+  
   useEffect(() => {
     if (data?.images) {
       data.images.forEach((item) => {
@@ -26,6 +22,11 @@ const Temp5 = ({ data }) => {
       })
     }
   },[])
+
+  if (!data?.images) {
+    return null
+  }
+
 
   console.log({filesUrl})
   return (

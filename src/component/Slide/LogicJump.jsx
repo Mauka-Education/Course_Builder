@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { IoMdArrowBack } from 'react-icons/io'
-import { setUpdateSlide, setUpdateLogicSlide } from '../../../redux/slices/util'
+import { setUpdateSlide, setUpdateLogicSlide, deleteLogicJumpSlides } from '../../../redux/slices/util'
 import { useRouter } from 'next/router'
 import { RiDeleteBinLine, RiEditCircleFill } from 'react-icons/ri'
 import { Preview } from '../../shared'
@@ -21,7 +21,7 @@ const LogicJump = ({ id }) => {
 
     }, [dispatch])
 
-    const { slide } = useSelector(state => state.util)
+    const { slide, logicJumpSlides } = useSelector(state => state.util)
     const [getSlide] = useGetSlideMutation()
     const [deleteSlide] = useDeleteSlideInLogicMutation()
 
@@ -38,7 +38,16 @@ const LogicJump = ({ id }) => {
         }
     }, [])
 
-    console.log({ allLogicJumpSlides })
+    useEffect(() => {
+        if (id) {
+            getSlide(id).unwrap().then(res => {
+                setAllLogicJumpSlides(res.data)
+            }).catch((err) => {
+                console.log({ err })
+            })
+        }
+    }, [dispatch, router])
+
 
     const onBackHandler = () => {
         dispatch(setUpdateSlide({ is: false, data: null, id: null }))
@@ -78,7 +87,7 @@ const LogicJump = ({ id }) => {
 
 
     const editSlide = (item) => {
-        const MainLogicSlide = slide.find(obj => obj._id === id)
+        const MainLogicSlide = logicJumpSlides.find(obj => obj._id === id)
         let arrno = null
         for (let i = 0; i < 4; i++) {
             const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
@@ -91,22 +100,30 @@ const LogicJump = ({ id }) => {
     }
 
     const onSlideDeleteHandler = (item) => {
+        let arrno
         const MainLogicSlide = slide.find(obj => obj._id === id)
-        let arrno = null
+        console.log({ MainLogicSlide })
         for (let i = 0; i < 4; i++) {
             const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
             arrno = i
             if (index > -1) break
         }
-        deleteSlide({ id, arrno, logic_jump_id: item._id }).unwrap().then(() => {
+        deleteSlide({ id, arrno, logic_jump_id: item._id,logic_jump:item.builderslideno===11 ? true :false }).unwrap().then(() => {
             toast.success("Slide Deleted")
+            if(item.builderslideno===11) {
+                dispatch(deleteLogicJumpSlides({id: item._id}))
+            }
             setAllLogicJumpSlides(prev => prev.filter(obj => obj._id !== item._id))
-            console.log("Success")
         }).catch((err) => {
             console.log({ err })
         })
     }
 
+    const onAllLogicSlideShowHandler = ({ id, data }) => {
+        dispatch(setUpdateSlide({ is: true, data, id }))
+        router.push(`/slide/logic?id=${id}`)
+        // router.reload()
+    }
 
     return (
         <>
@@ -141,29 +158,13 @@ const LogicJump = ({ id }) => {
 
                                             ) : (
                                                 <>
-                                                    <motion.div className="title logic_jump" whileTap={{ scale: .98 }}>
+                                                    <motion.div className="title logic_jump" whileTap={{ scale: .98 }} onClick={() => onAllLogicSlideShowHandler({ id: item._id, data: item, is: true })}>
                                                         <FaListAlt size={20} cursor="pointer" />
                                                         <p>All Slides</p>
                                                     </motion.div>
                                                 </>
                                             )
                                         }
-
-                                        {/* <AnimatePresence>
-                        {
-                            (showSlideOpt.id === id && showSlideOpt.show) && (
-                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
-                                {
-                                    orderArr()?.map((order) => order !== item.order && (
-                                        <div className="option__item" onClick={() => onOrderSelectHandler({ id: item._id, order })} key={order}>
-                                        <p>{order}</p>
-                                        </div>
-                                        ))
-                                    }
-                                    </motion.div>
-                                    )
-                                }
-                            </AnimatePresence> */}
                                     </div>
                                     <motion.div className="edit__delete" onClick={() => onSlideDeleteHandler(item)} whileTap={{ scale: .98 }}>
                                         <RiDeleteBinLine size={25} />
