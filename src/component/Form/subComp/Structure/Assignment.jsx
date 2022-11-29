@@ -42,8 +42,6 @@ const Assignment = ({ course, toast }) => {
     }
   }, [])
 
-  console.log({savedData})
-
 
   useEffect(() => {
     dispatch(setCourseData({ assigment: savedData }))

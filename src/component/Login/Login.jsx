@@ -5,10 +5,12 @@ import { toast, ToastContainer } from 'react-toast'
 import { setAdmin } from '../../../redux/slices/util'
 import { useDispatch } from 'react-redux'
 import axios from 'axios'
+import { useRouter } from 'next/router'
 
 const Login = () => {
   const { register, handleSubmit } = useForm()
   const dispatch = useDispatch()
+  const router=useRouter()
 
   useEffect(() => {
 
@@ -19,6 +21,7 @@ const Login = () => {
       console.log({ res })
       toast.success("Admin LoggedIn")
       dispatch(setAdmin({ ...res.data }))
+      router.reload()
     }).catch((err) => {
       console.log({ err })
       toast.error("Sign in Failed")

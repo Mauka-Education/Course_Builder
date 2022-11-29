@@ -68,6 +68,11 @@ input::-webkit-inner-spin-button {
   z-index: 10000 !important;
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .mauka__builder-nav {
   display: flex;
   justify-content: center;
@@ -1404,6 +1409,26 @@ input::-webkit-inner-spin-button {
   align-items: flex-start;
   min-width: 24rem;
   max-width: calc(500px + 1.5rem);
+}
+.course__builder-preview .preview__item .temp2 .question {
+  max-height: 12rem;
+  overflow-y: auto;
+  /* Track */
+  /* Handle */
+  /* Handle on hover */
+}
+.course__builder-preview .preview__item .temp2 .question::-webkit-scrollbar {
+  width: 5px;
+}
+.course__builder-preview .preview__item .temp2 .question::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.course__builder-preview .preview__item .temp2 .question::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+.course__builder-preview .preview__item .temp2 .question::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 .course__builder-preview .preview__item .temp2 .question span {
   font-size: 0.9rem;

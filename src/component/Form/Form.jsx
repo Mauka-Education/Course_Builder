@@ -17,7 +17,7 @@ const Form = () => {
     const [createCourseTitle] = useCreateCourseMutation()
     const [updateCourseTitle] = useUpdateCourseMutation()
     const [courseImage, setCourseImage] = useState({ url: null, type: null })
-    const { activeStep, initiated, course, isPreview ,user} = useSelector(state => state.util)
+    const { activeStep, initiated, course, isPreview, user } = useSelector(state => state.util)
 
     const [getLessons] = useGetLessonMutation()
 
@@ -48,10 +48,10 @@ const Form = () => {
         if (!course?.structure) {
             getLessons(course?.id).unwrap().then((res) => {
                 let arr = []
-                let preType=[]
-                res.data.forEach((item,index) => {
+                let preType = []
+                res.data.forEach((item, index) => {
                     arr.push({ name: item?.name, pre: item?.pre, row: item?.order, isSaved: item?._id })
-                    preType.push({id: index, name: item?.name})
+                    preType.push({ id: index, name: item?.name })
                     // dispatch(setCourseData({structure:{name: "", pre: null, row: 0, isSaved: null, update: false}}))
                 })
                 dispatch(setCourseData({ structure: arr }))
@@ -60,16 +60,21 @@ const Form = () => {
             }).catch((err) => {
                 console.log({ err })
             })
-        }else dispatch(setActiveStep(activeStep + 1))
+        } else dispatch(setActiveStep(activeStep + 1))
     }
-    console.log({ course })
 
 
-    const onSubmitHandler = async(data) => {
+    const onSubmitHandler = async (data) => {
         switch (activeStep) {
             case 0:
                 if (!initiated.once) {
-                    createCourseTitle({ ...data, img_url: courseImage.url, type: courseImage.type }).unwrap().then((res) => {
+                    let url
+                    await uploadMediaToS3(courseImage.url, user.token).then((res) => {
+                        url = res.data.data
+                    })
+
+                    if (!url) toast.error("Error Occurred, While Upload Image")
+                    createCourseTitle({ ...data, img_url: url, type: courseImage.type }).unwrap().then((res) => {
                         dispatch(setActiveStep(activeStep + 1))
                         dispatch(setInitiated({ once: true }))
                         dispatch(setCourseData({ ...data, image_url: res.data?.img_url, id: res.id }))
@@ -90,12 +95,11 @@ const Form = () => {
                         })
                     } else {
                         let url
-                        await uploadMediaToS3(courseImage.url,user.token).then((res)=>{
-                            url=res.data.data
+                        await uploadMediaToS3(courseImage.url, user.token).then((res) => {
+                            url = res.data.data
                         })
 
-                        console.log({url})
-                        if(!url) toast.error("Error Occurred, While Upload Image")
+                        if (!url) toast.error("Error Occurred, While Upload Image")
 
                         updateCourseTitle({ data: { ...data, img_url: url }, id: course?.id }).unwrap().then((res) => {
                             dispatch(setCourseData({ ...data, ...res.data }))
@@ -104,7 +108,7 @@ const Form = () => {
                             console.log({ err })
                             toast.error("Error Occured")
                         })
-                        
+
                     }
                     getAllLesson()
 

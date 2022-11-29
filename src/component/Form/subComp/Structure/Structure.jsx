@@ -183,7 +183,6 @@ const Structure = ({ toast }) => {
         const data = fieldArr.filter((_, index) => index === id)
 
         if (data[0].isSaved) {
-            console.log("Runng")
             deleteLesson(data[0]?.isSaved).unwrap().then(() => {
                 toast.success("Lesson Deleted")
                 setFieldArr((item) => item.filter((_, index) => index !== id))
@@ -198,7 +197,6 @@ const Structure = ({ toast }) => {
     }
 
     const optionSelectHandler = (data, row) => {
-        console.log(data)
         setFieldArr(list => list.map((obj, i) => i === row ? { ...obj, pre: data, update: obj.isSaved ? true : false } : obj))
         setShowOption(item => ({ ...item, id: null, show: false, row: null }))
     }

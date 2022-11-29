@@ -5,7 +5,7 @@ import { BsChevronDown } from "react-icons/bs"
 import { MdOutlineArrowBackIos } from "react-icons/md"
 import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
-import { Temp10, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
+import { Temp10, Temp11, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
 import { setTestData, setUpdateSlide, updateTestSlides } from "../../../redux/slices/util"
 import { useGetTestSlideMutation } from "../../../redux/slices/slide"
@@ -43,7 +43,12 @@ const templateType = [
         id: 5,
         name: "Media + MCQ",
         slideno: 9
-    }
+    },
+    {
+        id: 6,
+        name: "Logic Jump",
+        slideno: 9
+    },
 ]
 const Test = ({ title, id, no, lessonId }) => {
     const { course, test, updateSlide } = useSelector(state => state.util)
@@ -138,6 +143,8 @@ const Test = ({ title, id, no, lessonId }) => {
                 return <Temp9 {...config} />
             case 5:
                 return <Temp10 {...config} />
+            case 6:
+                return <Temp11 {...config} />
             default:
                 return <Temp2 {...config} />
         }
@@ -161,7 +168,6 @@ const Test = ({ title, id, no, lessonId }) => {
                                     {course.test.map((item, i) => (
                                         <Link href={`/slide/test?no=${i + 1}&title=${item?.heading}&key=${lessonId}`} key={item?.heading}>
                                             <div className="option__item">
-                                                {console.log({ item })}
                                                 <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
                                                 <h3>{item.heading}</h3>
                                             </div>

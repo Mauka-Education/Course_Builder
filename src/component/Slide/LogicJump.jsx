@@ -87,7 +87,7 @@ const LogicJump = ({ id }) => {
 
 
     const editSlide = (item) => {
-        const MainLogicSlide = logicJumpSlides.find(obj => obj._id === id)
+        const MainLogicSlide = slide.find(obj => obj._id === id)
         let arrno = null
         for (let i = 0; i < 4; i++) {
             const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
@@ -102,16 +102,17 @@ const LogicJump = ({ id }) => {
     const onSlideDeleteHandler = (item) => {
         let arrno
         const MainLogicSlide = slide.find(obj => obj._id === id)
-        console.log({ MainLogicSlide })
+        
+        if(!MainLogicSlide) return
         for (let i = 0; i < 4; i++) {
             const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
             arrno = i
             if (index > -1) break
         }
-        deleteSlide({ id, arrno, logic_jump_id: item._id,logic_jump:item.builderslideno===11 ? true :false }).unwrap().then(() => {
+        deleteSlide({ id, arrno, logic_jump_id: item._id, logic_jump: item.builderslideno === 11 ? true : false }).unwrap().then(() => {
             toast.success("Slide Deleted")
-            if(item.builderslideno===11) {
-                dispatch(deleteLogicJumpSlides({id: item._id}))
+            if (item.builderslideno === 11) {
+                dispatch(deleteLogicJumpSlides({ id: item._id }))
             }
             setAllLogicJumpSlides(prev => prev.filter(obj => obj._id !== item._id))
         }).catch((err) => {

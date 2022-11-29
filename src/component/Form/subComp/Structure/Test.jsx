@@ -88,7 +88,7 @@ const Test = ({ course, toast }) => {
   }
 
   const assigmentDeleteHandler = (id) => {
-    console.log({ id })
+    
     deleteTest(id).unwrap().then(() => {
       toast.success("Test Deleted")
       setSavedData(item => item.filter((d) => d.id !== id))
@@ -102,8 +102,6 @@ const Test = ({ course, toast }) => {
     setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
     setSelectLesson({ id: null, name: null })
   }
-
-  console.log({ course })
 
 
   return (
