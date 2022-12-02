@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { Preview } from '../../shared'
-import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useAddSlideInLogicMutation, useUpdateMediaSlideMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
+import { Preview, RichTextEditor } from '../../shared'
+import { useCreateSlideMutation, useAddSlideInLogicMutation, useUpdateMediaSlideMutation } from '../../../redux/slices/slide'
 import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 import { uploadMediaToS3 } from '../../util/uploadMedia'
 import { getPreSignedUrl } from '../../util/getPreSignedUrl'
+import LogicJump from './util/LogicJump'
 
-const QullEditor = dynamic(import("react-quill"), {
-  ssr: false,
-})
 
 const tabItem = [
   {
@@ -39,9 +36,8 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
 
   const [addSlideInLogic] = useAddSlideInLogicMutation()
   const { logicJump, user, updateLogicSlide } = useSelector(state => state.util)
-  const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
-  const [logicJumpId, setLogicJumpId] = useState(null)
+  const [logicJumpId, setLogicJumpId] = useState([])
 
 
   useEffect(() => {
@@ -161,6 +157,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     }
   }
 
+  console.log({isNewMedia})
   const onUpdateHandler = async (data) => {
     let url
     if (!watch("video_url") && isNewMedia) {
@@ -181,11 +178,11 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
         updateSlide({
           id: updateLogicSlide.logic_jump_id,
           data: {
-            isNewMedia,
             heading: data.heading,
             subheading: data?.subheading,
             subtext: subText,
-            image_url: url
+            image_url: url,
+            isNewMedia,
           }
         }).unwrap().then((res) => {
           isLogicJump.handler(res.data, true)
@@ -196,7 +193,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
 
         return
       }
-      updateSlide({ id: update?.id, data: { heading: data.heading, subheading: data?.subheading, subtext: subText, image_url: url } }).unwrap().then((res) => {
+      updateSlide({ id: update?.id, data: { heading: data.heading, subheading: data?.subheading, subtext: subText, image_url: url,isNewMedia } }).unwrap().then((res) => {
         onSlideUpdateHandler(update?.id, res.data)
         toast.success("Slide updated")
       }).catch((err) => {
@@ -234,7 +231,13 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     }
   }
   const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
-
+  const onMulSelectHandler=(data)=>{
+    if(logicJumpId.includes(data)){
+      setLogicJumpId(prev=>prev.filter(item=>item!==data))
+    }else{
+      setLogicJumpId(prev=>[...prev,data])
+    }
+  }
   return (
     <>
       <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
@@ -248,18 +251,11 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
         </div>
         <div className="item">
           <p>Paragraph</p>
-          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={isUpdate ? update.data.subtext : null} />
+          <RichTextEditor handler={setSubText} defaultValue={isUpdate ? update.data.subtext : null} />
         </div>
         {
           isLogicJump.is && (
-            <div className="item logic_jump">
-              <p>Select where to add this slide in Logic Jump Option </p>
-              <div className="logic_jump-option">
-                {isLogicJumpArr?.logic_jump.arr.map((item) => (
-                  <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
-                ))}
-              </div>
-            </div>
+            <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />            
           )
         }
         {renderer(activeTab)}
