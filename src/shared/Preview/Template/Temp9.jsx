@@ -13,12 +13,12 @@ const Temp9 = ({ data }) => {
         if (!data?.editor) {
             if (data.image_url) {
                 getPreSignedUrl(data?.image_url).then(res => {
-                    console.log({res})
+                    
                     setFileUrl(res)
                 })
             } else {
                 getPreSignedUrl(data?.url).then(res => {
-                    console.log({res})
+                    
                     setFileUrl(res)
                 })
             }
@@ -33,7 +33,6 @@ const Temp9 = ({ data }) => {
         }
     })
 
-    console.log({data},"")
     return (
         <div className="temp8">
             <div className="left">

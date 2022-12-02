@@ -16,10 +16,10 @@
     justify-content: space-between;
     // pointer-events: none;
 
-    &__edit{
+    &__edit {
       position: absolute;
-      top: .5rem;
-      right: .5rem;
+      top: 0.5rem;
+      right: 0.5rem;
       z-index: 23;
       cursor: pointer;
     }
@@ -43,65 +43,61 @@
         .paragraph {
           height: 10rem !important;
         }
-        .image{
-          img{
+        .image {
+          img {
             height: 14rem !important;
           }
-
         }
       }
       .temp2 {
         font-size: 0.8rem;
-        .pre__option{
-          &-item{
-            padding: .4rem 1rem;
+        .pre__option {
+          &-item {
+            padding: 0.4rem 1rem;
           }
         }
       }
-      .temp5{
-        font-size: .8rem;
+      .temp5 {
+        font-size: 0.8rem;
         padding: 1rem;
 
-        .scale{
+        .scale {
           margin-top: 2rem;
-          &__item{
-            .inner{
+          &__item {
+            .inner {
               width: 2rem;
               height: 2rem;
             }
           }
         }
       }
-      .temp8{
-        .temp2{
+      .temp8 {
+        .temp2 {
           width: 17rem;
           max-width: none;
           min-width: 0;
 
-          textarea{
+          textarea {
             width: 100% !important;
           }
         }
-        .image{
-          img{
+        .image {
+          img {
             height: auto;
           }
         }
       }
-      
     }
 
     &__item {
       position: relative;
       width: 100%;
-      
-      
 
       &.center {
         height: 100%;
         @include center_elem;
       }
-      &.all{
+      &.all {
         display: block;
         height: 18rem;
         overflow-y: auto;
@@ -148,6 +144,9 @@
         max-width: calc(500px + 1.5rem);
 
         .question {
+          max-height: 12rem;
+          overflow-y: auto;
+          @include custom__track;
           span {
             font-size: 0.9rem;
             color: gray;

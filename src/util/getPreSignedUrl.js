@@ -3,7 +3,6 @@ import axios from "axios";
 const HOST_URL=process.env.NODE_ENV==="development" ? "http://localhost:3000/api" : "https://lms.maukaeducation.com/api"
 
 const getPreSignedUrl = async(url) => {
-  console.log({url})
   const isS3Url = url?.includes(
     "https://mauka-user-videos.s3.ap-south-1.amazonaws.com/"
   );

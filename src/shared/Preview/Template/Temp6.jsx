@@ -27,8 +27,6 @@ const Temp5 = ({ data }) => {
     return null
   }
 
-
-  console.log({filesUrl})
   return (
     <div className="temp5">
       <div className="slider">
