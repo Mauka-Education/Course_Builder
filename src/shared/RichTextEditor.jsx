@@ -2,9 +2,7 @@ import React from 'react'
 import dynamic from 'next/dynamic'
 
 
-const QullEditor = dynamic(import("react-quill"), {
-    ssr: false,
-})
+const QullEditor = dynamic(()=>import("react-quill"), {ssr: false})
 
 var toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -26,8 +24,10 @@ var toolbarOptions = [
   
     ['clean'],                                         // remove formatting button
   ];
+  
 
 const RichTextEditor = ({ handler, defaultValue,placeholder }) => {
+    console.log("Helknln")
     return (
         <QullEditor modules={{toolbar:toolbarOptions}} onChange={(data) => handler(data)} theme="snow" placeholder={ placeholder ?? 'Enter Your Paragraph'} defaultValue={defaultValue} />
     )
