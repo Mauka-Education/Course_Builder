@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Preview } from '../../shared'
-import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
+import { Preview,RichTextEditor } from '../../shared'
+import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
-import { useDispatch, useSelector } from 'react-redux'
-
-const QullEditor = dynamic(import("react-quill"), {
-  ssr: false,
-})
+import { useSelector } from 'react-redux'
+import LogicJump from './util/LogicJump'
 
 const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
   const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
   const [subText, setSubText] = useState(update?.data?.subtext ?? null)
   const { logicJump, updateLogicSlide } = useSelector(state => state.util)
 
-  const [logicJumpId, setLogicJumpId] = useState(null)
+  const [logicJumpId, setLogicJumpId] = useState([])
 
   const [addSlide] = useCreateSlideMutation()
   const [updateSlide] = useUpdateSlideMutation()
   const [addSlideInLogic] = useAddSlideInLogicMutation()
-  const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
+  // const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
   useEffect(() => {
 
@@ -29,7 +25,6 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
   const isUpdate = update?.is
 
   const onSubmitHandler = (data) => {
-
     if (!subText) {
       return toast.error("Please Add Paragraph")
     }
@@ -74,8 +69,16 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }
   }
 
-  console.log({subText})
+  
   const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+
+  const onMulSelectHandler=(data)=>{
+    if(logicJumpId.includes(data)){
+      setLogicJumpId(prev=>prev.filter(item=>item!==data))
+    }else{
+      setLogicJumpId(prev=>[...prev,data])
+    }
+  }
 
   return (
     <>
@@ -90,19 +93,12 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         </div>
         <div className="item">
           <p>Paragraph</p>
-          <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Paragraph' defaultValue={update.is ? update.data.subtext : null} />
+          <RichTextEditor handler={setSubText}  defaultValue={update.is ? update.data.subtext : null} />
         </div>
 
         {
           isLogicJump.is && (
-            <div className="item logic_jump">
-              <p>Select where to add this slide in Logic Jump Option </p>
-              <div className="logic_jump-option">
-                {isLogicJumpArr?.logic_jump.arr.map((item) => (
-                  <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
-                ))}
-              </div>
-            </div>
+            <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />            
           )
         }
 

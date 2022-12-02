@@ -1,16 +1,13 @@
 import React, { useState } from 'react'
-import { Preview } from '../../shared'
-import dynamic from 'next/dynamic'
-import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
+import { Preview, RichTextEditor } from '../../shared'
+import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import { useForm } from "react-hook-form"
 import { useSelector } from 'react-redux'
+import LogicJump from './util/LogicJump'
 
-const QullEditor = dynamic(import("react-quill"), {
-    ssr: false,
-})
 
-const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler,isLogicJump }) => {
+const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
     const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
 
 
@@ -20,11 +17,11 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     const [subText, setSubText] = useState(isUpdate ? update.data.question : "")
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump,updateLogicSlide } = useSelector(state => state.util)
+    const { logicJump, updateLogicSlide } = useSelector(state => state.util)
 
-    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
+    // const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
-    const [logicJumpId, setLogicJumpId] = useState(null)
+    const [logicJumpId, setLogicJumpId] = useState([])
 
     const onSubmitHandler = (data) => {
 
@@ -42,7 +39,7 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             })
             return
         }
-        
+
         addSlide({ id: lessonId, data: { heading: subText, type: 7, ...data, builderslideno: 4, order } }).unwrap().then((res) => {
             onAddSlide({ ...res.data, slideno: 4 })
             toast.success("Slide Added")
@@ -74,12 +71,20 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }
 
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+
+    const onMulSelectHandler = (data) => {
+        if (logicJumpId.includes(data)) {
+            setLogicJumpId(prev => prev.filter(item => item !== data))
+        } else {
+            setLogicJumpId(prev => [...prev, data])
+        }
+    }
     return (
         <>
             <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
                 <div className="item quil_small" >
                     <p>Question/Prompt</p>
-                    <QullEditor onChange={(data) => setSubText(data)} theme="snow" placeholder='Enter Your Question' defaultValue={isUpdate ? update?.data?.heading : null} />
+                    <RichTextEditor handler={subText} defaultValue={isUpdate ? update?.data?.heading : null} />
                 </div>
                 <div className="multi">
                     <div className="item">
@@ -93,14 +98,7 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                 </div>
                 {
                     isLogicJump.is && (
-                        <div className="item logic_jump">
-                            <p>Select where to add this slide in Logic Jump Option </p>
-                            <div className="logic_jump-option">
-                                {isLogicJumpArr?.logic_jump.arr.map((item) => (
-                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
-                                ))}
-                            </div>
-                        </div>
+                        <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />
                     )
                 }
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>

@@ -38,6 +38,19 @@ export const slideApi = createApi({
         method: "GET",
       }),
     }),
+    getSlideByArr: builder.mutation({
+      query: (arr) => ({
+        url: `/getslidesbyarr`,
+        method: "POST",
+        body:{arr}
+      }),
+    }),
+    getLogicJumpSlide: builder.mutation({
+      query: (id) => ({
+        url: `/getlogicjumpslide/${id}`,
+        method: "GET",
+      }),
+    }),
     getTestSlide: builder.mutation({
       query: (id) => ({
         url: `/testslide/${id}`,
@@ -92,6 +105,12 @@ export const slideApi = createApi({
         method: "PATCH"
       }),
     }),
+    changeSlideOrderInLogicJump: builder.mutation({
+      query: ({ id,from,to,logic_jump_id }) => ({
+        url: `/changeslideorderinlogicjump/${id}?logic_jump_id=${logic_jump_id}&from=${from}&to=${to}`,
+        method: "GET"
+      }),
+    }),
     changeTestSlideOrder: builder.mutation({
       query: ({ id1,id2,order }) => ({
         url: `/changetestslideorder/${id1}/${id2}?order=${order}`,
@@ -112,8 +131,8 @@ export const slideApi = createApi({
     }),
     addSlideInLogic:builder.mutation({
       query:({id,logicId,data,level={is:false,lesson:null}})=>({
-        url:`/addslideinlogic/${id}?logic_id=${logicId}&level=${level.is}&lesson=${level.lesson}`,
-        body:data,
+        url:`/addslideinlogic/${id}?level=${level.is}&lesson=${level.lesson}`,
+        body:{data,logic_id:logicId},
         method:"POST"
       })
     }),
@@ -137,6 +156,7 @@ export const {
   useCreateSlideMutation,
   useCreateTestSlideMutation,
   useDeleteSlideMutation,
+  useGetLogicJumpSlideMutation,
   useGetSlideMutation,
   useDeleteTestSlideMutation,
   useGetTestSlideMutation,
@@ -150,5 +170,7 @@ export const {
   useAdminUploadMutation,
   useUpdateSlideInLogicMutation,
   useDeleteSlideInLogicMutation,
-  useGetSlideByIdMutation
+  useGetSlideByIdMutation,
+  useGetSlideByArrMutation,
+  useChangeSlideOrderInLogicJumpMutation
 } = slideApi;

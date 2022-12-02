@@ -8,8 +8,8 @@ import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
 import { Temp1, Temp10, Temp11, Temp12, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setLogicJump, setLogicJumpSlides, setSlideData, setUpdateLogicSlide, setUpdateSlide, updateSlides,setRunLogicJumpSetup } from "../../../redux/slices/util"
-import { useGetSlideByIdMutation, useGetSlideMutation } from "../../../redux/slices/slide"
+import { setLogicJump, setSlideData, setUpdateLogicSlide, setUpdateSlide, updateSlides, clearLogicJump, updateLogicJump } from "../../../redux/slices/util"
+import { useGetLogicJumpSlideMutation, useGetSlideMutation } from "../../../redux/slices/slide"
 
 const templateType = [
     {
@@ -78,7 +78,7 @@ const templateType = [
 ]
 
 const Slide = ({ title, id, no, lessonId }) => {
-    const { course, slide, updateSlide, logicJump, updateLogicSlide,runLogicJumpSetup } = useSelector(state => state.util)
+    const { course, slide, updateSlide, logicJump, updateLogicSlide } = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -92,82 +92,36 @@ const Slide = ({ title, id, no, lessonId }) => {
 
     const [getSlides] = useGetSlideMutation()
     const { isLogicJump, logicJumpId } = router.query
-    const [getSlideById] = useGetSlideByIdMutation()
+    
     const [logicJumpArr, setLogicJumpArr] = useState([])
 
+    const [getLogicJumpSlide] = useGetLogicJumpSlideMutation()
 
-    const [mainLessonId, setMainLessonId] = useState(null)
 
-    
     useEffect(() => {
-        if (slide.length!==0) {
+        if (slide.length !== 0) {
             setTotalSlideAdded(slide)
-        }else{
-            getSlides(lessonId).unwrap().then((res) => {
-                setSlideData(res.data)
-                setTotalSlideAdded(res.data)
-            }).catch((err) => {
-                console.log("Error Occured", err)
-            })
-        }
-        
+        } 
+
         if (updateSlide?.is) {
             const name = templateType.find((item) => item.id === updateSlide.data.builderslideno).name
             setCurrentTemplate({ id: updateSlide.data.builderslideno, name })
         }
         if (logicJump.length !== 0) {
-            setCurrentLogicJump({ id: logicJump[0]._id, name: "Logic Jump 1" })
+            setLogicJumpArr(logicJump)
+            setCurrentLogicJump({ id: logicJump[0]._id, name: "Select Logic Jump" })
         }
-
+        
         if (updateLogicSlide.is) {
             const name = templateType.find((item) => item.id === updateLogicSlide.data.builderslideno).name
             setCurrentTemplate({ id: updateLogicSlide.data.builderslideno, name })
         }
-        setMainLessonId(lessonId)
     }, [])
-
     
-    const fetchSlide = (arr) => {
-        
-        for (let i = 0; i < arr.length; i++) {
-            getSlideById(arr[i].id).unwrap().then((res) => {
-                dispatch(setLogicJump(res.data))
-                setLogicJumpArr(prev => [...prev, { ...res.data }])
-
-                if(runLogicJumpSetup){
-                    setTotalSlideAdded(prev => [...prev, { ...res.data }])
-                    dispatch(setRunLogicJumpSetup(false))
-                }
-            })
-        }
-    }
-
-    useEffect(() => {
-        const isLogicJumpSlide = slide.find((item) => item.builderslideno === 11 && item.lesson === lessonId)
-
-        if (mainLessonId !== lessonId) {
-            setLogicJumpArr([])
-        }
-
-
-        
-        if (isLogicJumpSlide && mainLessonId === lessonId && logicJumpArr.length===0) {
-            dispatch(setLogicJump(isLogicJumpSlide))
-            setMainLessonId(lessonId)
-            
-            setLogicJumpArr(prev => [...prev, isLogicJumpSlide])
-            
-            if (isLogicJumpSlide?.logic_jump.inner?.length !== 0) {
-                fetchSlide(isLogicJumpSlide?.logic_jump?.inner)
-            }
-            
-        }
-    }, [slide, lessonId, mainLessonId])
-
     
     useEffect(() => {
         if (logicJump.length !== 0) {
-            setCurrentLogicJump({ id: logicJump[0]._id, name: "Logic Jump 1" })
+            setCurrentLogicJump({ id: logicJump[0]._id, name: "Select Logic Jump" })
         }
 
     }, [dispatch, logicJump])
@@ -187,9 +141,14 @@ const Slide = ({ title, id, no, lessonId }) => {
         if (isLogicJump) router.push(`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${data?._id}`)
     }
 
-    const onSlideUpdateHandler = (id, data) => {
+    const onSlideUpdateHandler = (id, data, isLogicJump) => {
         dispatch(updateSlides({ id, data }))
         dispatch(setUpdateSlide({ id: null, is: false, data: null }))
+        if (isLogicJump) {
+            console.log({ data })
+            dispatch(setUpdateLogicSlide({ is: false, data: null, logic_jump_id: null, arrno: null }))
+            setLogicJumpArr(prev => [...prev, data])
+        }
         router.back()
     }
 
@@ -204,11 +163,12 @@ const Slide = ({ title, id, no, lessonId }) => {
     }
 
     const onLogicJumpSLideAddHandler = (data, update = false) => {
-        dispatch(setLogicJumpSlides(data))
+        // dispatch(setLogicJumpSlides(data))
+        dispatch(updateLogicJump({id:data._id,data}))
         setTotalSlideAdded((prev) => prev.map((obj) => obj._id === data._id ? { ...obj, ...data } : obj))
         if (update) {
-            router.back()
             dispatch(setUpdateLogicSlide({ is: false, data: null, logic_jump_id: null, arrno: null }))
+            router.back()
         }
 
         setCurrentTemplate({ id: null, name: null })
@@ -257,7 +217,34 @@ const Slide = ({ title, id, no, lessonId }) => {
 
     const isLessonSlidesExists = slide ? slide.filter((item) => item.lesson === lessonId) : []
 
-    
+
+
+    const onSlideOptClickHandler = (item, index) => {
+        getSlides(item.isSaved).unwrap().then(res => {
+            setTotalSlideAdded(res.data)
+            getLogicJumpSlide(item.isSaved).unwrap().then(res=>{
+                dispatch(clearLogicJump())
+                dispatch(setLogicJump(res.data))
+                setLogicJumpArr([res.data])
+                if(res.inner.is){
+                    res.inner.arr.forEach(item=>{
+                        dispatch(setLogicJump(item))
+                        setLogicJumpArr(prev=>[...prev,item])
+                    })
+                }
+                router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)
+            }).catch(err=>{
+                router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)                
+            })
+        }).catch(err => {
+            dispatch(clearLogicJump())
+            setTotalSlideAdded([])
+            setLogicJumpArr([])
+            router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)
+        })
+    }
+    console.log({logicJumpArr})
+
     return (
         <div className="course__builder-slide">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -273,12 +260,10 @@ const Slide = ({ title, id, no, lessonId }) => {
                             showOpt && (
                                 <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                                     {course.structure.map((item, i) => (
-                                        <Link href={`/slide/lesson?no=${i + 1}&title=${item?.name}&key=${item.isSaved}`} key={item?.name}>
-                                            <div className="option__item">
-                                                <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
-                                                <h3>{item.name}</h3>
-                                            </div>
-                                        </Link>
+                                        <div className="option__item" onClick={() => onSlideOptClickHandler(item, i + 1)} key={item?.name}>
+                                            <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
+                                            <h3>{item.name}</h3>
+                                        </div>
                                     ))}
                                 </motion.div>
                             )
@@ -313,7 +298,7 @@ const Slide = ({ title, id, no, lessonId }) => {
                             <div className="right">
                                 <h3>Logic Jump</h3>
                                 <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
-                                    <h3>{currentLogicJump.name} </h3>
+                                    <h3 dangerouslySetInnerHTML={{__html:currentLogicJump.name}}></h3>
                                     <BsChevronDown size={20} />
                                 </div>
                                 <AnimatePresence>
@@ -324,10 +309,10 @@ const Slide = ({ title, id, no, lessonId }) => {
                                                     logicJumpArr.map((item, i) => (
                                                         <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?._id}`} key={item._id}>
                                                             <div className="option__item" style={{ justifyContent: "space-between" }} key={item.id} onClick={() => {
-                                                                setCurrentLogicJump({ id: item._id, name: `Logic Jump ${i + 1}` })
+                                                                setCurrentLogicJump({ id: item._id, name: item.question.slice(0,50) })
                                                                 setShowLogicOpt(false)
                                                             }}>
-                                                                <b>{`Logic Jump ${i + 1}`}</b>
+                                                                <b dangerouslySetInnerHTML={{__html:`${item.question.slice(0,50)}`}} ></b>
                                                                 {/* <span>#{item.id}</span> */}
                                                             </div>
                                                         </Link>

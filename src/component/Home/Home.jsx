@@ -53,6 +53,11 @@ const Home = ({ data }) => {
           )
         }
         <div className="astrodivider"><div className="astrodividermask"></div><span><i>&#10038;</i></span></div>
+        {/* <div className="mauka__builder-home__bar">
+          <motion.div className="help" whileTap={{scale:.97}}>
+            <h2>How to Use</h2>
+          </motion.div>
+        </div> */}
         <div className="mauka__builder-home__content">
           <Link href={"/addcourse"} passHref>
             <motion.div className="add__card" whileTap={{ scale: .97 }} onClick={() => dispatch(clearCourse())}>

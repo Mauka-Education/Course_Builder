@@ -1,5 +1,3 @@
-import dynamic from "next/dynamic"
-
 
 const Temp1 = ({ data }) => {
     const dummyText = "Lorem ipsum dolor sit amet consectetur adipisicing elit. A cum, blanditiis aspernatur quibusdam fugit enim omnis nostrum amet, numquam tempore possimus officia obcaecati veritatis. Alias dignissimos deserunt reiciendis? In, consectetur!Sunt, pariatur recusandae at dolor a sint incidunt omnis voluptatem, voluptate sit facere dolorem eos. Enim, nemo molestiae! Optio excepturi minus, iste accusamus laudantium officia facilis quis hic asperiores culpa."
