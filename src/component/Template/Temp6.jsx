@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useUpdateSlideMutation,useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
+import LogicJump from './util/LogicJump'
 
 
-const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,isLogicJump }) => {
+const Temp6 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
 
-    const isUpdate=update?.is
+    const isUpdate = update?.is
     const [previewImg, setPreviewImg] = useState([])
 
     const [addSlide] = useCreateSlideMutation()
-    const [updateSlide]=useUpdateSlideMutation()
+    const [updateSlide] = useUpdateSlideMutation()
 
     const [allNew, setAllNew] = useState(false)
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump,updateLogicSlide } = useSelector(state => state.util)
+    const { logicJump, updateLogicSlide } = useSelector(state => state.util)
 
-    const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
-    
-    const [logicJumpId, setLogicJumpId] = useState(null)
-    
-    const onSubmitHandler = async(e) => {
+    // const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
+
+    const [logicJumpId, setLogicJumpId] = useState([])
+
+    const onSubmitHandler = async (e) => {
         e.preventDefault()
 
         if (previewImg.length === 0) {
@@ -34,7 +35,7 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
         // const {}=await 
 
         if (isLogicJump.is === "true") {
-            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { images: previewImg, type: 8, builderslideno: 5, order} }).unwrap().then((res) => {
+            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { images: previewImg, type: 8, builderslideno: 5, order } }).unwrap().then((res) => {
                 isLogicJump.handler(res.data)
                 toast.success("Slide Added")
             }).catch((err) => {
@@ -52,26 +53,26 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
             console.log("Err", err)
         })
     }
-    useEffect(()=>{
-        if(isUpdate && update?.data?.images?.length!==0){
+    useEffect(() => {
+        if (isUpdate && update?.data?.images?.length !== 0) {
             setPreviewImg(update.data.images)
         }
-    },[])
+    }, [])
     useEffect(() => {
 
     }, [previewImg])
 
     const onChangeHandler = async (e) => {
-        console.log({hs:e.target.files})
+        console.log({ hs: e.target.files })
         if (e.target.files.length > 1) {
             for (let i = 0; i < e.target.files.length; i++) {
                 console.log("runn")
                 const Image_Url = await convertToBase64(e.target.files[i])
-                setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[i].type,name:e.target.files[i]?.name,update: isUpdate }])
+                setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[i].type, name: e.target.files[i]?.name, update: isUpdate }])
             }
         } else if (e.target.files.length === 1) {
             const Image_Url = await convertToBase64(e.target.files[0])
-            setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[0].type,name:e.target.files[0]?.name,update: isUpdate }])
+            setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[0].type, name: e.target.files[0]?.name, update: isUpdate }])
         }
     }
 
@@ -79,7 +80,7 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
         e.preventDefault()
 
         if (updateLogicSlide.is) {
-            updateSlide({ id: updateLogicSlide.logic_jump_id, data: { ...data, heading: subText }}).unwrap().then((res) => {
+            updateSlide({ id: updateLogicSlide.logic_jump_id, data: { ...data, heading: subText } }).unwrap().then((res) => {
                 isLogicJump.handler(res.data, true)
                 toast.success("Slide updated")
             }).catch((err) => {
@@ -89,7 +90,7 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
             return
         }
 
-        updateSlide({ id: update?.id, data: { images:{ files: previewImg.filter((item)=>item?.update===true),isAllNew: allNew} } }).unwrap().then((res) => {
+        updateSlide({ id: update?.id, data: { images: { files: previewImg.filter((item) => item?.update === true), isAllNew: allNew } } }).unwrap().then((res) => {
             onSlideUpdateHandler(update?.id, res.data)
             toast.success("Slide updated")
         }).catch((err) => {
@@ -100,30 +101,30 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order,update,onSlideUpdateHandler,
 
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
+    const onMulSelectHandler = (data) => {
+        if (logicJumpId.includes(data)) {
+            setLogicJumpId(prev => prev.filter(item => item !== data))
+        } else {
+            setLogicJumpId(prev => [...prev, data])
+        }
+    }
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={ !isUpdate ? onSubmitHandler : onUpdateHandler }>
+            <form className="course__builder-temp1" onSubmit={!isUpdate ? onSubmitHandler : onUpdateHandler}>
                 <div className="item image">
                     <span>Media</span>
                     <div className="image__inner">
                         <input type="file" className='upload' id='upload' accept='image/*' multiple onChange={(e) => onChangeHandler(e)} />
                         <label htmlFor="upload">Upload <RiArrowUpSLine size={25} /> </label>
                         <motion.span whileTap={{ scale: .98 }} onClick={() => {
-                             setPreviewImg([])
-                             setAllNew(true)
+                            setPreviewImg([])
+                            setAllNew(true)
                         }} >Clear All</motion.span>
                     </div>
                 </div>
                 {
                     isLogicJump.is && (
-                        <div className="item logic_jump">
-                            <p>Select where to add this slide in Logic Jump Option </p>
-                            <div className="logic_jump-option">
-                                {isLogicJumpArr?.logic_jump.arr.map((item) => (
-                                    <h3 key={item._id} onClick={() => setLogicJumpId(item._id)} className={item._id === logicJumpId ? "corr" : ""} >{item.val}</h3>
-                                ))}
-                            </div>
-                        </div>
+                        <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />
                     )
                 }
                 <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>

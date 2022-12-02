@@ -73,6 +73,10 @@ a {
   color: inherit;
 }
 
+ul, ol {
+  padding: 0 1.5rem;
+}
+
 .mauka__builder-nav {
   display: flex;
   justify-content: center;
@@ -204,6 +208,20 @@ a {
   justify-content: space-between;
   font-size: 1.5rem;
   font-weight: 700;
+}
+.mauka__builder-home__bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+.mauka__builder-home__bar .help {
+  padding: 0.4rem 1rem;
+  background: black;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
 .mauka__builder-home__content {
   padding: 2rem;
@@ -1025,6 +1043,20 @@ a {
   grid-template-columns: repeat(2, 1fr);
   grid-gap: 3rem;
 }
+.course__builder-slide .slides__opt {
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem 2rem;
+  background: #d1d1d1;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+.course__builder-slide .slides__opt h3 {
+  margin-left: 2rem;
+}
 .course__builder-slide .slides__item {
   display: flex;
   justify-content: center;
@@ -1272,6 +1304,10 @@ a {
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
+}
+.course__builder-preview .preview a {
+  text-decoration: underline;
+  color: rgb(60, 60, 218);
 }
 .course__builder-preview .preview__edit {
   position: absolute;

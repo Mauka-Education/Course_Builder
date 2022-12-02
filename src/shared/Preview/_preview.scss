@@ -6,6 +6,11 @@
     background: white;
     @include card_shadow;
 
+    a{
+      text-decoration: underline;
+      color: rgb(60, 60, 218);
+    }
+
     width: 60rem;
     height: 35rem;
     padding: 2rem;

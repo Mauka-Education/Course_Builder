@@ -1,51 +1,67 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { IoMdArrowBack } from 'react-icons/io'
-import { setUpdateSlide, setUpdateLogicSlide, deleteLogicJumpSlides } from '../../../redux/slices/util'
+import { setUpdateSlide, setUpdateLogicSlide, deleteLogicJumpSlides, updateSlides, updateLogicJump } from '../../../redux/slices/util'
 import { useRouter } from 'next/router'
 import { RiDeleteBinLine, RiEditCircleFill } from 'react-icons/ri'
 import { Preview } from '../../shared'
 import { BsChevronDown } from 'react-icons/bs'
 import { FaListAlt } from 'react-icons/fa'
-import { useGetSlideMutation, useDeleteSlideInLogicMutation } from '../../../redux/slices/slide'
+import { useDeleteSlideInLogicMutation, useGetSlideByArrMutation ,useChangeSlideOrderInLogicJumpMutation} from '../../../redux/slices/slide'
 import { toast, ToastContainer } from 'react-toast'
 
-const LogicJump = ({ id }) => {
+const LogicJump = ({ id, mainSlide }) => {
     const dispatch = useDispatch()
     const router = useRouter()
 
     const [allLogicJumpSlides, setAllLogicJumpSlides] = useState([])
+    const [showSlideOpt, setShowSlideOpt] = useState({ id: null, show: false })
 
-    useEffect(() => {
-
-    }, [dispatch])
-
-    const { slide, logicJumpSlides } = useSelector(state => state.util)
-    const [getSlide] = useGetSlideMutation()
+    const { slide, logicJump } = useSelector(state => state.util)
+    const [getSlideByArr] = useGetSlideByArrMutation()
     const [deleteSlide] = useDeleteSlideInLogicMutation()
+    const [changeSlideOrderInLogicJump]=useChangeSlideOrderInLogicJumpMutation()
 
-    const logicJumpSlide = slide.find((obj) => obj.builderslideno === 11)
-    // const AllLogicJumpSlides = [...mainSlide.logic_jump.arr[0].next, ...mainSlide.logic_jump.arr[1].next, ...mainSlide.logic_jump.arr[2].next, ...mainSlide.logic_jump.arr[3].next]
+
+    const [logicJumpSlide, setLogicJumpSlide] = useState(logicJump.find((obj) => obj._id === id) ?? null)
+    // const logicJumpSlide=slide.find((obj) => obj._id === id)
+
+
+    const getLogicJumpSlides = (refetch, newLogicJumpSlide) => {
+        if (refetch) {
+            setLogicJumpSlide(newLogicJumpSlide)
+            setAllLogicJumpSlides([])
+            return
+        }
+        logicJumpSlide.logic_jump.arr.forEach((item) => {
+            getSlideByArr(item.next).unwrap().then(res => {
+                setAllLogicJumpSlides(prev => [...prev, { val: item.val, arr: res.data,id:item._id }])
+            }).catch((err) => {
+                setAllLogicJumpSlides(prev => [...prev, { val: item.val, arr: [],id:item._id}])
+            })
+        })
+
+    }
+
+    useEffect(()=>{
+        if(allLogicJumpSlides.length>4){
+            setAllLogicJumpSlides(allLogicJumpSlides?.filter((v, i, a) => a.findIndex(v2 => (v2.val === v.val)) === i))
+        }
+    },[allLogicJumpSlides])
 
     useEffect(() => {
-        if (id) {
-            getSlide(id).unwrap().then(res => {
-                setAllLogicJumpSlides(res.data)
-            }).catch((err) => {
-                console.log({ err })
-            })
+        if (logicJumpSlide) {
+            getLogicJumpSlides()
         }
-    }, [])
+    }, [id, logicJumpSlide])
 
     useEffect(() => {
-        if (id) {
-            getSlide(id).unwrap().then(res => {
-                setAllLogicJumpSlides(res.data)
-            }).catch((err) => {
-                console.log({ err })
-            })
+        if (logicJumpSlide) {
+            getLogicJumpSlides()
         }
+
+        console.log("updated")
     }, [dispatch, router])
 
 
@@ -99,18 +115,18 @@ const LogicJump = ({ id }) => {
         router.push(`/slide/lesson?title=${item.heading}&key=${id}`)
     }
 
-    const onSlideDeleteHandler = (item) => {
+    const onSlideDeleteHandler = (item, mainSlideVal) => {
         let arrno
-        const MainLogicSlide = slide.find(obj => obj._id === id)
-        
-        if(!MainLogicSlide) return
-        for (let i = 0; i < 4; i++) {
-            const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
-            arrno = i
-            if (index > -1) break
-        }
-        deleteSlide({ id, arrno, logic_jump_id: item._id, logic_jump: item.builderslideno === 11 ? true : false }).unwrap().then(() => {
+
+        const index = logicJumpSlide.logic_jump.arr.findIndex(obj => obj.val === mainSlideVal)
+
+        if (index > -1) arrno = index
+
+        deleteSlide({ id, arrno, logic_jump_id: item._id, logic_jump: item.builderslideno === 11 ? true : false }).unwrap().then((res) => {
             toast.success("Slide Deleted")
+            getLogicJumpSlides(true, res.data)
+            dispatch(updateSlides({ id: res.data._id, data: res.data }))
+            dispatch(updateLogicJump({ id: res.data._id, data: res.data }))
             if (item.builderslideno === 11) {
                 dispatch(deleteLogicJumpSlides({ id: item._id }))
             }
@@ -126,6 +142,18 @@ const LogicJump = ({ id }) => {
         // router.reload()
     }
 
+    const onOrderSelectHandler=({id,from,to,logic_jump_id})=>{
+        changeSlideOrderInLogicJump({id,from,to,logic_jump_id}).unwrap().then((res)=>{
+            setShowSlideOpt({id:null,show:null})
+            setLogicJumpSlide(res.data)
+            dispatch(updateLogicJump({id:res.data._id,data:res.data}))
+        }).catch(err=>{
+            console.log({err})
+        })
+    }
+
+    console.log({logicJumpSlide})
+    
     return (
         <>
             <ToastContainer position="top-right" delay={3000} />
@@ -135,46 +163,74 @@ const LogicJump = ({ id }) => {
                     <p>Back to All Slides</p>
                 </motion.div>
 
-                <div className="slides">
-                    {
-                        allLogicJumpSlides?.map((item, id) => (
-                            <div className="slides__item" key={id}>
-                                <motion.div className="update" whileTap={{ scale: .97 }} onClick={() => editSlide(item)} >
-                                    <RiEditCircleFill size={40} cursor="pointer" />
-                                </motion.div>
-                                <div className="preview">
-                                    <Preview type={item?.builderslideno} data={{ ...previewData(item, item?.builderslideno), allSlide: true }} allSlide={true} />
-                                </div>
-                                <div className="edit">
-                                    <div className="edit__order">
-                                        {
-                                            !item?.logic_jump?.level ? (
-                                                <>
-                                                    <p>Slide no</p>
-                                                    <div className="title">
-                                                        <p>{item?.order} </p>
-                                                        <BsChevronDown size={15} />
-                                                    </div>
-                                                </>
 
-                                            ) : (
-                                                <>
-                                                    <motion.div className="title logic_jump" whileTap={{ scale: .98 }} onClick={() => onAllLogicSlideShowHandler({ id: item._id, data: item, is: true })}>
-                                                        <FaListAlt size={20} cursor="pointer" />
-                                                        <p>All Slides</p>
-                                                    </motion.div>
-                                                </>
-                                            )
-                                        }
-                                    </div>
-                                    <motion.div className="edit__delete" onClick={() => onSlideDeleteHandler(item)} whileTap={{ scale: .98 }}>
-                                        <RiDeleteBinLine size={25} />
-                                    </motion.div>
-                                </div>
+                {
+                    allLogicJumpSlides.map((obj, indexId) => (
+                        <div key={indexId} style={{ marginBottom: "2rem" }}>
+                            <div className="slides__opt">
+                                <h2>Option {indexId + 1} :</h2>
+                                <h3>{obj.val} </h3>
                             </div>
-                        ))
-                    }
-                </div>
+                            <div className="slides">
+                                {
+                                    obj?.arr?.map((item, index) => (
+                                        <div className="slides__item" key={obj.id}>
+                                            <motion.div className="update" whileTap={{ scale: .97 }} onClick={() => editSlide(item)} >
+                                                <RiEditCircleFill size={40} cursor="pointer" />
+                                            </motion.div>
+                                            <div className="preview">
+                                                <Preview type={item?.builderslideno} data={{ ...previewData(item, item?.builderslideno), allSlide: true }} allSlide={true} />
+                                            </div>
+                                            <div className="edit">
+                                                <div className="edit__order">
+                                                    {
+                                                        !item?.logic_jump?.level ? (
+                                                            <>
+                                                                <p>Slide no</p>
+                                                                <div className="title" onClick={() => setShowSlideOpt(item => ({ id: showSlideOpt.id=== index ? null : index , show: showSlideOpt.id===index ? false :  true }))}>
+                                                                    <p>{index + 1} </p>
+                                                                    <BsChevronDown size={15} />
+                                                                </div>
+                                                            </>
+
+                                                        ) : (
+                                                            <>
+                                                                <motion.div className="title logic_jump" whileTap={{ scale: .98 }} onClick={() => onAllLogicSlideShowHandler({ id: item._id, data: item, is: true })}>
+                                                                    <FaListAlt size={20} cursor="pointer" />
+                                                                    <p>All Slides</p>
+                                                                </motion.div>
+                                                            </>
+                                                        )
+                                                    }
+
+                                                    <AnimatePresence>
+                                                        {
+                                                            (showSlideOpt.id === index && showSlideOpt.show) && (
+                                                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
+                                                                    {
+                                                                        obj?.arr.map((_, orderIndex) => (showSlideOpt.id !== orderIndex && showSlideOpt.show) &&  (
+                                                                            <div className="option__item" onClick={() => onOrderSelectHandler({ id, from:id,to:orderIndex,logic_jump_id:obj.id })} key={orderIndex}>
+                                                                                <p>{orderIndex + 1}</p>
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </motion.div>
+                                                            )
+                                                        }
+                                                    </AnimatePresence>
+                                                </div>
+
+                                                <motion.div className="edit__delete" onClick={() => onSlideDeleteHandler(item, obj.val)} whileTap={{ scale: .98 }}>
+                                                    <RiDeleteBinLine size={25} />
+                                                </motion.div>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                    ))
+                }
             </div>
         </>
     )

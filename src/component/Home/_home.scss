@@ -37,6 +37,20 @@
     font-size: 1.5rem;
     @include heading_font;
   }
+
+  &__bar{
+    @include center_elem;
+    justify-content: flex-end;
+    width: 100%;
+
+    .help{
+      padding: .4rem 1rem;
+      background: black;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
   &__content {
     // margin-top: 2rem;
     padding: 2rem;

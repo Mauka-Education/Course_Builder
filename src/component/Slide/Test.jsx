@@ -5,9 +5,9 @@ import { BsChevronDown } from "react-icons/bs"
 import { MdOutlineArrowBackIos } from "react-icons/md"
 import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
-import { Temp10, Temp11, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
+import { Temp10, Temp12, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setTestData, setUpdateSlide, updateTestSlides } from "../../../redux/slices/util"
+import { setTestData, setUpdateSlide, updateTestSlides,setTestLogicJump,setTestLogicJumpSlides,setTestUpdateLogicSlide,clearTestLogicJump,deleteTestLogicJumpSlides,updateTestLogicJump } from "../../../redux/slices/util"
 import { useGetTestSlideMutation } from "../../../redux/slices/slide"
 import { useRouter } from "next/router"
 
@@ -47,11 +47,11 @@ const templateType = [
     {
         id: 6,
         name: "Logic Jump",
-        slideno: 9
+        slideno: 11
     },
 ]
 const Test = ({ title, id, no, lessonId }) => {
-    const { course, test, updateSlide } = useSelector(state => state.util)
+    const { course, test, updateSlide , testLogicJump, updateTestLogicSlide} = useSelector(state => state.util)
     const [showOpt, setShowOpt] = useState(false)
     const [showTemplateOpt, setShowTemplateOpt] = useState(false)
     const [currentTemplate, setCurrentTemplate] = useState({ id: null, name: null })
@@ -60,6 +60,8 @@ const Test = ({ title, id, no, lessonId }) => {
     const dispatch = useDispatch()
     const [getTestSlide] = useGetTestSlideMutation()
     const router = useRouter()
+
+    const { isLogicJump, logicJumpId } = router.query
 
     useEffect(() => {
         if (test) {
@@ -119,6 +121,17 @@ const Test = ({ title, id, no, lessonId }) => {
 
     }
 
+    const onLogicJumpSLideAddHandler = (data, update = false) => {
+        dispatch(setTestLogicJumpSlides(data))
+        setTotalSlideAdded((prev) => prev.map((obj) => obj._id === data._id ? { ...obj, ...data } : obj))
+        if (update) {
+            router.back()
+            dispatch(setTestUpdateLogicSlide({ is: false, data: null, logic_jump_id: null, arrno: null }))
+        }
+
+        setCurrentTemplate({ id: null, name: null })
+    }
+
     function renderer(id) {
         const config = {
             lessonId,
@@ -127,7 +140,8 @@ const Test = ({ title, id, no, lessonId }) => {
             order: test.length,
             isTest: true,
             update: updateSlide,
-            onSlideUpdateHandler
+            onSlideUpdateHandler,
+            isLogicJump: { is: isLogicJump ?? false, logicJumpId, handler: onLogicJumpSLideAddHandler }
         }
 
         switch (id) {
@@ -144,7 +158,7 @@ const Test = ({ title, id, no, lessonId }) => {
             case 5:
                 return <Temp10 {...config} />
             case 6:
-                return <Temp11 {...config} />
+                return <Temp12 {...config} />
             default:
                 return <Temp2 {...config} />
         }
@@ -202,6 +216,7 @@ const Test = ({ title, id, no, lessonId }) => {
                             }
                         </AnimatePresence>
                     </div>
+                    
                 </div>
                 {
                     currentTemplate.name && (

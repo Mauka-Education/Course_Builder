@@ -32,7 +32,15 @@ const utilSlice = createSlice({
       arrno: null,
       data: null,
     },
-    runLogicJumpSetup:true
+    testLogicJump: [],
+    testLogicJumpSlides: [],
+    updateTestLogicSlide: {
+      is: false,
+      id: null,
+      logic_jump_id: null,
+      arrno: null,
+      data: null,
+    },
   },
   reducers: {
     setWinWidth: (state, action) => {
@@ -70,24 +78,26 @@ const utilSlice = createSlice({
       state.preRequisite = [];
       state.slide = [];
       state.test = [];
-      (state.updateSlide = {
+      state.updateSlide = {
         is: false,
         id: null,
         data: null,
-      }),
-        (state.logicJump = []),
-        (state.logicJumpSlides = []);
+      };
+      state.logicJump = [];
+      state.logicJumpSlides = [];
       state.updateLogicSlide = {
         is: false,
         id: null,
         logic_jump_id: null,
         arrno: null,
         data: null,
-      },
-      state.runLogicJumpSetup=true
+      };
     },
     setIsPreview: (state, action) => {
       state.isPreview = { ...state.isPreview, ...action.payload };
+    },
+    clearSlideData:(state)=>{
+      state.slide=[]
     },
     setUpdateSlide: (state, action) => {
       state.updateSlide = { ...state.updateSlide, ...action.payload };
@@ -113,17 +123,20 @@ const utilSlice = createSlice({
     },
     updateLogicJump: (state, action) => {
       const { id, data } = action.payload;
+      console.log(id,data.logic_jump.arr)
       const index = state.logicJump.findIndex((obj) => obj._id === id);
       if (index >= 0) state.logicJump[index] = data;
     },
-    clearLogicJump:(state)=>{
-      state.logicJump=[]
+    clearLogicJump: (state) => {
+      state.logicJump = [];
     },
     setLogicJumpSlides: (state, action) => {
       state.logicJumpSlides.push({ ...action.payload });
     },
     deleteLogicJumpSlides: (state, action) => {
-      state.slide=state.slide.filter(item=>item._id!==action.payload.id)
+      state.slide = state.slide.filter(
+        (item) => item._id !== action.payload.id
+      );
       state.logicJump = state.logicJump.filter(
         (item) => item._id !== action.payload.id
       );
@@ -131,10 +144,32 @@ const utilSlice = createSlice({
     setUpdateLogicSlide: (state, action) => {
       state.updateLogicSlide = { ...state.updateLogicSlide, ...action.payload };
     },
-    setRunLogicJumpSetup:(state,action)=>{
-      state.runLogicJumpSetup=action.payload
-    }
-    
+    setTestLogicJump: (state, action) => {
+      state.testLogicJump.push({ ...action.payload });
+    },
+    updateTestLogicJump: (state, action) => {
+      const { id, data } = action.payload;
+      const index = state.testLogicJump.findIndex((obj) => obj._id === id);
+      if (index >= 0) state.testLogicJump[index] = data;
+    },
+    clearTestLogicJump: (state) => {
+      state.testLogicJump = [];
+    },
+    setTestLogicJumpSlides: (state, action) => {
+      state.testLogicJumpSlides.push({ ...action.payload });
+    },
+    deleteTestLogicJumpSlides: (state, action) => {
+      state.test = state.test.filter((item) => item._id !== action.payload.id);
+      state.testLogicJump = state.logicJump.filter(
+        (item) => item._id !== action.payload.id
+      );
+    },
+    setTestUpdateLogicSlide: (state, action) => {
+      state.updateTestLogicSlide = {
+        ...state.updateLogicSlide,
+        ...action.payload,
+      };
+    },
   },
 });
 
@@ -154,10 +189,17 @@ export const {
   updateTestSlides,
   setLogicJump,
   updateLogicJump,
+  clearLogicJump,
   setLogicJumpSlides,
   setUpdateLogicSlide,
   deleteLogicJumpSlides,
-  setRunLogicJumpSetup
+  setTestLogicJump,
+  updateTestLogicJump,
+  clearTestLogicJump,
+  setTestLogicJumpSlides,
+  deleteTestLogicJumpSlides,
+  setTestUpdateLogicSlide,
+  clearSlideData
 } = utilSlice.actions;
 
 export default utilSlice;

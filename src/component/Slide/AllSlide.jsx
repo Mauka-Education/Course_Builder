@@ -9,7 +9,7 @@ import { Preview } from "../../shared"
 import { RiDeleteBinLine, RiEditCircleFill } from "react-icons/ri"
 import { IoMdArrowBack } from "react-icons/io"
 
-import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation } from "../../../redux/slices/slide"
+import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation, useGetSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
 import { deleteLogicJumpSlides, setLogicJumpSlides, setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
@@ -21,6 +21,7 @@ const AllSlide = ({ id: key, type }) => {
     const [allSlides, setAllSlides] = useState([])
     const { course, slide, test, logicJump } = useSelector(state => state.util)
 
+    const [getSlides]=useGetSlideMutation()
 
     const router = useRouter()
     const [deleteSlide] = useDeleteSlideMutation()
@@ -28,8 +29,6 @@ const AllSlide = ({ id: key, type }) => {
 
     const [changeSlideOrder] = useChangeSlideOrderMutation()
     const [changeTestSlideOrder] = useChangeTestSlideOrderMutation()
-
-
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -99,7 +98,7 @@ const AllSlide = ({ id: key, type }) => {
         if (type === "lesson") {
             deleteSlide(id).unwrap().then(() => {
                 if (isLogicJump) {
-                    dispatch(deleteLogicJumpSlides({id}))
+                    dispatch(deleteLogicJumpSlides({ id }))
                 }
                 toast.success("Item Deleted")
                 setAllSlides(item => item.filter((item) => item?._id !== id))
@@ -171,10 +170,19 @@ const AllSlide = ({ id: key, type }) => {
     }
 
     const onAllLogicSlideShowHandler = ({ id, data }) => {
-        dispatch(setUpdateSlide({ is: true, data, id }))
+        // dispatch(setUpdateSlide({ is: true, data, id }))
         router.push(`/slide/logic?id=${id}`)
     }
 
+    const onSlideOptClickHandler = (item, index) => {
+        getSlides(item.isSaved).unwrap().then(res => {
+            router.push(`/slide?key=${item.isSaved}&type=lesson`)
+            setAllSlides(res.data)
+        }).catch(err => {
+            console.log({err})
+            toast.error("Error Fetching Slides")
+        })
+    }
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />
@@ -194,12 +202,10 @@ const AllSlide = ({ id: key, type }) => {
                         showOpt && type === "lesson" ? (
                             <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
                                 {course?.structure?.map((item, i) => (
-                                    <Link href={`/slide?key=${item.isSaved}&type=lesson`} key={item?.name}>
-                                        <div className="option__item">
-                                            <h3 style={{ textTransform: "capitalize" }}>Lesson {i + 1}: &nbsp;</h3>
-                                            <h3>{item.name}</h3>
-                                        </div>
-                                    </Link>
+                                    <div className="option__item" onClick={() => onSlideOptClickHandler(item, i + 1)} key={item.name}>
+                                        <h3 style={{ textTransform: "capitalize" }}>Lesson {i + 1}: &nbsp;</h3>
+                                        <h3>{item.name}</h3>
+                                    </div>
                                 ))}
                             </motion.div>
                         ) : showOpt && (
