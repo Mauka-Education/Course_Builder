@@ -1,7 +1,7 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 
-const QullEditor = dynamic(()=>import("react-quill"), {ssr: false})
+const QullEditor = dynamic(import("react-quill"), {ssr: false})
 
 const toolbarOptions = [
     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons

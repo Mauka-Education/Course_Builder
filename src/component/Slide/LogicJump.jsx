@@ -217,7 +217,7 @@ const LogicJump = ({ id, mainSlide }) => {
                                                     <AnimatePresence>
                                                         {
                                                             (showSlideOpt.id === index && showSlideOpt.show) && (
-                                                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
+                                                                <motion.div className="option slideopt" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
                                                                     {
                                                                         obj?.arr.map((_, orderIndex) => (showSlideOpt.id !== orderIndex && showSlideOpt.show) &&  (
                                                                             <div className="option__item" onClick={() => onOrderSelectHandler({ id, from:index,to:orderIndex,logic_jump_id:obj.id })} key={orderIndex}>
