@@ -53,6 +53,12 @@
         background: rgb(199, 199, 199);
       }
     }
+
+    &.slideopt{
+      max-height: 18rem;
+      overflow-y: auto;
+      @include custom__track;
+    }
   }
 
   &__title {

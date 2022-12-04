@@ -34,8 +34,11 @@ const LogicJump = ({ id, mainSlide }) => {
             setAllLogicJumpSlides([])
             return
         }
+        
+
         logicJumpSlide.logic_jump.arr.forEach((item) => {
             getSlideByArr(item.next).unwrap().then(res => {
+                console.log({res})
                 setAllLogicJumpSlides(prev => [...prev, { val: item.val, arr: res.data,id:item._id }])
             }).catch((err) => {
                 setAllLogicJumpSlides(prev => [...prev, { val: item.val, arr: [],id:item._id}])
@@ -44,9 +47,16 @@ const LogicJump = ({ id, mainSlide }) => {
 
     }
 
+    console.log({allLogicJumpSlides})
+    function uniqByKeepLast(data,key){
+        return [
+            ...new Map(data.map(x=>[key(x),x])).values()
+        ]
+    }
     useEffect(()=>{
-        if(allLogicJumpSlides.length>4){
-            setAllLogicJumpSlides(allLogicJumpSlides?.filter((v, i, a) => a.findIndex(v2 => (v2.val === v.val)) === i))
+        if(allLogicJumpSlides.length>4){            
+            // setAllLogicJumpSlides(allLogicJumpSlides?.filter((v, i, a) => a.findIndex(v2 => (v2.val === v.val)) === i))
+            setAllLogicJumpSlides(prev=>uniqByKeepLast(prev,it=>it.id))
         }
     },[allLogicJumpSlides])
 
@@ -143,6 +153,7 @@ const LogicJump = ({ id, mainSlide }) => {
     }
 
     const onOrderSelectHandler=({id,from,to,logic_jump_id})=>{
+        console.log({to,from})
         changeSlideOrderInLogicJump({id,from,to,logic_jump_id}).unwrap().then((res)=>{
             setShowSlideOpt({id:null,show:null})
             setLogicJumpSlide(res.data)
@@ -165,7 +176,7 @@ const LogicJump = ({ id, mainSlide }) => {
 
 
                 {
-                    allLogicJumpSlides.map((obj, indexId) => (
+                    allLogicJumpSlides.slice(0,4).map((obj, indexId) => (
                         <div key={indexId} style={{ marginBottom: "2rem" }}>
                             <div className="slides__opt">
                                 <h2>Option {indexId + 1} :</h2>
@@ -206,10 +217,10 @@ const LogicJump = ({ id, mainSlide }) => {
                                                     <AnimatePresence>
                                                         {
                                                             (showSlideOpt.id === index && showSlideOpt.show) && (
-                                                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
+                                                                <motion.div className="option slideopt" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
                                                                     {
                                                                         obj?.arr.map((_, orderIndex) => (showSlideOpt.id !== orderIndex && showSlideOpt.show) &&  (
-                                                                            <div className="option__item" onClick={() => onOrderSelectHandler({ id, from:id,to:orderIndex,logic_jump_id:obj.id })} key={orderIndex}>
+                                                                            <div className="option__item" onClick={() => onOrderSelectHandler({ id, from:index,to:orderIndex,logic_jump_id:obj.id })} key={orderIndex}>
                                                                                 <p>{orderIndex + 1}</p>
                                                                             </div>
                                                                         ))

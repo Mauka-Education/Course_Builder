@@ -883,6 +883,26 @@ ul, ol {
 .course__builder-slide .option__item:hover {
   background: rgb(199, 199, 199);
 }
+.course__builder-slide .option.slideopt {
+  max-height: 18rem;
+  overflow-y: auto;
+  /* Track */
+  /* Handle */
+  /* Handle on hover */
+}
+.course__builder-slide .option.slideopt::-webkit-scrollbar {
+  width: 5px;
+}
+.course__builder-slide .option.slideopt::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.course__builder-slide .option.slideopt::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+.course__builder-slide .option.slideopt::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 .course__builder-slide__title {
   width: 100%;
   position: relative;

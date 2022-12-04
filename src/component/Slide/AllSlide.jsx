@@ -265,7 +265,7 @@ const AllSlide = ({ id: key, type }) => {
                                     <AnimatePresence>
                                         {
                                             (showSlideOpt.id === id && showSlideOpt.show) && (
-                                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
+                                                <motion.div className="option slideopt" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
                                                     {
                                                         orderArr()?.map((order) => order !== item.order && (
                                                             <div className="option__item" onClick={() => onOrderSelectHandler({ id: item._id, order })} key={order}>
