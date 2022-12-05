@@ -238,6 +238,7 @@ const Temp11 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
       setLogicJumpId(prev=>[...prev,data])
     }
   }
+
   return (
     <>
       <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
