@@ -140,7 +140,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
                 </div>
                 {
                     isLogicJump.is && (
-                        <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />
+                        <LogicJump handler={setLogicJumpId} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} multi={false} />
                     )
                 }
                 {isTest && (
