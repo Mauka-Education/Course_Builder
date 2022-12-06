@@ -19,7 +19,7 @@ const AllSlide = ({ id: key, type }) => {
     const [showOpt, setShowOpt] = useState(false)
     const [showSlideOpt, setShowSlideOpt] = useState({ id: null, show: false })
     const [allSlides, setAllSlides] = useState([])
-    const { course, slide, test, logicJump } = useSelector(state => state.util)
+    const { course, slide, test } = useSelector(state => state.util)
 
     const [getSlides]=useGetSlideMutation()
 
@@ -171,7 +171,7 @@ const AllSlide = ({ id: key, type }) => {
 
     const onAllLogicSlideShowHandler = ({ id, data }) => {
         // dispatch(setUpdateSlide({ is: true, data, id }))
-        router.push(`/slide/logic?id=${id}`)
+        router.push(`/slide/logic?id=${id}&isTest=${type==="test"}`)
     }
 
     const onSlideOptClickHandler = (item, index) => {
@@ -183,6 +183,7 @@ const AllSlide = ({ id: key, type }) => {
             toast.error("Error Fetching Slides")
         })
     }
+    // console.log("We Are here")
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />

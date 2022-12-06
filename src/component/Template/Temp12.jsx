@@ -47,10 +47,10 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
 
         if (isLogicJump.is === "true") {
             const mainId = logicJump.find((item) => parseInt(item.logic_jump.level) === 1)
-            if (!mainId) {
-                toast.error("One Logic Jump Exist, You can't Another")
-                return
-            }
+            // if (!mainId) {
+            //     toast.error("One Logic Jump Exist, You can't Another")
+            //     return
+            // }
             addSlideInLogic({ id: isLogicJump.logicJumpId, level: { is: true, lesson: mainId._id }, logicId: [logicJumpId], data: { question: subText, type: 9, logic_jump: { arr: option }, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
                 dispatch(setLogicJump(res.slide))
                 dispatch(updateLogicJump({ data: res.data, id: res.data._id }))

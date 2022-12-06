@@ -101,7 +101,7 @@ const Temp1 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />            
           )
         }
-
+        
         <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
           <h3>{isUpdate ? "Update" : "Save"}</h3>
         </motion.button>

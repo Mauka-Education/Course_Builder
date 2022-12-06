@@ -1423,7 +1423,7 @@ ul, ol {
   color: #2b3990;
 }
 .course__builder-preview .preview__item .temp1 .paragraph {
-  height: 20rem;
+  height: 18rem;
   overflow-y: auto;
   /* Track */
   /* Handle */
@@ -1486,7 +1486,7 @@ ul, ol {
 .course__builder-preview .preview__item .temp2 .question::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-.course__builder-preview .preview__item .temp2 .question span {
+.course__builder-preview .preview__item .temp2 .question__info {
   font-size: 0.9rem;
   color: gray;
 }

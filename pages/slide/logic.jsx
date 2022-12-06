@@ -1,19 +1,19 @@
 import React from 'react'
 import { LogicJump } from '../../src/component'
 
-const Logic = ({ id }) => {
+const Logic = ({ id,isTest }) => {
 
     return (
-        <LogicJump id={id} />
+        <LogicJump id={id} isTest={isTest==="true"} />
     )
 }
 
 
 export async function getServerSideProps(context) {
-    const { id } = context.query
+    const { id ,isTest} = context.query
     return {
         props: {
-            id
+            id,isTest
         }
     }
 }
