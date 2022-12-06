@@ -26,6 +26,12 @@ export const slideApi = createApi({
         
       })
     }),
+    getTotalLesson: builder.mutation({
+      query: (id) => ({
+        url: `/gettotallesson/${id}`,
+        method: "GET",
+      }),
+    }),
     getSlide: builder.mutation({
       query: (id) => ({
         url: `/getslide/${id}`,
@@ -45,6 +51,13 @@ export const slideApi = createApi({
         body:{arr}
       }),
     }),
+    getTestSlideByArr: builder.mutation({
+      query: (arr) => ({
+        url: `/gettestslidesbyarr`,
+        method: "POST",
+        body:{arr}
+      }),
+    }),
     getLogicJumpSlide: builder.mutation({
       query: (id) => ({
         url: `/getlogicjumpslide/${id}`,
@@ -54,6 +67,12 @@ export const slideApi = createApi({
     getTestSlide: builder.mutation({
       query: (id) => ({
         url: `/testslide/${id}`,
+        method: "GET",
+      }),
+    }),
+    getTestLogicJumpSlide: builder.mutation({
+      query: (id) => ({
+        url: `/gettestlogicjumpslide/${id}`,
         method: "GET",
       }),
     }),
@@ -111,6 +130,12 @@ export const slideApi = createApi({
         method: "GET"
       }),
     }),
+    changeSlideOrderInTestLogicJump: builder.mutation({
+      query: ({ id,from,to,logic_jump_id }) => ({
+        url: `/changeslideorderintestlogicjump/${id}?logic_jump_id=${logic_jump_id}&from=${from}&to=${to}`,
+        method: "GET"
+      }),
+    }),
     changeTestSlideOrder: builder.mutation({
       query: ({ id1,id2,order }) => ({
         url: `/changetestslideorder/${id1}/${id2}?order=${order}`,
@@ -148,20 +173,38 @@ export const slideApi = createApi({
         url:`/deletelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}&islogicjump=${logic_jump}`,
         method:"DELETE",
       })
-    })
+    }),
+    deleteTestSlideInLogic: builder.mutation({
+      query:({id,logic_jump_id,arrno,logic_jump})=>({
+        url:`/deletetestlogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}&islogicjump=${logic_jump}`,
+        method:"DELETE",
+      })
+    }),
+    addSlideInTestLogic:builder.mutation({
+      query:({id,logicId,data,level={is:false,lesson:null}})=>({
+        url:`/addslideintestlogic/${id}?level=${level.is}&lesson=${level.lesson}`,
+        body:{data,logic_id:logicId},
+        method:"POST"
+      })
+    }),
   }),
 });
 
 export const {
   useCreateSlideMutation,
+  useGetTotalLessonMutation,
   useCreateTestSlideMutation,
+  useGetTestSlideByArrMutation,
+  useAddSlideInTestLogicMutation,
   useDeleteSlideMutation,
   useGetLogicJumpSlideMutation,
   useGetSlideMutation,
   useDeleteTestSlideMutation,
   useGetTestSlideMutation,
+  useDeleteTestSlideInLogicMutation,
   useUpdateSlideMutation,
   useChangeSlideOrderMutation,
+  useChangeSlideOrderInTestLogicJumpMutation,
   useChangeTestSlideOrderMutation,
   useUpdateMediaSlideMutation,
   useUpdateTestSlideMutation,
@@ -172,5 +215,6 @@ export const {
   useDeleteSlideInLogicMutation,
   useGetSlideByIdMutation,
   useGetSlideByArrMutation,
-  useChangeSlideOrderInLogicJumpMutation
+  useChangeSlideOrderInLogicJumpMutation,
+  useGetTestLogicJumpSlideMutation
 } = slideApi;

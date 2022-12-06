@@ -6,8 +6,8 @@ const Temp2 = ({ data,style }) => {
     return (
         <div className="temp2" style={{...style}} >
             <div className="question">
-                <h4 dangerouslySetInnerHTML={{__html:data?.question  ?? dummyText}} />
-                <span>(Answer in 100-200 words)</span>
+                <div dangerouslySetInnerHTML={{__html:data?.question  ?? dummyText}} />
+                <span className="question__info">(Answer in 100-200 words)</span>
             </div>
             <div className="input_large">
                 <textarea placeholder="Start Typing here.." rows="5" />  

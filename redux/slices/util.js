@@ -92,12 +92,21 @@ const utilSlice = createSlice({
         arrno: null,
         data: null,
       };
+      state.testLogicJump = [];
+      state.testLogicJumpSlides = [];
+      state.updateTestLogicSlide = {
+        is: false,
+        id: null,
+        logic_jump_id: null,
+        arrno: null,
+        data: null,
+      };
     },
     setIsPreview: (state, action) => {
       state.isPreview = { ...state.isPreview, ...action.payload };
     },
-    clearSlideData:(state)=>{
-      state.slide=[]
+    clearSlideData: (state) => {
+      state.slide = [];
     },
     setUpdateSlide: (state, action) => {
       state.updateSlide = { ...state.updateSlide, ...action.payload };
@@ -123,7 +132,7 @@ const utilSlice = createSlice({
     },
     updateLogicJump: (state, action) => {
       const { id, data } = action.payload;
-      console.log(id,data.logic_jump.arr)
+      console.log(id, data.logic_jump.arr);
       const index = state.logicJump.findIndex((obj) => obj._id === id);
       if (index >= 0) state.logicJump[index] = data;
     },
@@ -199,7 +208,7 @@ export const {
   setTestLogicJumpSlides,
   deleteTestLogicJumpSlides,
   setTestUpdateLogicSlide,
-  clearSlideData
+  clearSlideData,
 } = utilSlice.actions;
 
 export default utilSlice;

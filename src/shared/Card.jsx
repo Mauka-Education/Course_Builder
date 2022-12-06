@@ -6,27 +6,35 @@ import { clearCourse, setCourseData, setInitiated, setIsPreview } from "../../re
 import { useRouter } from "next/router"
 import { useGetCourseByIdMutation } from "../../redux/slices/course"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { getPreSignedUrl } from "../util/getPreSignedUrl"
+import { useGetTotalLessonMutation } from "../../redux/slices/slide"
 
-const Card = ({ title, subtitle, duration, lesson, img, id }) => {
+const Card = ({ title, subtitle, duration, img, id }) => {
     const dispatch = useDispatch()
+    const [lesson, setLesson] = useState(0)
     const [run] = useGetCourseByIdMutation()
 
     const [imgUrl, setImgUrl] = useState("")
 
     const router = useRouter()
 
+    const [getTotalLesson]=useGetTotalLessonMutation()
+
     useEffect(() => {
         getPreSignedUrl(img).then((res)=>{
             setImgUrl(res)
+        })
+        getTotalLesson(id).unwrap().then(res=>{
+            console.log(res.data)
+            setLesson(res.data)
         })
 
         return ()=>{
             getPreSignedUrl()
         }
-        
     }, [])
+
+
     const onPreviewHandler = () => {
         dispatch(clearCourse())
         dispatch(setIsPreview({ is: true, id }))
@@ -47,6 +55,8 @@ const Card = ({ title, subtitle, duration, lesson, img, id }) => {
             return string
         }
     }
+
+
 
 
     return (

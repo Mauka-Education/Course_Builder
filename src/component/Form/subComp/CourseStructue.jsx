@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { MdOutlineKeyboardArrowRight as RightArrow } from "react-icons/md"
 import { motion } from 'framer-motion'
-import Link from 'next/link'
-import { useGetLogicJumpSlideMutation, useGetSlideMutation } from '../../../../redux/slices/slide'
-import { clearLogicJump, setLogicJump, setSlideData } from '../../../../redux/slices/util'
+// import Link from 'next/link'
+import { useGetLogicJumpSlideMutation, useGetSlideMutation,useGetTestLogicJumpSlideMutation,useGetTestSlideMutation } from '../../../../redux/slices/slide'
+import { clearLogicJump, clearTestLogicJump, setLogicJump, setSlideData,setTestData, setTestLogicJump } from '../../../../redux/slices/util'
 import { useRouter } from 'next/router'
 import { toast, ToastContainer } from 'react-toast'
 import { useDispatch } from 'react-redux'
@@ -11,8 +11,10 @@ import { useDispatch } from 'react-redux'
 const CourseStructue = ({ course }) => {
     const [structureData, setStructureData] = useState([])
     const [getSLide] = useGetSlideMutation()
+    const [getTestSlide] = useGetTestSlideMutation()
     const router = useRouter()
     const [getLogicJumpSlide] = useGetLogicJumpSlideMutation()
+    const [getTestLogicJumpSlide] = useGetTestLogicJumpSlideMutation()
     const dispatch=useDispatch()
 
     useEffect(() => {
@@ -54,6 +56,31 @@ const CourseStructue = ({ course }) => {
             router.push(`/slide/lesson?no=${i}&title=${item?.title}&key=${item.id}`)
             console.log({err})
             // toast.error("Error Fetching Lesson Slides")
+        })
+    }
+
+    const onTestClickHandler=(i,item)=>{
+        getTestSlide(item.id).unwrap().then(res=>{
+            dispatch(setTestData(res.data))
+
+            getTestLogicJumpSlide(item.id).unwrap().then(res=>{
+                dispatch(clearTestLogicJump())
+                dispatch(setTestLogicJump(res.data))
+
+                if(res.inner.is){
+                    res.inner.arr.forEach(item=>{
+                        dispatch(setTestLogicJump(res.data))
+                    })
+                }
+                router.push(`/slide/test?no=${i + 1}&title=${item?.heading}&key=${item.id}`)
+            }).catch(err=>{
+                router.push(`/slide/test?no=${i + 1}&title=${item?.heading}&key=${item.id}`)
+                
+            })
+            console.log(res)
+        }).catch(err=>{
+            router.push(`/slide/test?no=${i + 1}&title=${item?.heading}&key=${item.id}`)
+            console.log({err})
         })
     }
     return (
@@ -119,8 +146,8 @@ const CourseStructue = ({ course }) => {
 
                                     <div className="line"></div>
                                     {item.test.map((a, i) => (
-                                        <div key={i}>
-                                            <motion.div className={`card main`} key={a.heading} whileTap={{ scale: .995 }} onClick={() => onLessonClickHandler(i + 1, a.id)}>
+                                           <div key={i}>
+                                            <motion.div className={`card main`} key={a.heading} whileTap={{ scale: .995 }}  onClick={()=>onTestClickHandler(i,a)}>
                                                 <div className="card__left" >
                                                     <div className="card__dec">
                                                         <div className="hidden" />

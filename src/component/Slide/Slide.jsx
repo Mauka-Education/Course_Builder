@@ -92,7 +92,7 @@ const Slide = ({ title, id, no, lessonId }) => {
 
     const [getSlides] = useGetSlideMutation()
     const { isLogicJump, logicJumpId } = router.query
-    
+
     const [logicJumpArr, setLogicJumpArr] = useState([])
 
     const [getLogicJumpSlide] = useGetLogicJumpSlideMutation()
@@ -101,7 +101,7 @@ const Slide = ({ title, id, no, lessonId }) => {
     useEffect(() => {
         if (slide.length !== 0) {
             setTotalSlideAdded(slide)
-        } 
+        }
 
         if (updateSlide?.is) {
             const name = templateType.find((item) => item.id === updateSlide.data.builderslideno).name
@@ -111,14 +111,14 @@ const Slide = ({ title, id, no, lessonId }) => {
             setLogicJumpArr(logicJump)
             setCurrentLogicJump({ id: logicJump[0]._id, name: "Select Logic Jump" })
         }
-        
+
         if (updateLogicSlide.is) {
             const name = templateType.find((item) => item.id === updateLogicSlide.data.builderslideno).name
             setCurrentTemplate({ id: updateLogicSlide.data.builderslideno, name })
         }
     }, [])
-    
-    
+
+
     useEffect(() => {
         if (logicJump.length !== 0) {
             setCurrentLogicJump({ id: logicJump[0]._id, name: "Select Logic Jump" })
@@ -164,7 +164,7 @@ const Slide = ({ title, id, no, lessonId }) => {
 
     const onLogicJumpSLideAddHandler = (data, update = false) => {
         // dispatch(setLogicJumpSlides(data))
-        dispatch(updateLogicJump({id:data._id,data}))
+        dispatch(updateLogicJump({ id: data._id, data }))
         setTotalSlideAdded((prev) => prev.map((obj) => obj._id === data._id ? { ...obj, ...data } : obj))
         if (update) {
             dispatch(setUpdateLogicSlide({ is: false, data: null, logic_jump_id: null, arrno: null }))
@@ -222,19 +222,19 @@ const Slide = ({ title, id, no, lessonId }) => {
     const onSlideOptClickHandler = (item, index) => {
         getSlides(item.isSaved).unwrap().then(res => {
             setTotalSlideAdded(res.data)
-            getLogicJumpSlide(item.isSaved).unwrap().then(res=>{
+            getLogicJumpSlide(item.isSaved).unwrap().then(res => {
                 dispatch(clearLogicJump())
                 dispatch(setLogicJump(res.data))
                 setLogicJumpArr([res.data])
-                if(res.inner.is){
-                    res.inner.arr.forEach(item=>{
+                if (res.inner.is) {
+                    res.inner.arr.forEach(item => {
                         dispatch(setLogicJump(item))
-                        setLogicJumpArr(prev=>[...prev,item])
+                        setLogicJumpArr(prev => [...prev, item])
                     })
                 }
                 router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)
-            }).catch(err=>{
-                router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)                
+            }).catch(err => {
+                router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)
             })
         }).catch(err => {
             dispatch(clearLogicJump())
@@ -243,89 +243,95 @@ const Slide = ({ title, id, no, lessonId }) => {
             router.push(`/slide/lesson?no=${index}&title=${item?.name}&key=${item.isSaved}`)
         })
     }
-    console.log({logicJumpArr})
 
     return (
         <div className="course__builder-slide">
             <ToastContainer position="bottom-left" delay={3000} />
+
             <div className="upper">
-                <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
-                    <div className="left">
-                        <h2 style={{ textTransform: "capitalize" }}>{id} {no}: &nbsp;</h2>
-                        <h2>{title}</h2>
-                    </div>
-                    <BsChevronDown size={30} />
-                    <AnimatePresence>
-                        {
-                            showOpt && (
-                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                    {course.structure.map((item, i) => (
-                                        <div className="option__item" onClick={() => onSlideOptClickHandler(item, i + 1)} key={item?.name}>
-                                            <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
-                                            <h3>{item.name}</h3>
-                                        </div>
-                                    ))}
-                                </motion.div>
-                            )
-                        }
-                    </AnimatePresence>
-                </div>
-                <div className="course__builder-slide__template">
-                    <div className="left">
-                        <h3>Template</h3>
-                        <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
-                            <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
-                            <BsChevronDown size={20} />
-                        </div>
-                        <AnimatePresence>
-                            {
-                                showTemplateOpt && (
-                                    <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                        {
-                                            templateType.map(item => (
-                                                <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
-                                                    <p>{item.name}</p>
-                                                </div>
-                                            ))
-                                        }
-                                    </motion.div>
-                                )
-                            }
-                        </AnimatePresence>
-                    </div>
-                    {
-                        logicJumpArr.length !== 0 && (
-                            <div className="right">
-                                <h3>Logic Jump</h3>
-                                <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
-                                    <h3 dangerouslySetInnerHTML={{__html:currentLogicJump.name}}></h3>
-                                    <BsChevronDown size={20} />
+                {
+                    (updateLogicSlide.is || updateSlide.is) ? null : (
+                        <>
+                            <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
+                                <div className="left">
+                                    <h2 style={{ textTransform: "capitalize" }}>{id} {no}: &nbsp;</h2>
+                                    <h2>{title}</h2>
                                 </div>
+                                <BsChevronDown size={30} />
                                 <AnimatePresence>
                                     {
-                                        showLogicOpt && (
+                                        showOpt && (
                                             <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                                {
-                                                    logicJumpArr.map((item, i) => (
-                                                        <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?._id}`} key={item._id}>
-                                                            <div className="option__item" style={{ justifyContent: "space-between" }} key={item.id} onClick={() => {
-                                                                setCurrentLogicJump({ id: item._id, name: item.question.slice(0,50) })
-                                                                setShowLogicOpt(false)
-                                                            }}>
-                                                                <b dangerouslySetInnerHTML={{__html:`${item.question.slice(0,50)}`}} ></b>
-                                                                {/* <span>#{item.id}</span> */}
-                                                            </div>
-                                                        </Link>
-                                                    ))
-                                                }
+                                                {course.structure.map((item, i) => (
+                                                    <div className="option__item" onClick={() => onSlideOptClickHandler(item, i + 1)} key={item?.name}>
+                                                        <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
+                                                        <h3>{item.name}</h3>
+                                                    </div>
+                                                ))}
                                             </motion.div>
                                         )
                                     }
                                 </AnimatePresence>
                             </div>
-                        )
-                    }
-                </div>
+                            <div className="course__builder-slide__template">
+                                <div className="left">
+                                    <h3>Template</h3>
+                                    <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
+                                        <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
+                                        <BsChevronDown size={20} />
+                                    </div>
+                                    <AnimatePresence>
+                                        {
+                                            showTemplateOpt && (
+                                                <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                                    {
+                                                        templateType.map(item => (
+                                                            <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
+                                                                <p>{item.name}</p>
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </motion.div>
+                                            )
+                                        }
+                                    </AnimatePresence>
+                                </div>
+                                {
+                                    logicJumpArr.length !== 0 && (
+                                        <div className="right">
+                                            <h3>Logic Jump</h3>
+                                            <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
+                                                <h3 dangerouslySetInnerHTML={{ __html: currentLogicJump.name }}></h3>
+                                                <BsChevronDown size={20} />
+                                            </div>
+                                            <AnimatePresence>
+                                                {
+                                                    showLogicOpt && (
+                                                        <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                                            {
+                                                                logicJumpArr.map((item, i) => (
+                                                                    <Link href={`/slide/lesson?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?._id}`} key={item._id}>
+                                                                        <div className="option__item" style={{ justifyContent: "space-between" }} key={item.id} onClick={() => {
+                                                                            setCurrentLogicJump({ id: item._id, name: item.question.slice(0, 50) })
+                                                                            setShowLogicOpt(false)
+                                                                        }}>
+                                                                            <b dangerouslySetInnerHTML={{ __html: `${item.question.slice(0, 50)}` }} ></b>
+                                                                            {/* <span>#{item.id}</span> */}
+                                                                        </div>
+                                                                    </Link>
+                                                                ))
+                                                            }
+                                                        </motion.div>
+                                                    )
+                                                }
+                                            </AnimatePresence>
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </>
+                    )
+                }
                 {
                     currentTemplate.name && (
                         <div className="course__builder-slide__form">
