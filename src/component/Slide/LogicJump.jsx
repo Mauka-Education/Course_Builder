@@ -115,8 +115,9 @@ const LogicJump = ({ id, isTest }) => {
     }
 
 
+    console.log({slide})
     const editSlide = (item) => {
-        const MainLogicSlide = !isTest ? slide.find(obj => obj._id === id) : test.find(obj => obj._id === id)
+        const MainLogicSlide = !isTest ? logicJump.find(obj => obj._id === id) : testLogicJump.find(obj => obj._id === id)
 
         let arrno = null
         for (let i = 0; i < 4; i++) {

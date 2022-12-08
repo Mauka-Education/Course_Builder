@@ -119,6 +119,7 @@ const Slide = ({ title, id, no, lessonId }) => {
     }, [])
 
 
+    console.log({slide,logicJump})
     useEffect(() => {
         if (logicJump.length !== 0) {
             setCurrentLogicJump({ id: logicJump[0]._id, name: "Select Logic Jump" })

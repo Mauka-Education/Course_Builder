@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Preview, RichTextEditor } from '../../shared'
-import { useCreateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideMutation, useCreateTestSlideMutation, useUpdateTestSlideMutation } from '../../../redux/slices/slide'
+import { useCreateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideMutation, useCreateTestSlideMutation, useUpdateTestSlideMutation, useAddSlideInTestLogicMutation } from '../../../redux/slices/slide'
 import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 import { useEffect } from 'react'
@@ -27,7 +27,9 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     const dispatch = useDispatch()
 
     const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump, updateLogicSlide } = useSelector(state => state.util)
+    const [addSlideInTestLogic] = useAddSlideInTestLogicMutation()
+
+    const { logicJump, updateLogicSlide, testLogicJump,user } = useSelector(state => state.util)
 
     const [logicJumpId, setLogicJumpId] = useState(null)
 
@@ -63,7 +65,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
             })
             return
         }
-
+        
         addSlide({ id: lessonId, data: { question: subText, type: 9, logic_jump: { arr: option, level: 1 }, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then(async (res) => {
             dispatch(setLogicJump(res.data))
             toast.success("Slide Added")
@@ -79,13 +81,27 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
     const onTestSubmitHandler = (e) => {
         e.preventDefault()
         const isAllOption = option.filter((item) => item.val === "")
-
+        
         if (!subText) {
             return toast.error("Please Add Paragraph")
         } else if (isAllOption?.length !== 0) {
             return toast.error("Please Add All Option")
         }
-
+        
+        if (isLogicJump.is === "true") {
+            const mainId = testLogicJump.find((item) => parseInt(item.logic_jump.level) === 1)
+            addSlideInTestLogic({ id: isLogicJump.logicJumpId, level: { is: true, lesson: mainId._id }, logicId: [logicJumpId], data: { mark,question: subText, type: 9, logic_jump: { arr: option }, mcq_type: "radio", builderslideno: 11, order } }).unwrap().then((res) => {
+                dispatch(setTestLogicJump(res.slide))
+                dispatch(updateTestLogicJump({ data: res.data, id: res.data._id }))
+                onAddSlide({ ...res.slide, slideno: 11 }, true)
+                isLogicJump.handler(res.data)
+                toast.success("Slide Added")
+            }).catch((err) => {
+                toast.error("Error Occured")
+                console.log("Err", err)
+            })
+            return
+        }
 
         addTestSlide({ id: lessonId, data: { question: subText, type: 9, logic_jump: { arr: option, level: 1 }, mcq_type: "radio", builderslideno: 11, order, mark } }).unwrap().then((res) => {
             dispatch(setTestLogicJump(res.data))
@@ -123,7 +139,7 @@ const Temp12 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandl
         }
 
     }
-    const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
+    const isLogicJumpArr = !isTest ? logicJump.find((item) => item._id === isLogicJump.logicJumpId) : testLogicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
     const normalSubmit = !isUpdate ? onSubmitHandler : onUpdateHandler
     const testSubmit = !isUpdate ? onTestSubmitHandler : onUpdateHandler
