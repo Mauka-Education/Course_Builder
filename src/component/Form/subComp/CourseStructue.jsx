@@ -39,7 +39,9 @@ const CourseStructue = ({ course }) => {
                 
                 dispatch(clearLogicJump())
                 dispatch(setLogicJump(res.data))
+                console.log({res})
                 if(res.inner.is){
+                    console.log("run")
                     res.inner.arr.forEach(item=>{
                         dispatch(setLogicJump(item))
 
@@ -69,7 +71,7 @@ const CourseStructue = ({ course }) => {
 
                 if(res.inner.is){
                     res.inner.arr.forEach(item=>{
-                        dispatch(setTestLogicJump(res.data))
+                        dispatch(setTestLogicJump(item))
                     })
                 }
                 router.push(`/slide/test?no=${i + 1}&title=${item?.heading}&key=${item.id}`)

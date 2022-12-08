@@ -88,7 +88,7 @@ const Test = ({ title, id, no, lessonId }) => {
         }
     }, [])
 
-    console.log({currentTemplate})
+    console.log({testLogicJump})
 
     useEffect(() => {
 
