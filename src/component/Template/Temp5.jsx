@@ -84,7 +84,7 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
                 <div className="item quil_small" >
                     <p>Question/Prompt</p>
-                    <RichTextEditor handler={subText} defaultValue={isUpdate ? update?.data?.heading : null} />
+                    <RichTextEditor handler={setSubText} defaultValue={isUpdate ? update?.data?.heading : null} />
                 </div>
                 <div className="multi">
                     <div className="item">
