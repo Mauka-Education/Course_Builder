@@ -76,48 +76,6 @@ export const slideApi = createApi({
         method: "GET",
       }),
     }),
-    createSlide: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/addslide/${id}`,
-        method: "POST",
-        body: data,
-      }),
-    }),
-    createTestSlide: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/testslide/${id}`,
-        method: "POST",
-        body: data,
-      }),
-    }),
-    updateSlide: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/updateslide/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    updateMediaSlide: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/updatemediaslide/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    updateTestSlide: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/updatetestslide/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-    }),
-    updateMediaTestSlide: builder.mutation({
-      query: ({ id, data }) => ({
-        url: `/updatemediatestslide/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-    }),
     changeSlideOrder: builder.mutation({
       query: ({ id1,id2,order }) => ({
         url: `/changeslideorder/${id1}/${id2}?order=${order}`,
@@ -154,20 +112,6 @@ export const slideApi = createApi({
         method: "DELETE",
       }),
     }),
-    addSlideInLogic:builder.mutation({
-      query:({id,logicId,data,level={is:false,lesson:null}})=>({
-        url:`/addslideinlogic/${id}?level=${level.is}&lesson=${level.lesson}`,
-        body:{data,logic_id:logicId},
-        method:"POST"
-      })
-    }),
-    updateSlideInLogic: builder.mutation({
-      query:({id,logic_jump_id,arrno,data})=>({
-        url:`/updatelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}`,
-        method:"PATCH",
-        body:data
-      })
-    }),
     deleteSlideInLogic: builder.mutation({
       query:({id,logic_jump_id,arrno,logic_jump})=>({
         url:`/deletelogicjumpslide/${id}?logic_jump_id=${logic_jump_id}&arrno=${arrno}&islogicjump=${logic_jump}`,
@@ -180,41 +124,57 @@ export const slideApi = createApi({
         method:"DELETE",
       })
     }),
-    addSlideInTestLogic:builder.mutation({
-      query:({id,logicId,data,level={is:false,lesson:null}})=>({
-        url:`/addslideintestlogic/${id}?level=${level.is}&lesson=${level.lesson}`,
-        body:{data,logic_id:logicId},
+    
+    initiateSlide: builder.mutation({
+      query: ({id,type,slideno,order,isTest=false}) => ({
+        url: `/initiateslide/${id}?type=${type}&builderslideno=${slideno}&order=${order}&isTest=${isTest}`,
+        method: "GET",
+      }),
+    }),
+    autoSaveSlide:builder.mutation({
+      query:({id,data,isTest=false})=>({
+        url:`/autosave/${id}?isTest=${isTest}`,
+        body:{data},
         method:"POST"
       })
     }),
+    autoSaveMedia:builder.mutation({
+      query:({id,data,isTest=false})=>({
+        url:`/autosavemedia/${id}?isTest=${isTest}`,
+        body:{data},
+        method:"POST"
+      })
+    }),
+    autosaveslideinlogic:builder.mutation({
+      query:({id,logic_id,slide_id,isTest=false})=>({
+        url:`/autosaveslideinlogic/${id}?slide_id=${slide_id}&isTest=${isTest}`,
+        body:{logic_id},
+        method:"POST"
+      })
+    })
   }),
 });
 
 export const {
-  useCreateSlideMutation,
   useGetTotalLessonMutation,
-  useCreateTestSlideMutation,
   useGetTestSlideByArrMutation,
-  useAddSlideInTestLogicMutation,
   useDeleteSlideMutation,
   useGetLogicJumpSlideMutation,
   useGetSlideMutation,
   useDeleteTestSlideMutation,
   useGetTestSlideMutation,
   useDeleteTestSlideInLogicMutation,
-  useUpdateSlideMutation,
   useChangeSlideOrderMutation,
   useChangeSlideOrderInTestLogicJumpMutation,
   useChangeTestSlideOrderMutation,
-  useUpdateMediaSlideMutation,
-  useUpdateTestSlideMutation,
-  useUpdateMediaTestSlideMutation,
-  useAddSlideInLogicMutation,
   useAdminUploadMutation,
-  useUpdateSlideInLogicMutation,
   useDeleteSlideInLogicMutation,
   useGetSlideByIdMutation,
   useGetSlideByArrMutation,
   useChangeSlideOrderInLogicJumpMutation,
-  useGetTestLogicJumpSlideMutation
+  useGetTestLogicJumpSlideMutation,
+  useInitiateSlideMutation,
+  useAutoSaveSlideMutation,
+  useAutoSaveMediaMutation,
+  useAutosaveslideinlogicMutation
 } = slideApi;

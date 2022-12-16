@@ -60,8 +60,6 @@ const AllSlide = ({ id: key, type }) => {
 
     const lessonSlides = allSlides?.filter(item => type === "lesson" ? item.lesson === lesson?.isSaved : item.test === Test?.id)
 
-
-
     function previewData(item, no) {
         switch (no) {
             case 0:
@@ -157,9 +155,9 @@ const AllSlide = ({ id: key, type }) => {
     const editSlide = (item) => {
         dispatch(setUpdateSlide({ is: true, data: item, id: item._id }))
         if (type === "test") {
-            router.push(`/slide/test?title=${Test.heading}&key=${Test.id}`)
+            router.push(`/slide/test?title=${Test.heading}&key=${Test.id}&update=true`)
         } else {
-            router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}`)
+            router.push(`/slide/lesson?title=${lesson.name}&key=${lesson.isSaved}&update=true`)
         }
     }
 
@@ -183,7 +181,7 @@ const AllSlide = ({ id: key, type }) => {
             toast.error("Error Fetching Slides")
         })
     }
-    // console.log("We Are here")
+
     return (
         <div className="course__builder-slide preview">
             <ToastContainer position="bottom-left" delay={3000} />

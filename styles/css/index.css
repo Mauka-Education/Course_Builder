@@ -1028,7 +1028,6 @@ ul, ol {
   align-items: center;
   justify-content: space-between;
 }
-.course__builder-slide__navigation .lesson__btn .previous,
 .course__builder-slide__navigation .lesson__btn .add {
   width: 10rem;
   background: #0a1e32;
@@ -1037,26 +1036,12 @@ ul, ol {
   justify-content: center;
   align-items: center;
   padding: 0.7rem 1rem;
+  background: #4cb777;
   border-radius: 5px;
   cursor: pointer;
 }
-.course__builder-slide__navigation .lesson__btn .previous p,
 .course__builder-slide__navigation .lesson__btn .add p {
   margin-right: 0.5rem;
-}
-.course__builder-slide__navigation .lesson__btn .add {
-  margin: 0 3rem;
-}
-.course__builder-slide__navigation .lesson__btn .done {
-  cursor: pointer;
-  width: 7rem;
-  background: #4cb777;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.7rem 1rem;
-  border-radius: 5px;
 }
 .course__builder-slide .slides {
   display: grid;

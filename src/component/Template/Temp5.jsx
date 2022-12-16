@@ -1,74 +1,44 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Preview, RichTextEditor } from '../../shared'
-import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation } from '../../../redux/slices/slide'
-import { motion } from 'framer-motion'
 import { useForm } from "react-hook-form"
 import { useSelector } from 'react-redux'
 import LogicJump from './util/LogicJump'
+import { useInitateSlide } from '../../../hooks'
 
 
-const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
+const Temp5 = ({ lessonId, onAddSlide, order, update, isLogicJump, autoSaveHandler }) => {
     const { register, handleSubmit, watch } = useForm({ mode: "onChange" })
 
 
     const isUpdate = update?.is
-    const [addSlide] = useCreateSlideMutation()
-    const [updateSlide] = useUpdateSlideMutation()
     const [subText, setSubText] = useState(isUpdate ? update.data.question : "")
 
-    const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump, updateLogicSlide } = useSelector(state => state.util)
+    const { logicJump } = useSelector(state => state.util)
 
-    // const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
+
+    const BUILDER_SLIDE_NO = 4
+    const SLIDE_TYPE = 7
+    const { mainId, slide } = useInitateSlide(isLogicJump?.is ? isLogicJump?.logicJumpId : lessonId, SLIDE_TYPE, BUILDER_SLIDE_NO, isUpdate, order)
 
     const [logicJumpId, setLogicJumpId] = useState([])
 
-    const onSubmitHandler = (data) => {
-
-        if (!subText) {
-            return toast.error("Please Add Paragraph")
+    useEffect(() => {
+        if (mainId) {
+            onAddSlide(slide)
         }
+    }, [mainId])
 
-        if (isLogicJump.is === "true") {
-            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { heading: subText, type: 7, ...data, builderslideno: 4, order } }).unwrap().then((res) => {
-                isLogicJump.handler(res.data)
-                toast.success("Slide Added")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
-            return
+    useEffect(() => {
+        if (subText) {
+            autoSaveHandler(mainId, { heading: subText })
         }
+    }, [subText])
 
-        addSlide({ id: lessonId, data: { heading: subText, type: 7, ...data, builderslideno: 4, order } }).unwrap().then((res) => {
-            onAddSlide({ ...res.data, slideno: 4 })
-            toast.success("Slide Added")
-        }).catch((err) => {
-            toast.error("Error Occured")
-            console.log("Err", err)
-        })
-    }
-
-    const onUpdateHandler = (data) => {
-        if (updateLogicSlide.is) {
-            updateSlide({ id: updateLogicSlide.logic_jump_id, data: { ...data, heading: subText } }).unwrap().then((res) => {
-                isLogicJump.handler(res.data, true)
-                toast.success("Slide updated")
-            }).catch((err) => {
-                console.log({ err })
-            })
-
-            return
+    useEffect(() => {
+        if (logicJumpId.length !== 0) {
+            isLogicJump.handler(mainId, logicJumpId)
         }
-
-        updateSlide({ id: update?.id, data: { ...data, heading: subText } }).unwrap().then((res) => {
-            onSlideUpdateHandler(update?.id, res.data)
-            toast.success("Slide updated")
-        }).catch((err) => {
-            toast.error("Error Occured")
-            console.log("Err", err)
-        })
-    }
+    }, [logicJumpId])
 
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
 
@@ -79,12 +49,16 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             setLogicJumpId(prev => [...prev, data])
         }
     }
+
+    const onChangeHandler = (data) => {
+        autoSaveHandler(mainId, { ...data })
+    }
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={handleSubmit(!isUpdate ? onSubmitHandler : onUpdateHandler)}>
+            <form className="course__builder-temp1" onChange={handleSubmit(onChangeHandler)}>
                 <div className="item quil_small" >
                     <p>Question/Prompt</p>
-                    <RichTextEditor handler={subText} defaultValue={isUpdate ? update?.data?.heading : null} />
+                    <RichTextEditor handler={setSubText} defaultValue={isUpdate ? update?.data?.heading : null} />
                 </div>
                 <div className="multi">
                     <div className="item">
@@ -101,9 +75,6 @@ const Temp5 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                         <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />
                     )
                 }
-                <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>{isUpdate ? "Update" : "Save"}</h3>
-                </motion.button>
             </form>
             <Preview type={4} data={{ title: subText, lowLabel: watch("lowLabel"), highLabel: watch("highLabel") }} />
         </>

@@ -1,134 +1,59 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Preview, RichTextEditor } from '../../shared'
 import { useSelector } from 'react-redux'
-import { useCreateSlideMutation, useCreateTestSlideMutation, useAddSlideInLogicMutation, useUpdateSlideMutation, useUpdateTestSlideMutation, useAddSlideInTestLogicMutation } from '../../../redux/slices/slide'
-import { motion } from 'framer-motion'
 import MCQ from "./util/MCQ"
 import LogicJump from './util/LogicJump'
+import { useInitateSlide } from '../../../hooks'
 
-const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isTest = false, isLogicJump }) => {
+const Temp4 = ({ lessonId, onAddSlide, order, update, isTest = false, isLogicJump, autoSaveHandler }) => {
 
     const isUpdate = update?.is
     const [subText, setSubText] = useState(isUpdate ? update.data.question : "")
 
-    const [addSlide] = useCreateSlideMutation()
-    const [addTestSlide] = useCreateTestSlideMutation()
     const [mark, setMark] = useState(0)
 
     const [option, setOption] = useState([])
     const [correctOpt, setCorrectOpt] = useState([])
 
-    const [updateSlide] = useUpdateSlideMutation()
-    const [updateTestSlide] = useUpdateTestSlideMutation()
 
-    const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const [addSlideInTestLogic] = useAddSlideInTestLogicMutation()
-
-    const { logicJump, updateLogicSlide, testLogicJump } = useSelector(state => state.util)
+    const { logicJump, testLogicJump } = useSelector(state => state.util)
 
     const [logicJumpId, setLogicJumpId] = useState([])
 
-    const onSubmitHandler = (e) => {
-        e.preventDefault()
+    const BUILDER_SLIDE_NO = 3
+    const SLIDE_TYPE = 4
+    const { mainId, slide } = useInitateSlide(isLogicJump?.is ? isLogicJump?.logicJumpId : lessonId, SLIDE_TYPE, BUILDER_SLIDE_NO, isUpdate, order,isTest)
 
-        const removeUndifined = correctOpt.filter((item) => item !== undefined)
-        const isAllOption = option.filter((item) => item.val === "")
-
-        if (!subText) {
-            return toast.error("Please Add Paragraph")
-        } else if (isAllOption?.length !== 0) {
-            return toast.error("Please Add All Option")
-        } else if (removeUndifined?.length === 0) {
-            return toast.error("Please Select Correct Option")
+    useEffect(() => {
+        if (correctOpt.length !== 0) {
+            autoSaveHandler(mainId, { correct_options: correctOpt.filter(item => item !== undefined) })
         }
+    }, [correctOpt])
 
-        if (isLogicJump?.is === "true") {
-
-            if(!isTest){
-
-                addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark, builderslideno: 3, order } }).unwrap().then((res) => {
-                    isLogicJump.handler(res.data)
-                    toast.success("Slide Added")
-                }).catch((err) => {
-                    toast.error("Error Occured")
-                    console.log("Err", err)
-                })
-            }else{
-                addSlideInTestLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark, builderslideno: 3, order ,mark} }).unwrap().then((res) => {
-                    isLogicJump.handler(res.data)
-                    toast.success("Slide Added")
-                }).catch((err) => {
-                    toast.error("Error Occured")
-                    console.log("Err", err)
-                })
-
-            }
-            return
+    useEffect(() => {
+        if (logicJumpId.length !== 0) {
+            isLogicJump.handler(mainId, logicJumpId)
         }
+    }, [logicJumpId])
 
-        if (!isTest) {
-
-            addSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "checkbox", builderslideno: 3, order } }).unwrap().then((res) => {
-                onAddSlide({ ...res.data, slideno: 3 })
-                toast.success("Slide Added")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
-        } else {
-            addTestSlide({ id: lessonId, data: { question: subText, type: 4, options: option, correct_options: correctOpt.filter(item => item !== undefined), mcq_type: "radio", mark, builderslideno: 3, order } }).unwrap().then(res => {
-                onAddSlide({ ...res.data, slideno: 3, added: true })
-                toast.success("Test Slide Added")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
+    useEffect(() => {
+        if (mainId) {
+            onAddSlide(slide)
         }
-    }
+    }, [mainId])
 
-
-    const onUpdateHandler = (e) => {
-        e.preventDefault()
-
-        
-        if (!isTest) {
-            if (updateLogicSlide.is) {
-                updateSlide({ id: updateLogicSlide.logic_jump_id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-                    isLogicJump.handler(res.data, true)
-                    toast.success("Slide updated")
-                }).catch((err) => {
-                    console.log({ err })
-                })
-    
-                return
-            }
-            updateSlide({ id: update?.id, data: { question: subText, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-                onSlideUpdateHandler(update?.id, res.data)
-                toast.success("Slide updated")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
-        } else {
-            if (updateLogicSlide.is) {
-                updateTestSlide({ id: updateLogicSlide.logic_jump_id, data: { question: subText, mark,options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-                    isLogicJump.handler(res.data, true)
-                    toast.success("Slide updated")
-                }).catch((err) => {
-                    console.log({ err })
-                })
-    
-                return
-            }
-            updateTestSlide({ id: update?.id, data: { question: subText, mark, options: option, correct_options: correctOpt.filter(item => item !== undefined) } }).unwrap().then((res) => {
-                onSlideUpdateHandler(update?.id, res.data)
-                toast.success("Slide updated")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
+    useEffect(() => {
+        if (subText) {
+            autoSaveHandler(mainId, { question: subText, mcq_type: "checkbox" })
         }
-    }
+    }, [subText])
+
+    useEffect(()=>{
+        if(mark){
+          autoSaveHandler(mainId,{mark})
+        }
+      },[mark])
+
     const isLogicJumpArr = !isTest ? logicJump.find((item) => item._id === isLogicJump.logicJumpId) : testLogicJump.find((item) => item._id === isLogicJump.logicJumpId)
     const onMulSelectHandler = (data) => {
         if (logicJumpId.includes(data)) {
@@ -138,24 +63,30 @@ const Temp4 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
         }
     }
 
+    const onMarkAutoSave = (mark) => {
+        setMark(mark)
+        autoSaveHandler(mainId, { mark })
+    }
+
+    const onOptAutoSave = (opt) => {
+        setOption(opt)
+        autoSaveHandler(mainId, { options: opt })
+    }
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={!isUpdate ? onSubmitHandler : onUpdateHandler}>
+            <form className="course__builder-temp1" >
                 <div className="item quil_small" >
                     <p>Question/Prompt</p>
                     <RichTextEditor handler={setSubText} defaultValue={isUpdate ? update?.data?.question : null} />
                 </div>
                 <div className="item">
-                    <MCQ isMulti={true} setQuestion={setOption} setAnswer={setCorrectOpt} setMark={setMark} isTest={isTest} update={update} />
+                    <MCQ isMulti={true} setQuestion={onOptAutoSave} setAnswer={setCorrectOpt} setMark={onMarkAutoSave} isTest={isTest} update={update} />
                 </div>
                 {
                     isLogicJump.is && (
                         <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />
                     )
                 }
-                <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>{isUpdate ? "Update" : "Save"}</h3>
-                </motion.button>
             </form>
             <Preview type={3} data={{ question: subText, option, correct: correctOpt.filter((item) => item !== undefined), isTest }} />
         </>

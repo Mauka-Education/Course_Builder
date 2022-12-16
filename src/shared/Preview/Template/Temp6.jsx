@@ -4,7 +4,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 
-
 // import required modules
 import { Navigation, Pagination } from "swiper";
 import { useState,useEffect } from "react";
@@ -14,18 +13,20 @@ const Temp5 = ({ data }) => {
   const [filesUrl, setFilesUrl] = useState([])
   
   useEffect(() => {
-    if (data?.images) {
-      data.images.forEach((item) => {
-        getPreSignedUrl(item).then(res => {
-          setFilesUrl(prev=>[...prev,res])
+      if(data?.images){
+        data.images.map((item) => {
+          getPreSignedUrl(item).then(res => {
+            setFilesUrl(prev=>[...prev,res])
+          })
         })
-      })
-    }
-  },[])
+      }
+  },[data])
 
   if (!data?.images) {
     return null
   }
+
+  console.log({data})
 
   return (
     <div className="temp5">

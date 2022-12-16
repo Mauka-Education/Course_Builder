@@ -161,31 +161,19 @@
     }
     .lesson__btn {
       @include center_elem;
-      justify-content: space-between;
-      .previous,
+      justify-content: space-between;      
       .add {
         width: 10rem;
         background: $main_color;
         color: white;
         @include center_elem;
         padding: 0.7rem 1rem;
+        background: #4cb777;
         border-radius: 5px;
         cursor: pointer;
         p {
           margin-right: 0.5rem;
         }
-      }
-      .add {
-        margin: 0 3rem;
-      }
-      .done {
-        cursor: pointer;
-        width: 7rem;
-        background: #4cb777;
-        color: white;
-        @include center_elem;
-        padding: 0.7rem 1rem;
-        border-radius: 5px;
       }
     }
   }
