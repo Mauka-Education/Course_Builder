@@ -132,7 +132,6 @@ const utilSlice = createSlice({
     },
     updateLogicJump: (state, action) => {
       const { id, data } = action.payload;
-      console.log(id, data.logic_jump.arr);
       const index = state.logicJump.findIndex((obj) => obj._id === id);
       if (index >= 0) state.logicJump[index] = data;
     },

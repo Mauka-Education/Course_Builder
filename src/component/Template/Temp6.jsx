@@ -1,58 +1,41 @@
 import React, { useEffect, useState } from 'react'
 import { Preview } from '../../shared'
-import { useCreateSlideMutation, useUpdateSlideMutation, useAddSlideInLogicMutation, useUpdateSlideInLogicMutation } from '../../../redux/slices/slide'
 import { useSelector } from 'react-redux'
 import { motion } from 'framer-motion'
 import { RiArrowUpSLine } from 'react-icons/ri'
 import { convertToBase64 } from '../../util/ConvertImageToBase64'
 import LogicJump from './util/LogicJump'
+import { uploadMediaToS3 } from '../../util/uploadMedia'
+import { useInitateSlide } from '../../../hooks'
 
 
-const Temp6 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandler, isLogicJump }) => {
+const Temp6 = ({ lessonId, toast, onAddSlide, order, update, isLogicJump, autoSaveHandler }) => {
 
     const isUpdate = update?.is
     const [previewImg, setPreviewImg] = useState([])
 
-    const [addSlide] = useCreateSlideMutation()
-    const [updateSlide] = useUpdateSlideMutation()
-
     const [allNew, setAllNew] = useState(false)
+    const { logicJump, user } = useSelector(state => state.util)
 
-    const [addSlideInLogic] = useAddSlideInLogicMutation()
-    const { logicJump, updateLogicSlide } = useSelector(state => state.util)
-
-    // const [updateSlideInLogic] = useUpdateSlideInLogicMutation()
 
     const [logicJumpId, setLogicJumpId] = useState([])
 
-    const onSubmitHandler = async (e) => {
-        e.preventDefault()
+    const BUILDER_SLIDE_NO = 8
+    const SLIDE_TYPE = 5
+    const { mainId, slide } = useInitateSlide(isLogicJump?.is ? isLogicJump?.logicJumpId :lessonId, SLIDE_TYPE, BUILDER_SLIDE_NO, isUpdate, order)
 
-        if (previewImg.length === 0) {
-            return toast.error("Please Select Image")
+    useEffect(() => {
+        if (mainId) {
+            onAddSlide(slide)
         }
+    }, [mainId])
 
-        // const {}=await 
-
-        if (isLogicJump.is === "true") {
-            addSlideInLogic({ id: isLogicJump.logicJumpId, logicId: logicJumpId, data: { images: previewImg, type: 8, builderslideno: 5, order } }).unwrap().then((res) => {
-                isLogicJump.handler(res.data)
-                toast.success("Slide Added")
-            }).catch((err) => {
-                toast.error("Error Occured")
-                console.log("Err", err)
-            })
-            return
+    useEffect(()=>{
+        if(logicJumpId.length!==0){
+          isLogicJump.handler(mainId,logicJumpId)
         }
+      },[logicJumpId])
 
-        addSlide({ id: lessonId, data: { images: previewImg, type: 8, builderslideno: 5, order } }).unwrap().then((res) => {
-            onAddSlide({ ...res.data, slideno: 5 })
-            toast.success("Slide Added")
-        }).catch((err) => {
-            toast.error("Error Occured")
-            console.log("Err", err)
-        })
-    }
     useEffect(() => {
         if (isUpdate && update?.data?.images?.length !== 0) {
             setPreviewImg(update.data.images)
@@ -63,40 +46,27 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
     }, [previewImg])
 
     const onChangeHandler = async (e) => {
-        console.log({ hs: e.target.files })
+        let url = []
         if (e.target.files.length > 1) {
             for (let i = 0; i < e.target.files.length; i++) {
-                console.log("runn")
                 const Image_Url = await convertToBase64(e.target.files[i])
-                setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[i].type, name: e.target.files[i]?.name, update: isUpdate }])
+                uploadMediaToS3(e.target.files[i], user.token).then(res => {
+                    url.push(res.data.data)
+                })
+
+                setPreviewImg(item => [...item, Image_Url])
             }
+
         } else if (e.target.files.length === 1) {
             const Image_Url = await convertToBase64(e.target.files[0])
+            uploadMediaToS3(e.target.files[0], user.token).then(res => {
+                url.push(res.data.data)
+            })
             setPreviewImg(item => [...item, { url: Image_Url, type: e.target.files[0].type, name: e.target.files[0]?.name, update: isUpdate }])
         }
-    }
 
-    const onUpdateHandler = (e) => {
-        e.preventDefault()
-
-        if (updateLogicSlide.is) {
-            updateSlide({ id: updateLogicSlide.logic_jump_id, data: { ...data, heading: subText } }).unwrap().then((res) => {
-                isLogicJump.handler(res.data, true)
-                toast.success("Slide updated")
-            }).catch((err) => {
-                console.log({ err })
-            })
-
-            return
-        }
-
-        updateSlide({ id: update?.id, data: { images: { files: previewImg.filter((item) => item?.update === true), isAllNew: allNew } } }).unwrap().then((res) => {
-            onSlideUpdateHandler(update?.id, res.data)
-            toast.success("Slide updated")
-        }).catch((err) => {
-            toast.error("Error Occured")
-            console.log("Err", err)
-        })
+        autoSaveHandler(mainId, { images: url })
+        toast.success("Images Uploaded")
     }
 
     const isLogicJumpArr = logicJump.find((item) => item._id === isLogicJump.logicJumpId)
@@ -108,9 +78,10 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
             setLogicJumpId(prev => [...prev, data])
         }
     }
+
     return (
         <>
-            <form className="course__builder-temp1" onSubmit={!isUpdate ? onSubmitHandler : onUpdateHandler}>
+            <form className="course__builder-temp1">
                 <div className="item image">
                     <span>Media</span>
                     <div className="image__inner">
@@ -127,11 +98,8 @@ const Temp6 = ({ lessonId, toast, onAddSlide, order, update, onSlideUpdateHandle
                         <LogicJump handler={onMulSelectHandler} idArr={logicJumpId} arr={isLogicJumpArr?.logic_jump.arr} />
                     )
                 }
-                <motion.button className="save__btn" type='submit' whileTap={{ scale: .97 }}>
-                    <h3>{isUpdate ? "Update" : "Save"}</h3>
-                </motion.button>
             </form>
-            <Preview type={5} data={{ images: previewImg }} />
+            <Preview type={5} data={{ images: previewImg, editor: true }} />
         </>
     )
 }

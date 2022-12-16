@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AnimatePresence, motion } from 'framer-motion'
 import { IoMdArrowBack } from 'react-icons/io'
-import { setUpdateSlide, setUpdateLogicSlide, deleteLogicJumpSlides, updateSlides, updateLogicJump, updateTestLogicJump } from '../../../redux/slices/util'
+import { setUpdateSlide, deleteLogicJumpSlides, updateSlides, updateLogicJump, updateTestLogicJump } from '../../../redux/slices/util'
 import { useRouter } from 'next/router'
 import { RiDeleteBinLine, RiEditCircleFill } from 'react-icons/ri'
 import { Preview } from '../../shared'
@@ -18,7 +18,7 @@ const LogicJump = ({ id, isTest }) => {
     const [allLogicJumpSlides, setAllLogicJumpSlides] = useState([])
     const [showSlideOpt, setShowSlideOpt] = useState({ id: null, show: false,row:null })
 
-    const { slide, logicJump, testLogicJump, test, updateSlide } = useSelector(state => state.util)
+    const { slide, logicJump, testLogicJump, test } = useSelector(state => state.util)
     const [getSlideByArr] = useGetSlideByArrMutation()
     const [getTestSlideByArr] = useGetTestSlideByArrMutation()
     const [deleteSlide] = useDeleteSlideInLogicMutation()
@@ -43,7 +43,6 @@ const LogicJump = ({ id, isTest }) => {
 
         logicJumpSlide.logic_jump.arr.forEach((item) => {
             slidesFetcher(item.next).unwrap().then(res => {
-                console.log({ res })
                 setAllLogicJumpSlides(prev => [...prev, { val: item.val, arr: res.data, id: item._id }])
             }).catch((err) => {
                 setAllLogicJumpSlides(prev => [...prev, { val: item.val, arr: [], id: item._id }])
@@ -74,7 +73,6 @@ const LogicJump = ({ id, isTest }) => {
         if (logicJumpSlide) {
             getLogicJumpSlides()
         }
-        console.log("called")
     }, [dispatch, router.query.id])
 
 
@@ -115,23 +113,29 @@ const LogicJump = ({ id, isTest }) => {
     }
 
 
-    console.log({slide})
     const editSlide = (item) => {
-        const MainLogicSlide = !isTest ? logicJump.find(obj => obj._id === id) : testLogicJump.find(obj => obj._id === id)
+        // const MainLogicSlide = !isTest ? logicJump.find(obj => obj._id === id) : testLogicJump.find(obj => obj._id === id)
 
-        let arrno = null
-        for (let i = 0; i < 4; i++) {
-            const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
-            arrno = i
-            if (index > -1) break
-        }
-        // dispatch(setUpdateSlide({ is: false, data: null, id: null }))
-        dispatch(setUpdateLogicSlide({ is: true, data: item, id, arrno, logic_jump_id: item._id }))
-        if (!isTest) {
-            router.push(`/slide/lesson?title=${item.heading}&key=${id}`)
+        // let arrno = null
+        // for (let i = 0; i < 4; i++) {
+        //     const index = MainLogicSlide.logic_jump.arr[i]?.next?.findIndex(obj => obj.id === item._id)
+        //     arrno = i
+        //     if (index > -1) break
+        // }
+        // // dispatch(setUpdateSlide({ is: false, data: null, id: null }))
+        // dispatch(setUpdateLogicSlide({ is: true, data: item, id, arrno, logic_jump_id: item._id }))
+        // if (!isTest) {
+        //     router.push(`/slide/lesson?title=${item.heading}&key=${id}`)
+        // } else {
+        //     router.push(`/slide/test?title=${item.heading}&key=${id}`)
+        // }
+
+
+        dispatch(setUpdateSlide({ is: true, data: item, id: item._id }))
+        if (isTest) {
+            router.push(`/slide/test?title=$Test&key=0&update=true`)
         } else {
-            router.push(`/slide/test?title=${item.heading}&key=${id}`)
-
+            router.push(`/slide/lesson?title=Lesson&key=0&update=true`)
         }
     }
 
@@ -199,9 +203,6 @@ const LogicJump = ({ id, isTest }) => {
 
         }
     }
-
-
-    console.log({showSlideOpt})
     return (
         <>
             <ToastContainer position="top-right" delay={3000} />

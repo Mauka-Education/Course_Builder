@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { Temp10, Temp12, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
 import { setTestData, setUpdateSlide, updateTestSlides, setTestLogicJump, setTestLogicJumpSlides, setTestUpdateLogicSlide, clearTestLogicJump, deleteTestLogicJumpSlides, updateTestLogicJump } from "../../../redux/slices/util"
-import { useGetTestSlideMutation } from "../../../redux/slices/slide"
+import { useAutoSaveMediaMutation, useAutosaveslideinlogicMutation, useAutoSaveSlideMutation, useGetTestSlideMutation } from "../../../redux/slices/slide"
 import { useRouter } from "next/router"
 import { RemoveHtmlFromString } from "../../util/RemoveHtmlFromString"
 
@@ -67,6 +67,10 @@ const Test = ({ title, id, no, lessonId }) => {
     const [showLogicOpt, setShowLogicOpt] = useState(false)
     const [currentLogicJump, setCurrentLogicJump] = useState({ id: null, name: null })
 
+    const [autoSave] = useAutoSaveSlideMutation()
+    const [autoSaveMedia] = useAutoSaveMediaMutation()
+    const [autoSaveInLogic] = useAutosaveslideinlogicMutation()
+
     useEffect(() => {
         if (test.length !== 0) {
             setTotalSlideAdded(test)
@@ -81,18 +85,24 @@ const Test = ({ title, id, no, lessonId }) => {
             setLogicJumpArr(testLogicJump)
             setCurrentLogicJump({ id: testLogicJump[0]._id, name: "Select Logic Jump" })
         }
-        if (updateLogicSlide.is) {
-            const name = templateType.find((item) => item.slideno === updateLogicSlide.data.builderslideno).name
-            const builderslideno = templateType.find(obj => obj.slideno === updateLogicSlide.data.builderslideno)
-            setCurrentTemplate({ id: builderslideno.id, name })
-        }
     }, [])
-
-    console.log({testLogicJump})
 
     useEffect(() => {
 
     }, [dispatch, test])
+
+    useEffect(() => {
+        if (testLogicJump.length !== 0) {
+            if (logicJumpId && isLogicJump === "true") {
+                const logicSlide = testLogicJump.find(item => item._id === logicJumpId)
+                setCurrentLogicJump({ id: logicJumpId, name: logicSlide.question })
+            } else {
+                setCurrentLogicJump({ id: testLogicJump[0]._id, name: "Select Logic Jump" })
+
+            }
+        }
+
+    }, [testLogicJump])
 
     useEffect(() => {
         dispatch(setTestData(totalSlideAdded))
@@ -105,38 +115,47 @@ const Test = ({ title, id, no, lessonId }) => {
     }
 
     const onAddSlide = (data) => {
-        setCurrentTemplate({ id: null, name: null })
+        if (logicJumpId) {
+            return
+        }
         setTotalSlideAdded(item => [...item, { ...data }])
+        toast.success("Slide  Created")
     }
 
-    const onSlideUpdateHandler = (id, data) => {
-        dispatch(updateTestSlides({ id, data }))
-        dispatch(setUpdateSlide({ id: null, is: false, data: null }))
-        router.back()
+    const autoSaveHandler = (id, data, media = false, isLogicJump) => {
+        const modifiedId = updateSlide.is ? updateSlide.id : id
+
+        setTimeout(() => {
+            if (!media) {
+                autoSave({ id: modifiedId, data, isTest: true }).unwrap().then(res => {
+                    setTotalSlideAdded((prev) => prev.map(obj => obj._id === modifiedId ? { ...res.data } : obj))
+
+                    if (isLogicJump) {
+                        dispatch(updateLogicJump({ id: modifiedId, data: res.data }))
+                    }
+                }).catch(err => {
+                })
+
+            } else {
+                autoSaveMedia({ id: modifiedId, data, isTest: true }).unwrap().then(res => {
+                    setTotalSlideAdded((prev) => prev.map(obj => obj._id === modifiedId ? { ...res.data } : obj))
+
+                    if (isLogicJump) {
+                        dispatch(updateLogicJump({ id: modifiedId, data: res.data }))
+                    }
+                }).catch(err => {
+                })
+            }
+        }, 1000)
     }
 
-
-    const onPrevClick = () => {
-        const lastSlide = test[test.length - 1]
-        const findSlide = templateType.filter(item => item.slideno === lastSlide.slideno)[0]
-
-
-        if (lastSlide) {
-            setCurrentTemplate({ id: findSlide?.id, name: findSlide?.name, temp: findSlide?.comp })
-        }
-
-    }
-
-    const onLogicJumpSLideAddHandler = (data, update = false) => {
-        // dispatch(setTestLogicJumpSlides(data))
-        dispatch(updateTestLogicJump({ id: data._id, data }))
-        setTotalSlideAdded((prev) => prev.map((obj) => obj._id === data._id ? { ...obj, ...data } : obj))
-        if (update) {
-            router.back()
-            dispatch(setTestUpdateLogicSlide({ is: false, data: null, logic_jump_id: null, arrno: null }))
-        }
-
-        setCurrentTemplate({ id: null, name: null })
+    const onLogicJumpAutoSave = (slide_id, logic_id) => {
+        autoSaveInLogic({ id: logicJumpId, slide_id, logic_id, isTest: true }).then((res) => {
+            setTotalSlideAdded(prev => prev.map(obj => obj._id === logicJumpId ? { ...res.data.data } : obj))
+            dispatch(updateTestLogicJump({ id: logicJumpId, data: res.data.data }))
+        }).catch(err => {
+            console.log({ err })
+        })
     }
 
     function renderer(id) {
@@ -146,9 +165,9 @@ const Test = ({ title, id, no, lessonId }) => {
             onAddSlide,
             order: test.length,
             isTest: true,
-            update: !updateSlide.is ? updateLogicSlide : updateSlide,
-            onSlideUpdateHandler,
-            isLogicJump: { is: isLogicJump ?? false, logicJumpId, handler: onLogicJumpSLideAddHandler }
+            update: updateSlide,
+            isLogicJump: { is: isLogicJump ?? false, logicJumpId, handler: onLogicJumpAutoSave },
+            autoSaveHandler
         }
 
         switch (id) {
@@ -172,7 +191,7 @@ const Test = ({ title, id, no, lessonId }) => {
     }
 
 
-    
+
 
     return (
         <div className="course__builder-slide">
@@ -234,7 +253,7 @@ const Test = ({ title, id, no, lessonId }) => {
                                         <div className="right">
                                             <h3>Logic Jump</h3>
                                             <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
-                                                <h3 dangerouslySetInnerHTML={{ __html: currentLogicJump.name }}></h3>
+                                                <h3>{RemoveHtmlFromString(currentLogicJump.name)?.slice(0, 30) ?? "No Heading"}</h3>
                                                 <BsChevronDown size={20} />
                                             </div>
                                             <AnimatePresence>
@@ -248,8 +267,7 @@ const Test = ({ title, id, no, lessonId }) => {
                                                                             setCurrentLogicJump({ id: item._id, name: RemoveHtmlFromString(item.question).slice(0, 15) })
                                                                             setShowLogicOpt(false)
                                                                         }}>
-                                                                            <b dangerouslySetInnerHTML={{ __html: `${RemoveHtmlFromString(item.question).slice(0, 15)}` }} ></b>
-                                                                            {/* <span>#{item.id}</span> */}
+                                                                            <b>{RemoveHtmlFromString(item.question)?.slice(0, 30) ?? "No Heading"}</b>
                                                                         </div>
                                                                     </Link>
                                                                 ))
@@ -285,23 +303,17 @@ const Test = ({ title, id, no, lessonId }) => {
                         )
                     }
                 </div>
-                <div className="lesson__btn">
-                    {
-                        test?.length !== 0 && (
-                            <motion.button className="previous" whileTap={{ scale: .97 }} onClick={onPrevClick} >
-                                <p>Previous Slide</p>
-                                <MdOutlineArrowBackIos size={20} />
+
+                {
+                    !updateSlide?.is && (
+                        <div className="lesson__btn">
+                            <motion.button className="add" whileTap={{ scale: .97 }} onClick={() => setCurrentTemplate({ id: null, name: null, temp: null })}>
+                                <p>Add Slide</p>
+                                <AiOutlinePlus size={20} />
                             </motion.button>
-                        )
-                    }
-                    <motion.button className="add" whileTap={{ scale: .97 }} onClick={() => setCurrentTemplate({ id: null, name: null, temp: null })}>
-                        <p>Add Slide</p>
-                        <AiOutlinePlus size={20} />
-                    </motion.button>
-                    <motion.button className="done" whileTap={{ scale: .97 }} >
-                        Done
-                    </motion.button>
-                </div>
+                        </div>
+                    )
+                }
             </div>
         </div >
     )
