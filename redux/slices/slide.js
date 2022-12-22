@@ -151,6 +151,13 @@ export const slideApi = createApi({
         body:{logic_id},
         method:"POST"
       })
+    }),
+    lessonlistOrder:builder.mutation({
+      query:(data)=>({
+        url:"/lessonlist",
+        body:{data},
+        method:"PATCH"
+      })
     })
   }),
 });
@@ -176,5 +183,6 @@ export const {
   useInitiateSlideMutation,
   useAutoSaveSlideMutation,
   useAutoSaveMediaMutation,
-  useAutosaveslideinlogicMutation
+  useAutosaveslideinlogicMutation,
+  useLessonlistOrderMutation
 } = slideApi;

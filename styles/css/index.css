@@ -684,7 +684,7 @@ ul, ol {
 }
 .mauka__builder-create__form .course__struct-content .card {
   cursor: pointer;
-  padding: 1.5rem;
+  padding: 1.5rem 2.5rem;
   box-shadow: 0 0.125rem 0.5rem -0.25rem rgba(31, 27, 45, 0.12), 0 0.25rem 1rem rgba(31, 27, 45, 0.12) !important;
   display: flex;
   justify-content: center;
@@ -730,17 +730,18 @@ ul, ol {
 }
 .mauka__builder-create__form .course__struct-content .card.light {
   background: #c0e1ff;
-  padding: 1.5rem 2.5rem;
 }
 .mauka__builder-create__form .course__struct-content .card.light:last-child {
   margin-bottom: 0;
 }
 .mauka__builder-create__form .course__struct-content .card.violet {
   background: #8560a8;
+  padding-left: 1.5rem;
   margin-left: 1rem;
   color: white;
 }
 .mauka__builder-create__form .course__struct-content .card.main {
+  padding-left: 1.5rem;
   margin-left: 1rem;
   background: #0a1e32;
   color: white;

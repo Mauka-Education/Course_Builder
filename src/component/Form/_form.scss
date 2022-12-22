@@ -382,12 +382,13 @@
 
           .card {
             cursor: pointer;
-            padding: 1.5rem;
+            padding: 1.5rem 2.5rem;
             @include card_shadow;
             @include center_elem;
             justify-content: space-between;
             border-radius: 0.5rem;
 
+            
             &__left {
               @include center_elem;
             }
@@ -425,7 +426,6 @@
             &.light {
               // margin-bottom: 5rem;
               background: #c0e1ff;
-              padding: 1.5rem 2.5rem;
               &:last-child{
                 margin-bottom: 0;
                 
@@ -433,10 +433,12 @@
             }
             &.violet {
               background: #8560a8;
+              padding-left: 1.5rem;
               margin-left: 1rem;
               color: white;
             }
             &.main {
+              padding-left: 1.5rem;
               margin-left: 1rem;
               background: $main-color;
               color: white;

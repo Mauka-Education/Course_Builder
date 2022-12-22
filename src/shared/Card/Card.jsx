@@ -2,12 +2,12 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { TbNotebook } from "react-icons/tb"
 import { useDispatch } from "react-redux"
-import { clearCourse, setCourseData, setInitiated, setIsPreview } from "../../redux/slices/util"
+import { clearCourse, setCourseData, setInitiated, setIsPreview } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
-import { useGetCourseByIdMutation } from "../../redux/slices/course"
+import { useGetCourseByIdMutation } from "../../../redux/slices/course"
 import { useEffect, useState } from "react"
-import { getPreSignedUrl } from "../util/getPreSignedUrl"
-import { useGetTotalLessonMutation } from "../../redux/slices/slide"
+import { getPreSignedUrl } from "../../util/getPreSignedUrl"
+import { useGetTotalLessonMutation } from "../../../redux/slices/slide"
 
 const Card = ({ title, subtitle, duration, img, id }) => {
     const dispatch = useDispatch()

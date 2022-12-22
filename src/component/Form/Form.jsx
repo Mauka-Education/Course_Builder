@@ -50,7 +50,7 @@ const Form = () => {
                 let arr = []
                 let preType = []
                 res.data.forEach((item, index) => {
-                    arr.push({ name: item?.name, pre: item?.pre, row: item?.order, isSaved: item?._id })
+                    arr.push({ name: item?.name, pre: item?.pre, row: item?.order, isSaved: item?._id,order:item.order })
                     preType.push({ id: index, name: item?.name })
                     // dispatch(setCourseData({structure:{name: "", pre: null, row: 0, isSaved: null, update: false}}))
                 })

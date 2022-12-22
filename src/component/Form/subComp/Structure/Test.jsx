@@ -35,7 +35,7 @@ const Test = ({ course, toast }) => {
       getTests(course?.id).unwrap().then((res)=>{
         let arr=[]
         res.data.forEach((item)=>{
-          arr.push({heading:item.heading,id:item._id,lesson: item.lesson, time_to_finish: item.time_to_finish,subtext:item.subtext})
+          arr.push({heading:item.heading,id:item._id,lesson: item.lesson, time_to_finish: item.time_to_finish,subtext:item.subtext,order:item?.order ?? 0 })
         })
         setSavedData(arr)
       }).catch((err)=>{
@@ -59,7 +59,7 @@ const Test = ({ course, toast }) => {
   }
 
   const onSubmitHandler = () => {
-    if (!formData.heading || !formData.heading || !formData.time_to_finish || !selectLesson.id) {
+    if (!formData.heading || !formData.heading || !formData.time_to_finish) {
       toast.error("All Field is Required")
     } else if (isUpdate) {
       updateTest({ data: { ...formData }, id: formData?.id }).unwrap().then((res) => {
@@ -175,7 +175,7 @@ const Test = ({ course, toast }) => {
                     opacity: 0
                   }}>
                     {
-                      course?.structure?.map((item, i) => (course?.test[i]?.lesson === item?.lesson) && (
+                      course?.structure?.map((item, i) =>  !course?.test.find(obj=>obj.lesson===item?.isSaved) && (
                         <div className="opt" onClick={() => onOptionClickHandler(item)} key={item?.id}>
                           <p style={{ textAlign: "start" }}>
                             {item.name}  -  #{item.isSaved}</p>
