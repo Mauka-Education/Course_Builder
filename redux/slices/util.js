@@ -53,6 +53,7 @@ const utilSlice = createSlice({
       state.initiated = { ...state.initiated, ...action.payload };
     },
     setCourseData: (state, action) => {
+      console.log(action.payload)
       state.course = { ...state.course, ...action.payload };
     },
     setPreRequisite: (state, action) => {

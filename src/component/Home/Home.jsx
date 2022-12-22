@@ -1,5 +1,5 @@
 
-import Card from '../../shared/Card'
+import Card from '../../shared/Card/Card'
 import { BsPlusLg } from "react-icons/bs"
 import { motion } from 'framer-motion';
 import Link from 'next/link';
