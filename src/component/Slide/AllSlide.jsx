@@ -11,7 +11,7 @@ import { IoMdArrowBack } from "react-icons/io"
 
 import { useChangeSlideOrderMutation, useChangeTestSlideOrderMutation, useDeleteSlideMutation, useDeleteTestSlideMutation, useGetSlideMutation } from "../../../redux/slices/slide"
 import { toast, ToastContainer } from "react-toast"
-import { deleteLogicJumpSlides, setLogicJumpSlides, setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
+import { deleteLogicJumpSlides, deleteTestLogicJumpSlides, setLogicJumpSlides, setSlideData, setTestData, setUpdateSlide } from "../../../redux/slices/util"
 import { useRouter } from "next/router"
 import { FaListAlt } from "react-icons/fa"
 
@@ -105,6 +105,9 @@ const AllSlide = ({ id: key, type }) => {
             })
         } else {
             deleteTestSlide(id).unwrap().then(() => {
+                if (isLogicJump) {
+                    dispatch(deleteTestLogicJumpSlides({ id }))
+                }
                 toast.success("Item Deleted")
                 setAllSlides(item => item.filter((item) => item?._id !== id))
             }).catch((err) => {

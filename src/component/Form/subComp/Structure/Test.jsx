@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { setCourseData } from "../../../../../redux/slices/util"
 import { MdDelete } from "react-icons/md"
-import { useAddTestMutation, useDeleteTestMutation, useUpdateTestMutation ,useGetTestMutation} from "../../../../../redux/slices/course"
+import { useDeleteTestMutation, useUpdateTestMutation ,useGetTestMutation, useInitiateTestMutation} from "../../../../../redux/slices/course"
 
 
 const Test = ({ course, toast }) => {
@@ -14,15 +14,15 @@ const Test = ({ course, toast }) => {
   const dispatch = useDispatch()
   const [savedData, setSavedData] = useState([])
 
-  const [addTest] = useAddTestMutation()
+
+  const [initateTest]=useInitiateTestMutation()
   const [deleteTest] = useDeleteTestMutation()
   const [updateTest] = useUpdateTestMutation()
   const [getTests]=useGetTestMutation()
-  const [isUpdate, setIsUpdate] = useState(false)
 
   const {isPreview}=useSelector((state)=>state.util)
 
-
+  const [currentId, setCurrentId] = useState(null)
 
   useEffect(() => {
 
@@ -50,39 +50,31 @@ const Test = ({ course, toast }) => {
   }, [savedData])
 
   const onOptionClickHandler = (item) => {
-    setSelectLesson(prev => ({ ...prev, id: item.isSaved, name: item.name }))
-    setShowLesson(false)
+    
+    updateTest({ data:{lesson:item.isSaved}, id: currentId }).then(res => {
+      setSelectLesson(prev => ({ ...prev, id: item.isSaved, name: item.name }))
+      setShowLesson(false)
+      setSavedData(prev=>prev.map(obj=>obj.id==currentId ? {...obj,lesson:item.isSaved} : obj ))
+    }).catch(err => {
+      console.log("Err")
+    })
   }
 
   const onChangeHandler = (data) => {
     setFormData(item => ({ ...item, ...data }))
-  }
-
-  const onSubmitHandler = () => {
-    if (!formData.heading || !formData.heading || !formData.time_to_finish) {
-      toast.error("All Field is Required")
-    } else if (isUpdate) {
-      updateTest({ data: { ...formData }, id: formData?.id }).unwrap().then((res) => {
-        toast.success("Test Updated")
-        setSavedData(item => item.map((obj, i) => obj.id === formData?.id ? { ...obj, heading: res.data.heading, subtext: res.data.subtext, lesson: res.data.lesson, time_to_finish: res.data.time_to_finish } : obj))
-      }).catch((err) => {
-        toast.error("Error Occured, While Updating")
+    setSavedData(item => item.map(obj => obj.id === currentId ? { ...obj, ...data } : obj))
+    setTimeout(() => {
+      updateTest({ data, id: currentId }).then(res => {
+        console.log({ res })
+      }).catch(err => {
+        console.log("Err")
       })
-    } else {
-      addTest({ ...formData, lesson: selectLesson.id, course: course.id, time_to_finish: parseInt(formData.time_to_finish) }).unwrap().then((res) => {
-        toast.success("Test Added")
-        setSavedData(item => ([...item, { id: res.data._id, heading: res.data.heading, subtext: res.data.subtext, lesson: res.data.lesson, time_to_finish: res.data.time_to_finish }]))
-        setSelectLesson({ id: null, name: null })
-        setFormData({ heading: "", subtext: "", time_to_finish: "" })
-      }).catch((err) => {
-        toast.error("Some Error Occured")
-      })
-    }
+    }, 1000)
   }
 
   const itemClickHandler = (item) => {
-    setIsUpdate(true)
     setFormData({ ...formData, ...item })
+    setCurrentId(item.id)
     const lessonName = course?.structure?.find((prev) => prev.isSaved === item.lesson)
     setSelectLesson({ id: item.lesson, name: lessonName?.name })
   }
@@ -91,38 +83,48 @@ const Test = ({ course, toast }) => {
     
     deleteTest(id).unwrap().then(() => {
       toast.success("Test Deleted")
+      setCurrentId(null)
+      setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
       setSavedData(item => item.filter((d) => d.id !== id))
+      setSelectLesson({ id: null, name: null })
     }).catch((err) => {
       console.log({ err })
       toast.error("Error Occured")
     })
   }
   const onClearHandler = () => {
-    setIsUpdate(false)
+    setCurrentId(null)
     setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
     setSelectLesson({ id: null, name: null })
   }
 
+  const onInitiate = () => {
+    initateTest(course.id).unwrap().then(res => {
+      setCurrentId(res.data)
+      setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
+      setSelectLesson({id:null,name:null})
+      setSavedData(item => ([...item, { id: res.data }]))
+    }).catch(err => {
+      console.log({ err })
+    })
+  }
 
   return (
     <div className="course__structure-content__assignment">
       <div className="left">
-        {/* <div className="left__title">
-          <h1>List:-</h1>
-        </div> */}
         <div className="left__content">
           {
             savedData?.map((item, index) => (
               <div className="item" key={index} >
                 <div className="item__left" onClick={() => itemClickHandler(item)}>
-                  <h2>{index + 1}</h2>
+                  <h3>{index + 1}</h3>
                   <div className="title">
-                    <h2>{item.heading}</h2>
-                    <p>{item.subtext.slice(0, 150)}</p>
+                    <h3>{item.heading ?? "Heading" }</h3>
+                    <p>{ item.subtext ? item.subtext.slice(0, 150) : "Subtext"} </p>
                   </div>
                 </div>
                 <motion.div className="delete" whileTap={{ scale: .97 }} onClick={() => assigmentDeleteHandler(item.id)}>
-                  <MdDelete size={30} color="red" />
+                  <MdDelete size={20} color="red" />
                 </motion.div>
               </div>
             ))
@@ -133,28 +135,30 @@ const Test = ({ course, toast }) => {
       <div className="right">
         <div className="right__title">
           <h2>Add Test</h2>
-          <motion.div className="clear" onClick={onClearHandler} whileTap={{ scale: .98 }}>
-            <p>clear</p>
+          <motion.div className={`clear ${currentId && "danger"} `} onClick={ !currentId ? onInitiate : onClearHandler } whileTap={{ scale: .98 }}>
+            {
+              currentId ? <p>Clear</p> :<p>Add New</p>
+            }
           </motion.div>
 
         </div>
 
         <div className="right__form">
           <div className="right__form-item input">
-            <span>Title</span>
-            <input type="text" placeholder='Test Heading' value={formData?.heading} onChange={(e) => onChangeHandler({ heading: e.target.value })} />
+            <span style={{color: !currentId && "gray"}}>Title</span>
+            <input type="text" disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}} placeholder='Test Heading' value={formData?.heading} onChange={(e) => onChangeHandler({ heading: e.target.value })}  />
           </div>
           <div className="right__form-item input">
-            <span>Subtext</span>
-            <textarea type="text" placeholder='Test Subtext' rows={4} value={formData?.subtext} onChange={(e) => onChangeHandler({ subtext: e.target.value })} />
+            <span style={{color: !currentId && "gray"}}>Question</span>
+            <textarea type="text" disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}} placeholder='Test Question' rows={4} value={formData?.subtext} onChange={(e) => onChangeHandler({ subtext: e.target.value })}  />
           </div>
           <div className="right__form-item input">
-            <span>Duration</span>
-            <input type="number" placeholder="Add Test Duration in mins" value={formData?.time_to_finish} onChange={(e) => onChangeHandler({ time_to_finish: e.target.value })} />
+            <span style={{color: !currentId && "gray"}}>Duration</span>
+            <input type="number"  disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}}placeholder="Add Test Duration in mins" value={formData?.time_to_finish} onChange={(e) => onChangeHandler({ time_to_finish: e.target.value })}  />
           </div>
           <div className="right__form-item type">
-            <span>Lesson ID</span>
-            <div className="type__title" onClick={() => setShowLesson(!showLesson)}>
+            <span style={{color: !currentId && "gray"}}>Lesson ID</span>
+            <div className="type__title" disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}} onClick={() => currentId && setShowLesson(!showLesson )}>
               <p>{selectLesson.name ?? "None"}</p>
               <div className="cor">
                 <span>{selectLesson?.id && `#${selectLesson.id}`}</span>
@@ -183,15 +187,10 @@ const Test = ({ course, toast }) => {
                       ))
                     }
                   </motion.div>
-
                 )
               }
             </AnimatePresence>
           </div>
-          <motion.div className="right__form-save" whileTap={{ scale: .99 }} onClick={onSubmitHandler}>
-            <h2>Save Changes</h2>
-          </motion.div>
-
         </div>
       </div>
 

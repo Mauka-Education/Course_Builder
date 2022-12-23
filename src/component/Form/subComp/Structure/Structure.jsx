@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { BsPlusCircleFill } from "react-icons/bs"
 import { useDispatch, useSelector } from 'react-redux'
 import { setCourseData, setPreRequisite } from '../../../../../redux/slices/util'
-import { useAddLessonMutation, useUpdateLessonMutation, useDeleteLessonMutation } from '../../../../../redux/slices/course'
+import { useUpdateLessonMutation, useDeleteLessonMutation, useInitiateLessonMutation, useGetAssignmentMutation, useGetTestMutation } from '../../../../../redux/slices/course'
 import Assignment from './Assignment'
 import Test from './Test'
 
@@ -25,13 +25,25 @@ const switchOpton = [
 ]
 
 function Lesson(props) {
-    
-    const {changePos,setShowNumOpt,showNumOpt}=props
+    const { courseId } = props
+    const [initiateLesson] = useInitiateLessonMutation()
+
+    const { changePos, setShowNumOpt, showNumOpt } = props
+
+    const onAddLessonHandler = () => {
+        initiateLesson(courseId).unwrap().then(res => {
+            props.addFieldHandler(null, res.data)
+        }).catch(err => {
+            console.log({ err })
+        })
+    }
+
     return (<div>
         {props.fieldArr.map((item, index) => <div className="course__structure-content__item" key={index}>
             <div className='first' key={index}>
                 <br />
-                <h3 className='no' onClick={() => props.fieldArr.length !== 0 && setShowNumOpt({ id: showNumOpt.id ? null : index, show: showNumOpt.show ? false : true })} >{index + 1} {props.fieldArr.length !== 0 && <RiArrowDownSFill />} </h3>
+                {/* onClick={() => props.fieldArr.length !== 0 && setShowNumOpt({ id: showNumOpt.id ? null : index, show: showNumOpt.show ? false : true })}  */}
+                <h3 className='no' >{index + 1}</h3>
                 <AnimatePresence>
 
                     {
@@ -48,7 +60,7 @@ function Lesson(props) {
                             }}>
                                 {
                                     props.fieldArr.map((_, i) => (
-                                        <div className="opt" onClick={()=>changePos(index,i)} key={i}>
+                                        <div className="opt" onClick={() => changePos(index, i)} key={i}>
                                             <h3>{i + 1}</h3>
                                         </div>
                                     ))
@@ -60,7 +72,10 @@ function Lesson(props) {
             </div>
             <div className="input">
                 <span>Title</span>
-                <input type="text" placeholder='Type Lesson Name' value={item.name ?? null} onChange={e => props.onNameChangeHanlder(e, index)} />
+                <input type="text" placeholder='Type Lesson Name' value={item.name ?? null} onChange={e => {
+                    props.onChange(item.isSaved, { name: e.target.value })
+                    props.onNameChangeHanlder(e, index)
+                }} />
             </div>
             <div className="type">
                 <span>Pre-requisite</span>
@@ -103,7 +118,7 @@ function Lesson(props) {
         <div className="add">
             <motion.div className="add__btn" whileTap={{
                 scale: .97
-            }} onClick={() => props.addFieldHandler(props.fieldArr.length)}>
+            }} onClick={onAddLessonHandler}>
                 <BsPlusCircleFill size={40} />
             </motion.div>
         </div>
@@ -123,16 +138,17 @@ const Structure = ({ toast }) => {
     const [showNumOpt, setShowNumOpt] = useState({ id: null, show: false })
 
     const dispatch = useDispatch()
-    const [addLesson] = useAddLessonMutation()
     const [deleteLesson] = useDeleteLessonMutation()
     const [updateLesson] = useUpdateLessonMutation()
+    const [getAssignment]=useGetAssignmentMutation()
+    const [getTest]=useGetTestMutation()
 
     const [preType, setPreType] = useState([])
-    
+
 
     useEffect(() => {
 
-    }, [dispatch])
+    }, [dispatch, course])
     useEffect(() => {
         dispatch(setCourseData({ structure: fieldArr }))
     }, [fieldArr])
@@ -140,7 +156,6 @@ const Structure = ({ toast }) => {
 
     useEffect(() => {
         dispatch(setPreRequisite(preType))
-
     }, [preType])
 
     useEffect(() => {
@@ -150,12 +165,33 @@ const Structure = ({ toast }) => {
         if (preRequisite || preRequisite?.length === 0) {
             setPreType(preRequisite)
         }
-
+        if(!course?.assignment || !course?.assignment?.length===0){
+            getAssignment(course?.id).unwrap().then((res) => {
+                let arr = []
+                res.data.forEach((item) => {
+                  arr.push({ heading: item.heading, id: item._id, lesson: item.lesson, time_to_finish: item.time_to_finish, subtext: item.subtext, order: item?.order ?? 0 })
+                })
+                dispatch(setCourseData({assigment:arr}))
+              }).catch((err) => {
+                toast.error("Error Occured while Fetching")
+              })
+        }
+        if(!course?.test || !course?.test?.length===0){
+            getTest(course?.id).unwrap().then((res) => {
+                let arr = []
+                res.data.forEach((item) => {
+                  arr.push({ heading: item.heading, id: item._id, lesson: item.lesson, time_to_finish: item.time_to_finish, subtext: item.subtext, order: item?.order ?? 0 })
+                })
+                dispatch(setCourseData({test:arr}))
+              }).catch((err) => {
+                toast.error("Error Occured while Fetching")
+              })
+        }
     }, [])
+    console.log({course})
 
 
     const showOptionHandler = (id, no) => {
-
         if (id === showOption.id && no === showOption.row) {
             setShowOption(item => ({ ...item, id: null, show: false, row: null }))
         } else {
@@ -175,8 +211,8 @@ const Structure = ({ toast }) => {
         }
     }
 
-    const addFieldHandler = (index) => {
-        setFieldArr([...fieldArr, { name: "", pre: null, row: index, isSaved: null }])
+    const addFieldHandler = (index, id) => {
+        setFieldArr([...fieldArr, { name: "", pre: null, row: index, isSaved: id ?? null }])
     }
 
     const removeFieldHandler = (id) => {
@@ -198,38 +234,27 @@ const Structure = ({ toast }) => {
 
     const optionSelectHandler = (data, row) => {
         setFieldArr(list => list.map((obj, i) => i === row ? { ...obj, pre: data, update: obj.isSaved ? true : false } : obj))
+        onLessonChangeHandler(fieldArr[row].isSaved, { pre: data })
         setShowOption(item => ({ ...item, id: null, show: false, row: null }))
     }
 
 
-    const onSaveHandler = () => {
-        fieldArr.forEach((item, index) => {
-            if (!item.isSaved) {
-                addLesson({ data: { order: index, name: item.name, pre: item.pre }, id: course.id }).unwrap().then((res) => {
-                    toast.success("Lesson Added")
-                    setFieldArr(list => list.map((obj, i) => i === index ? { ...obj, isSaved: res.data?._id } : obj))
-                })
-            } else if (item.update) {
-                updateLesson({ data: item, id: item.isSaved }).unwrap().then(() => {
-
-                    setFieldArr(list => list.map((obj, i) => i === index ? { ...obj, update: false } : obj))
-                    toast.success("Lesson Updated")
-                })
-            }
-        })
-
-    }
-
     const changePos = (fromIndex, toIndex) => {
-        
         var element = fieldArr[fromIndex];
-        const newArr=[...fieldArr]
+        const newArr = [...fieldArr]
         newArr.splice(fromIndex, 1)
         newArr.splice(toIndex, 0, element)
         setFieldArr(newArr)
-        setShowNumOpt({id:null,show:false})
+        setShowNumOpt({ id: null, show: false })
     }
 
+    const onLessonChangeHandler = (id, data) => {
+        setTimeout(() => {
+            updateLesson({ id, data }).unwrap().then(res => {
+                console.log({ res })
+            })
+        }, 1000)
+    }
     function showComp() {
         switch (switchOption) {
             case "Lesson":
@@ -245,6 +270,9 @@ const Structure = ({ toast }) => {
                     changePos={changePos}
                     showNumOpt={showNumOpt}
                     setShowNumOpt={setShowNumOpt}
+
+                    courseId={course.id}
+                    onChange={onLessonChangeHandler}
 
                 />
             case "Assignment":
@@ -272,37 +300,29 @@ const Structure = ({ toast }) => {
 
             <div className="course__structure-title">
                 <h1>{course?.name ?? "Structure"}</h1>
-                {
-                    switchOption === "Lesson" && (
-                        <motion.div className="save" whileTap={{ scale: .97 }} onClick={onSaveHandler}>
-                            <h2>Save Changes</h2>
-                        </motion.div>
-                    )
-                }
-            </div>
-            <div className="course__structure-switch">
+                <div className="course__structure-switch">
+                    <motion.div className="btn" onClick={() => setShowSwitch(item => (!item))} whileTap={{ scale: .97 }}>
+                        <h3>{switchOption}</h3>
+                        <RiArrowDownSFill size={20} />
+                    </motion.div>
+                    <AnimatePresence>
+                        {
+                            showSwitch && (
+                                <motion.div className="btn__option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} >
+                                    {switchOpton.map((item) => (
+                                        <div className="btn__option-item" key={item.id} onClick={() => {
+                                            setSwitchOption(item.name)
+                                            setShowSwitch(false)
+                                        }}>
+                                            <p>{item.name}</p>
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            )
+                        }
+                    </AnimatePresence>
 
-                <motion.div className="btn" onClick={() => setShowSwitch(item => (!item))} whileTap={{ scale: .97 }}>
-                    <h3>{switchOption}</h3>
-                    <RiArrowDownSFill size={20} />
-                </motion.div>
-                <AnimatePresence>
-                    {
-                        showSwitch && (
-                            <motion.div className="btn__option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} >
-                                {switchOpton.map((item) => (
-                                    <div className="btn__option-item" key={item.id} onClick={() => {
-                                        setSwitchOption(item.name)
-                                        setShowSwitch(false)
-                                    }}>
-                                        <p>{item.name}</p>
-                                    </div>
-                                ))}
-                            </motion.div>
-                        )
-                    }
-                </AnimatePresence>
-
+                </div>
             </div>
             <div className="course__structure-content">
                 {showComp()}
