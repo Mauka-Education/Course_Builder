@@ -121,9 +121,11 @@ const CourseStructue = ({ course }) => {
             }
             case "assignment":{
                 dispatch(setCourseData({ assigment: course.assigment.map(obj=>obj.id===id ? {...obj,order} : obj )}))
+                return
             }
             case "test":{
                 dispatch(setCourseData({ test: course.test.map(obj=>obj.id===id ? {...obj,order} : obj )}))
+                return
             }
             default:
                 return
