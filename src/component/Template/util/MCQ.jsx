@@ -75,6 +75,8 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
       setQuestArray(item => item.map(obj => obj.id === id ? { ...obj, isCorrect: value } : { ...obj, isCorrect: false }))
     }
   }
+
+  console.log({questArray})
   return (
     <div className="course__builder-template__option">
       <div className="upper">

@@ -2,17 +2,17 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // const url = "http://localhost:3000/api/admin";
 // const prodUrl = "https://lms.maukaeducation.com/api/admin";
-const url=process.env.NODE_ENV==="development" ? "http://localhost:3000/api/admin" : "https://lms.maukaeducation.com/api/admin"
+const url =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000/api/admin"
+    : "https://lms.maukaeducation.com/api/admin";
 
 export const courseApi = createApi({
   reducerPath: "course",
   baseQuery: fetchBaseQuery({
     baseUrl: url,
     prepareHeaders: (headers, { getState }) => {
-      headers.set(
-        "Authorization",
-        `Bearer ${getState().util.user.token}`
-      );
+      headers.set("Authorization", `Bearer ${getState().util.user.token}`);
       return headers;
     },
   }),
@@ -48,11 +48,10 @@ export const courseApi = createApi({
         method: "GET",
       }),
     }),
-    addLesson: builder.mutation({
-      query: ({ data, id }) => ({
-        url: `/addlesson/${id}`,
-        method: "POST",
-        body: data,
+    initiateLesson: builder.mutation({
+      query: (id) => ({
+        url: `/initiatelesson/${id}`,
+        method: "GET",
       }),
     }),
     updateLesson: builder.mutation({
@@ -74,11 +73,10 @@ export const courseApi = createApi({
         method: "GET",
       }),
     }),
-    addAssignment: builder.mutation({
-      query: (data) => ({
-        url: `/addassignment`,
-        method: "POST",
-        body: data,
+    initiateAssinment: builder.mutation({
+      query: (id) => ({
+        url: `/initiateassignment/${id}`,
+        method: "GET",
       }),
     }),
     updateAssignment: builder.mutation({
@@ -100,11 +98,10 @@ export const courseApi = createApi({
         method: "GET",
       }),
     }),
-    addTest: builder.mutation({
-      query: (data) => ({
-        url: "/addtest",
-        method: "POST",
-        body: data,
+    initiateTest: builder.mutation({
+      query: (id) => ({
+        url: `/initiatetest/${id}`,
+        method: "GET",
       }),
     }),
     updateTest: builder.mutation({
@@ -127,16 +124,16 @@ export const {
   useUpdateAssignmentMutation,
   useCreateCourseMutation,
   useUpdateCourseMutation,
-  useAddLessonMutation,
+  useInitiateAssinmentMutation,
+  useInitiateLessonMutation,
+  useInitiateTestMutation,
   useGetCourseByIdMutation,
-  useAddAssignmentMutation,
   useGetCoursesQuery,
   useUpdateLessonMutation,
   useGetAssignmentMutation,
   useDeleteLessonMutation,
   useGetLessonMutation,
   useDeleteAssignmentMutation,
-  useAddTestMutation,
   useGetTestMutation,
   useDeleteTestMutation,
   useUpdateTestMutation,

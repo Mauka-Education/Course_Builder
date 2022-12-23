@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Preview, RichTextEditor } from '../../shared'
 import MCQ from "./util/MCQ"
 import { useEffect } from 'react'
-import { setLogicJump } from '../../../redux/slices/util'
+import { setLogicJump, setTestLogicJump } from '../../../redux/slices/util'
 import { useDispatch, useSelector } from 'react-redux'
 import LogicJump from './util/LogicJump'
 import { useInitateSlide } from '../../../hooks'
@@ -32,7 +32,11 @@ const Temp12 = ({ lessonId, onAddSlide, order, update, isTest = false, isLogicJu
     useEffect(() => {
         if (mainId) {
             onAddSlide(slide)
-            dispatch(setLogicJump(slide))
+            if(!isTest){
+                dispatch(setLogicJump(slide))
+            }else{
+                dispatch(setTestLogicJump(slide))
+            }
         }
     }, [mainId])
 
@@ -61,6 +65,7 @@ const Temp12 = ({ lessonId, onAddSlide, order, update, isTest = false, isLogicJu
         setOption(opt)
         autoSaveHandler(mainId, { logic_jump: { arr: opt, level: 1 } }, false, true)
     }
+
     return (
         <>
             <form className="course__builder-temp1">

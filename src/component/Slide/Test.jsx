@@ -2,13 +2,12 @@ import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { BsChevronDown } from "react-icons/bs"
-import { MdOutlineArrowBackIos } from "react-icons/md"
 import { AiOutlinePlus } from "react-icons/ai"
 import { useDispatch, useSelector } from "react-redux"
 import { Temp10, Temp12, Temp2, Temp3, Temp4, Temp8, Temp9 } from "../Template"
 import { toast, ToastContainer } from "react-toast"
-import { setTestData, setUpdateSlide, updateTestSlides, setTestLogicJump, setTestLogicJumpSlides, setTestUpdateLogicSlide, clearTestLogicJump, deleteTestLogicJumpSlides, updateTestLogicJump } from "../../../redux/slices/util"
-import { useAutoSaveMediaMutation, useAutosaveslideinlogicMutation, useAutoSaveSlideMutation, useGetTestSlideMutation } from "../../../redux/slices/slide"
+import { setTestData, setUpdateSlide, updateTestLogicJump } from "../../../redux/slices/util"
+import { useAutoSaveMediaMutation, useAutosaveslideinlogicMutation, useAutoSaveSlideMutation } from "../../../redux/slices/slide"
 import { useRouter } from "next/router"
 import { RemoveHtmlFromString } from "../../util/RemoveHtmlFromString"
 
@@ -76,14 +75,20 @@ const Test = ({ title, id, no, lessonId }) => {
             setTotalSlideAdded(test)
         }
 
-        if (updateSlide?.is) {
-            const temp = templateType.find((item) => item.slideno === updateSlide.data.builderslideno)
-            setCurrentTemplate({ id: temp.id, name: temp.name })
+        if (router.query?.update !== "true") {
+            dispatch(setUpdateSlide({ id: null, is: false, data: null }))
+        } else {
+            if (updateSlide?.is) {
+                const temp = templateType.find((item) => item.slideno === updateSlide.data.builderslideno)
+                setCurrentTemplate({ id: temp.id, name: temp.name })
+            }
         }
 
         if (testLogicJump.length !== 0) {
             setLogicJumpArr(testLogicJump)
             setCurrentLogicJump({ id: testLogicJump[0]._id, name: "Select Logic Jump" })
+        }else{
+            router.push(`/slide/test?no=${no}&title=${title}&key=${lessonId}`)
         }
     }, [])
 
@@ -157,6 +162,7 @@ const Test = ({ title, id, no, lessonId }) => {
             console.log({ err })
         })
     }
+    // console.log({log})
 
     function renderer(id) {
         const config = {

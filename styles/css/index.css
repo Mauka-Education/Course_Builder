@@ -403,9 +403,7 @@ ul, ol {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
   align-items: flex-end;
-  margin-top: 1rem;
   flex-direction: column;
   position: relative;
 }
@@ -444,7 +442,7 @@ ul, ol {
 }
 .mauka__builder-create__form .course__structure-content {
   display: flex;
-  margin-top: 3rem;
+  margin-top: 2rem;
   width: 100%;
 }
 .mauka__builder-create__form .course__structure-content__item {
@@ -579,18 +577,21 @@ ul, ol {
 .mauka__builder-create__form .course__structure-content__assignment .left .item {
   cursor: pointer;
   margin-bottom: 1rem;
+  border-radius: 7px;
   display: flex;
   justify-content: center;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 0.125rem 0.5rem -0.25rem rgba(31, 27, 45, 0.12), 0 0.25rem 1rem rgba(31, 27, 45, 0.12) !important;
+  box-shadow: 0 2px 9px 0 rgba(34, 12, 43, 0.1);
   padding: 1rem;
 }
 .mauka__builder-create__form .course__structure-content__assignment .left .item__left {
   display: flex;
   justify-content: center;
   align-items: center;
+  justify-content: flex-start;
   align-items: flex-start;
+  width: 100%;
 }
 .mauka__builder-create__form .course__structure-content__assignment .left .item__left .title {
   margin-left: 1.5rem;
@@ -623,13 +624,19 @@ ul, ol {
 }
 .mauka__builder-create__form .course__structure-content__assignment .right__title .clear {
   cursor: pointer;
-  background: red;
+  background: #4CB777;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 5px;
 }
+.mauka__builder-create__form .course__structure-content__assignment .right__title .clear.danger {
+  background: #DA4E4E;
+}
 .mauka__builder-create__form .course__structure-content__assignment .right__form {
   width: 35rem;
+}
+.mauka__builder-create__form .course__structure-content__assignment .right__form input {
+  border-radius: 5px;
 }
 .mauka__builder-create__form .course__structure-content__assignment .right__form-item {
   margin-bottom: 2rem;
