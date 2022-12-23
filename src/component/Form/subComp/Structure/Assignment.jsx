@@ -146,7 +146,7 @@ const Assignment = ({ course, toast }) => {
             <input type="text" disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}}   placeholder='Assignment Heading' value={formData?.heading} onChange={(e) => onChangeHandler({ heading: e.target.value })} />
           </div>
           <div className="right__form-item input">
-            <span style={{color: !currentId && "gray"}}>Question'</span>
+            <span style={{color: !currentId && "gray"}}>Question</span>
             <textarea type="text" placeholder='Assignment Question' disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}} rows={4} value={formData?.subtext} onChange={(e) => onChangeHandler({ subtext: e.target.value })} />
           </div>
           <div className="right__form-item input">
