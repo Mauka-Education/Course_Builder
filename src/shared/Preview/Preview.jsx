@@ -1,37 +1,36 @@
 import React from 'react'
 import { BsArrowLeft, BsArrowRight } from 'react-icons/bs';
-
-
 import { Temp1, Temp2, Temp3, Temp4, Temp5, Temp6, Temp7, Temp8, Temp9, Temp10, Temp11, Temp12 } from './Template';
+
 
 const Preview = ({ type, data, allSlide }) => {
     
     function renderer() {
         switch (type) {
             case 0:
-                return <Temp1 data={data} />
+                return <Temp1 data={data} all={allSlide} />
             case 1:
                 return <Temp2 data={data} />
             case 2:
-                return <Temp3 data={data} />
+                return <Temp3 data={data}  />
             case 3:
-                return <Temp4 data={data} />
+                return <Temp4 data={data}  />
             case 4:
-                return <Temp5 data={data} />
+                return <Temp5 data={data}  />
             case 5:
-                return <Temp6 data={data} />
+                return <Temp6 data={data}  />
             case 6:
-                return <Temp7 data={data} />
+                return <Temp7 data={data} all={allSlide} />
             case 7:
-                return <Temp8 data={data} />
+                return <Temp8 data={data} all={allSlide} />
             case 8:
-                return <Temp9 data={data} />
+                return <Temp9 data={data} all={allSlide} />
             case 9:
-                return <Temp10 data={data} />
+                return <Temp10 data={data} all={allSlide} />
             case 10:
-                return <Temp11 data={data} />
+                return <Temp11 data={data} all={allSlide} />
             case 11:
-                return <Temp12 data={data} />
+                return <Temp12 data={data} all={allSlide} />
             default:
                 break;
         }

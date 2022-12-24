@@ -5,7 +5,7 @@ import { useEffect } from "react"
 import ReactPlayer from "react-player"
 import { getPreSignedUrl } from "../../../util/getPreSignedUrl"
 
-const Temp7 = ({ data }) => {
+const Temp7 = ({ data, all }) => {
     const [fileUrl, setFileUrl] = useState(null)
     useEffect(() => {
         if (!data?.editor) {
@@ -28,12 +28,21 @@ const Temp7 = ({ data }) => {
         }
     })
 
-    
+
     return (
         <div className="temp1">
-            <div className="title">
-                <h1>{(data?.title?.length !== 0 && data?.title) ? data?.title : "Title"}</h1>
-            </div>
+            {
+                !all ? (
+                    <div className="title">
+                        <h1>{(data?.title?.length !== 0 && data?.title) ? data?.title : "Title"}</h1>
+                    </div>
+
+                ) : data?.title?.length !== 0  && (
+                    <div className="title">
+                        <h1>{data.title}</h1>
+                    </div>
+                )
+            }
             {
                 (!data?.image_url && !data?.url) && (
                     <div className="temp1__preview">
