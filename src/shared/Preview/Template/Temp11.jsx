@@ -3,7 +3,7 @@ import ReactPlayer from 'react-player'
 import { getPreSignedUrl } from '../../../util/getPreSignedUrl'
 import Temp1 from './Temp1'
 
-const Temp10 = ({ data }) => {
+const Temp10 = ({ data,all }) => {
     const [fileUrl, setFileUrl] = useState(null)
 
     useEffect(() => {
@@ -28,7 +28,7 @@ const Temp10 = ({ data }) => {
     return (
         <div className="temp8">
             <div className="left">
-                <Temp1 data={data} />
+                <Temp1 data={data} all={all} />
             </div>
             <div className="right">
                 {
