@@ -7,12 +7,34 @@ import { MdDelete } from "react-icons/md"
 import { useDeleteAssignmentMutation, useUpdateAssignmentMutation, useInitiateAssinmentMutation, useGetAssignmentMutation } from "../../../../../redux/slices/course"
 
 
+const types = [
+  {
+    id: 0,
+    val: "any"
+  },
+  {
+    id: 1,
+    val: "image"
+  },
+  {
+    id: 2,
+    val: "video"
+  },
+  {
+    id: 3,
+    val: "document"
+  },
+]
+
 const Assignment = ({ course, toast }) => {
   const [showLesson, setShowLesson] = useState(false)
   const [selectLesson, setSelectLesson] = useState({ id: null, name: null })
   const [formData, setFormData] = useState({ heading: null, subtext: null, time_to_finish: null })
   const dispatch = useDispatch()
   const [savedData, setSavedData] = useState([])
+
+  const [showFileType, setShowFileType] = useState(false)
+  const [fileType, setFileType] = useState(null)
 
   const [currentId, setCurrentId] = useState(null)
 
@@ -52,8 +74,8 @@ const Assignment = ({ course, toast }) => {
   const onOptionClickHandler = (item) => {
     setSelectLesson(prev => ({ ...prev, id: item.isSaved, name: item.name }))
     setShowLesson(false)
-    updateAssignment({ data:{lesson:item.isSaved}, id: currentId }).then(res => {
-      setSavedData(prev=>prev.map(obj=>obj.id==currentId ? {...obj,lesson:item.isSaved} : obj ))
+    updateAssignment({ data: { lesson: item.isSaved }, id: currentId }).then(res => {
+      setSavedData(prev => prev.map(obj => obj.id == currentId ? { ...obj, lesson: item.isSaved } : obj))
     }).catch(err => {
       console.log("Err")
     })
@@ -76,6 +98,7 @@ const Assignment = ({ course, toast }) => {
     setCurrentId(item.id)
     const lessonName = course?.structure?.find((prev) => prev.isSaved === item.lesson)
     setSelectLesson({ id: item.lesson, name: lessonName?.name })
+    setFileType(item?.fileType)
   }
 
   const assigmentDeleteHandler = (id) => {
@@ -83,7 +106,7 @@ const Assignment = ({ course, toast }) => {
       toast.success("Assignment Deleted")
       setCurrentId(null)
       setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
-      setSelectLesson({id:null,name:null})
+      setSelectLesson({ id: null, name: null })
       setSavedData(item => item.filter((d) => d.id !== id))
     }).catch((err) => {
       toast.error("Error Occured")
@@ -91,6 +114,7 @@ const Assignment = ({ course, toast }) => {
   }
   const onClearHandler = () => {
     setCurrentId(null)
+    setFileType(null)
     setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
     setSelectLesson({ id: null, name: null })
   }
@@ -99,13 +123,22 @@ const Assignment = ({ course, toast }) => {
     initateAssignment(course.id).unwrap().then(res => {
       setCurrentId(res.data)
       setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
-      setSelectLesson({id:null,name:null})
+      setSelectLesson({ id: null, name: null })
       setSavedData(item => ([...item, { id: res.data }]))
     }).catch(err => {
       console.log({ err })
     })
   }
 
+  const onFileTypeChange=(val)=>{
+    updateAssignment({ data: { fileType:val },id:currentId }).unwrap().then(res => {
+      setSavedData(prev => prev.map(obj => obj.id == currentId ? { ...obj, fileType } : obj))
+      setFileType(val)
+      setShowFileType(false)
+    }).catch(err => {
+      console.log({ err })
+    })
+  }
   return (
     <div className="course__structure-content__assignment">
       <div className="left">
@@ -132,9 +165,9 @@ const Assignment = ({ course, toast }) => {
       <div className="right">
         <div className="right__title">
           <h2>Add Assignment</h2>
-          <motion.div className={`clear ${currentId && "danger"} `} onClick={ !currentId ? onInitiate : onClearHandler } whileTap={{ scale: .98 }}>
+          <motion.div className={`clear ${currentId && "danger"} `} onClick={!currentId ? onInitiate : onClearHandler} whileTap={{ scale: .98 }}>
             {
-              currentId ? <p>Clear</p> :<p>Add New</p>
+              currentId ? <p>Clear</p> : <p>Add New</p>
             }
           </motion.div>
 
@@ -142,20 +175,53 @@ const Assignment = ({ course, toast }) => {
 
         <div className="right__form">
           <div className="right__form-item input">
-            <span style={{color: !currentId && "gray"}}>Title</span>
-            <input type="text" disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}}   placeholder='Assignment Heading' value={formData?.heading} onChange={(e) => onChangeHandler({ heading: e.target.value })} />
+            <span style={{ color: !currentId && "gray" }}>Title</span>
+            <input type="text" disabled={currentId ? false : true} style={{ backgroundColor: !currentId && "rgb(234 234 234)" }} placeholder='Assignment Heading' value={formData?.heading} onChange={(e) => onChangeHandler({ heading: e.target.value })} />
           </div>
           <div className="right__form-item input">
-            <span style={{color: !currentId && "gray"}}>Question</span>
-            <textarea type="text" placeholder='Assignment Question' disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}} rows={4} value={formData?.subtext} onChange={(e) => onChangeHandler({ subtext: e.target.value })} />
+            <span style={{ color: !currentId && "gray" }}>Question</span>
+            <textarea type="text" placeholder='Assignment Question' disabled={currentId ? false : true} style={{ backgroundColor: !currentId && "rgb(234 234 234)" }} rows={4} value={formData?.subtext} onChange={(e) => onChangeHandler({ subtext: e.target.value })} />
           </div>
           <div className="right__form-item input">
-            <span style={{color: !currentId && "gray"}}>Duration</span>
-            <input type="number" placeholder="Add Assignment Duration in mins" disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}} value={formData?.time_to_finish} onChange={(e) => onChangeHandler({ time_to_finish: e.target.value })} />
+            <span style={{ color: !currentId && "gray" }}>Duration</span>
+            <input type="number" placeholder="Add Assignment Duration in mins" disabled={currentId ? false : true} style={{ backgroundColor: !currentId && "rgb(234 234 234)" }} value={formData?.time_to_finish} onChange={(e) => onChangeHandler({ time_to_finish: e.target.value })} />
           </div>
           <div className="right__form-item type">
-            <span style={{color: !currentId && "gray"}}>Lesson ID</span>
-            <div className="type__title" onClick={() => currentId && setShowLesson(!showLesson)} disabled={currentId ? false : true} style={{backgroundColor: !currentId && "rgb(234 234 234)"}}>
+            <span style={{ color: !currentId && "gray" }}>File Type</span>
+            <div className="type__title" onClick={() => currentId && setShowFileType(!showFileType)} disabled={currentId ? false : true} style={{ backgroundColor: !currentId && "rgb(234 234 234)" }}>
+              <p style={{textTransform:"capitalize"}} >{fileType ?? "None"}</p>
+              <RiArrowDownSLine size={20} />
+            </div>
+            <AnimatePresence>
+              {
+                showFileType && (
+                  <motion.div className="type__option" initial={{
+                    scale: 0,
+                    opacity: 0
+                  }} animate={{
+                    scale: 1,
+                    opacity: 1
+                  }} exit={{
+                    scale: 0,
+                    opacity: 0
+                  }}>
+                    {
+                      types.map((item) => (
+                        <div className="opt" onClick={()=>onFileTypeChange(item.val)} key={item?.id}>
+                          <p style={{ textAlign: "start", textTransform: "capitalize" }}>
+                            {item.val} </p>
+                        </div>
+                      ))
+                    }
+                  </motion.div>
+
+                )
+              }
+            </AnimatePresence>
+          </div>
+          <div className="right__form-item type">
+            <span style={{ color: !currentId && "gray" }}>Lesson ID</span>
+            <div className="type__title" onClick={() => currentId && setShowLesson(!showLesson)} disabled={currentId ? false : true} style={{ backgroundColor: !currentId && "rgb(234 234 234)" }}>
               <p>{selectLesson.name ?? "None"}</p>
               <div className="cor" >
                 <span>{selectLesson?.id && `#${selectLesson.id}`}</span>
