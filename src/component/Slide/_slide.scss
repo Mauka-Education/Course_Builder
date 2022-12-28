@@ -1,273 +1,332 @@
-.course__builder-slide {
-  padding: 5rem;
-  height: 100vh;
-  @include center_elem;
-  flex-direction: column;
-
-  justify-content: space-between;
-
-  &.preview {
-    height: auto;
-    display: block;
-    padding: 3rem 5rem;
-
-    .nav{
-      @include center_elem;
-      padding: .8rem 1rem;
-      margin-bottom: 2rem;
-      background: black;
-      color: white;
-      width: 13rem;
-      justify-content: space-between;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  }
-
-  .upper {
-    width: 100%;
-  }
-  .option {
-    position: absolute;
-    top: 6rem;
-    background-color: white;
-    z-index: 3;
-
-    @include box-shadow;
-    width: 100%;
+.course__builder {
+  &-sidenav {
+    height: 100vh; /* Full-height: remove this if you want "auto" height */
+    width: auto; /* Set the width of the sidebar */
+    padding: 2rem;
+    padding-right: 2.5rem;
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 14; /* Stay on top */
+    top: 0; /* Stay at the top */
     left: 0;
-
-    &__item {
-      @include center_elem;
-
-      padding: 1rem;
-      justify-content: flex-start;
-      cursor: pointer;
-
-      h2 {
-        &:first-child {
-          @include regular_font;
-        }
-      }
-      &:hover {
-        background: rgb(199, 199, 199);
-      }
+    background: white;
+    @include card_shadow;
+    @include custom__track;
+    &::-webkit-scrollbar {
+      width: 8px;
     }
-
-    &.slideopt{
-      max-height: 18rem;
-      overflow-y: auto;
-      @include custom__track;
-    }
-  }
-
-  &__title {
-    width: 100%;
-    position: relative;
-    @include center_elem;
-    justify-content: space-between;
-    @include box-shadow;
-    padding: 1.5rem 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-bottom: 4rem;
-
-    .left {
-      @include center_elem;
-
-      h2 {
-        &:first-child {
-          @include regular_font;
-        }
-      }
-    }
-  }
-  &__template {
-    width: 100%;
-    position: relative;
-    @include center_elem;
-    justify-content: space-between;
-    .right{
-      @include center_elem;
-      flex-direction: column;
-      align-items: flex-end;
-      position:relative;
-    }
-    .left{
-      position: relative;
-    }
-
-    .button {
-      cursor: pointer;
-      margin-top: 0.5rem;
+    &::-webkit-scrollbar-thumb {
+      background: black;
       border-radius: 5px;
-      @include center_elem;
-      width: 25rem;
-      padding: 1rem;
-      @include card_shadow;
+    }
 
-      h3 {
-        margin-right: 1rem;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-y: auto;
+    padding-top: 20px;
+
+    .course__builder-slide {
+      padding: 0 !important;
+    }
+
+    .preview {
+      border-radius: 10px !important;
+    }
+
+    &__btn {
+      position: fixed;
+      left: -2.5rem;
+      top: 30%;
+      cursor: pointer;
+      width: 7rem;
+      background: #0a1e32;
+      color: white;
+      @include center_elem;
+      padding: 0.7rem 1rem;
+      border-radius: 5px;
+
+      &.close {
+        position: fixed;
+        background: $wrong;
+        color: white;
+        top: 0;
+        border-radius: 0;
+        border-bottom-right-radius:10px ;
+        left: 0;
+        z-index: 23;
+        margin-bottom: 2rem;
       }
+    }
+  }
+  &-slide {
+    padding: 5rem;
+    height: 100vh;
+    @include center_elem;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    &.preview {
+      height: auto;
+      display: block;
+      padding: 3rem 5rem;
+
+      .nav {
+        @include center_elem;
+        padding: 0.8rem 1rem;
+        margin-bottom: 2rem;
+        background: black;
+        color: white;
+        width: 13rem;
+        justify-content: space-between;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    }
+
+    .upper {
+      width: 100%;
     }
     .option {
-      width: 25rem;
-      min-height: 3rem;
-      max-height: 17rem;
-      overflow-y: scroll;
-      @include custom__track;
+      position: absolute;
+      top: 6rem;
+      background-color: white;
+      z-index: 3;
+
+      @include box-shadow;
+      width: 100%;
+      left: 0;
+
+      &__item {
+        @include center_elem;
+
+        padding: 1rem;
+        justify-content: flex-start;
+        cursor: pointer;
+
+        h2 {
+          &:first-child {
+            @include regular_font;
+          }
+        }
+        &:hover {
+          background: rgb(199, 199, 199);
+        }
+      }
+
+      &.slideopt {
+        max-height: 18rem;
+        overflow-y: auto;
+        @include custom__track;
+      }
     }
 
-  }
-  &__form {
-    margin-top: 3rem;
-  }
-
-  &__navigation {
-    margin: 4rem 4rem 0;
-    padding-bottom: 2rem;
-    width: 100%;
-    @include center_elem;
-    justify-content: space-between;
-    .main__btn {
+    &__title {
+      width: 100%;
+      position: relative;
       @include center_elem;
       justify-content: space-between;
-
-      
-
-      .prev,
-      .next,.all {
-        cursor: pointer;
-        width: 7rem;
-        background: $main_color;
-        color: white;
-        @include center_elem;
-        padding: 0.7rem 1rem;
-        border-radius: 5px;
-      }
-      .prev {
-        cursor: pointer;
-        margin-right: 4rem;
-        p {
-          margin-left: 0.5rem;
-        }
-      }
-      .next {
-        cursor: pointer;
-        p {
-          margin-right: 0.5rem;
-        }
-      }
-    }
-    .lesson__btn {
-      @include center_elem;
-      justify-content: space-between;      
-      .add {
-        width: 10rem;
-        background: $main_color;
-        color: white;
-        @include center_elem;
-        padding: 0.7rem 1rem;
-        background: #4cb777;
-        border-radius: 5px;
-        cursor: pointer;
-        p {
-          margin-right: 0.5rem;
-        }
-      }
-    }
-  }
-
-
-  .slides {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 3rem;
-
-    &__opt{
-      font-size: 1rem;
-      @include center_elem;
-      justify-content: flex-start;
-      padding: 1rem 2rem;
-      background: #d1d1d1;
+      @include box-shadow;
+      padding: 1.5rem 1rem;
       border-radius: 10px;
-      margin-bottom: 2rem;
+      cursor: pointer;
+      margin-bottom: 4rem;
 
-      h3{
-        margin-left: 2rem;
+      .left {
+        @include center_elem;
+
+        h2 {
+          &:first-child {
+            @include regular_font;
+          }
+        }
+      }
+    }
+    &__template {
+      width: 100%;
+      position: relative;
+      @include center_elem;
+      justify-content: space-between;
+      .right {
+        @include center_elem;
+        flex-direction: column;
+        align-items: flex-end;
+        position: relative;
+      }
+      .left {
+        position: relative;
+      }
+
+      .button {
+        cursor: pointer;
+        margin-top: 0.5rem;
+        border-radius: 5px;
+        @include center_elem;
+        width: 25rem;
+        padding: 1rem;
+        @include card_shadow;
+
+        h3 {
+          margin-right: 1rem;
+        }
+      }
+      .option {
+        width: 25rem;
+        min-height: 3rem;
+        max-height: 17rem;
+        overflow-y: scroll;
+        @include custom__track;
+      }
+    }
+    &__form {
+      margin-top: 3rem;
+    }
+
+    &__navigation {
+      margin: 4rem 4rem 0;
+      padding-bottom: 2rem;
+      width: 100%;
+      @include center_elem;
+      justify-content: space-between;
+      .main__btn {
+        @include center_elem;
+        justify-content: space-between;
+
+        .prev,
+        .next,
+        .all {
+          cursor: pointer;
+          width: 7rem;
+          background: $main_color;
+          color: white;
+          @include center_elem;
+          padding: 0.7rem 1rem;
+          border-radius: 5px;
+        }
+        .prev {
+          cursor: pointer;
+          margin-right: 4rem;
+          p {
+            margin-left: 0.5rem;
+          }
+        }
+        .next {
+          cursor: pointer;
+          p {
+            margin-right: 0.5rem;
+          }
+        }
+      }
+      .lesson__btn {
+        @include center_elem;
+        justify-content: space-between;
+        .add {
+          width: 10rem;
+          background: $main_color;
+          color: white;
+          @include center_elem;
+          padding: 0.7rem 1rem;
+          background: #4cb777;
+          border-radius: 5px;
+          cursor: pointer;
+          p {
+            margin-right: 0.5rem;
+          }
+        }
       }
     }
 
-    &__item {
-      @include center_elem;
-      justify-content: flex-start;
-      align-items: flex-start;
+    .slides {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 3rem;
 
-      .update{
-        position: absolute;
-        z-index: 2;
-        cursor: pointer;
+      &.sidenav {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: column;
+      }
 
-        &.logic_jump{
-          right:-2rem;
-          top: -.5rem;
+      &__opt {
+        font-size: 1rem;
+        @include center_elem;
+        justify-content: flex-start;
+        padding: 1rem 2rem;
+        background: #d1d1d1;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+
+        h3 {
+          margin-left: 2rem;
         }
       }
-      .preview {
-        position: relative;
-        width: 35rem;
-        padding: 1rem;
-      }
-      .edit {
-        margin-left: .5in;
-        
-        &__order {
+
+      &__item {
+        @include center_elem;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .update {
+          position: absolute;
+          z-index: 2;
+          cursor: pointer;
+
+          &.logic_jump {
+            right: -2rem;
+            top: -0.5rem;
+          }
+        }
+        .preview {
           position: relative;
+          width: 35rem;
+          padding: 1rem;
+        }
+        .edit {
+          margin-left: 0.5in;
 
-          .title {
-            border-radius: .5rem;
-            margin-top: 1rem;
-            @include heading_font;
-            padding: 1rem 2rem;
-            @include card_shadow;
-            @include center_elem;
-            cursor: pointer;
-            justify-content: space-between;
+          &__order {
+            position: relative;
 
-            
-            p {
-              margin-right: 1rem;
-            }
-            
-            &.logic_jump{
-              padding: 1rem;
-              width: 9rem;
+            .title {
+              border-radius: 0.5rem;
+              margin-top: 1rem;
+              @include heading_font;
+              padding: 1rem 2rem;
+              @include card_shadow;
               @include center_elem;
-              background: $safe_color;
-              color: white;
+              cursor: pointer;
+              justify-content: space-between;
+
               p {
-                margin-right: 0;
-                margin-left: .5rem;
+                margin-right: 1rem;
+              }
+
+              &.logic_jump {
+                padding: 1rem;
+                width: 9rem;
+                @include center_elem;
+                background: $safe_color;
+                color: white;
+                p {
+                  margin-right: 0;
+                  margin-left: 0.5rem;
+                }
               }
             }
           }
+          &__delete {
+            margin-top: 2rem;
 
-        }
-        &__delete{
-          margin-top: 2rem;
-
-          width: 3.5rem;
-          height: 3.5rem;
-          cursor: pointer;
-          padding: .5rem;
-          background-color: $wrong;
-          color: white;
-          border-radius: .5rem;
-          @include center_elem;
+            width: 3.5rem;
+            height: 3.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            background-color: $wrong;
+            color: white;
+            border-radius: 0.5rem;
+            @include center_elem;
+          }
         }
       }
     }
   }
-
-  
 }

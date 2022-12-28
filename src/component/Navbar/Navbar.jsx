@@ -26,7 +26,6 @@ const Navbar = () => {
   ]
   return (
     <div className="mauka__builder-nav">
-        
         <div className="nav">
           {
             navItem.map(item=>(

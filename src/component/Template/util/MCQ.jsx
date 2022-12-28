@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
-
+import {AiOutlineMinus, AiOutlinePlus} from "react-icons/ai"
+import { motion } from 'framer-motion'
+import { ToastContainer, toast } from 'react-toast'
 
 const initialValue = [
   {
@@ -29,6 +31,21 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
   const onChangeHandler = (id, value) => {
     setQuestArray(item => item.map(p => p.id === id ? { ...p, val: value } : p))
 
+  }
+
+  const onQuestAddHandler=(remove=false)=>{
+    if(questArray.length<=2 && remove ) {
+      toast.error("Can' Have Less than 2 Option")
+      return
+    }else if(questArray.length >= 8 && !remove){
+      toast.error("Can' Have More than 8 Option")
+      return
+    }
+    if(remove){
+      setQuestArray(prev=>prev.slice(0,-1))
+      return
+    }
+    setQuestArray(prev=>[...prev,{id:prev.length,val:"",isCorrect:false}])
   }
 
   useEffect(() => {
@@ -79,6 +96,7 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
   console.log({questArray})
   return (
     <div className="course__builder-template__option">
+      <ToastContainer delay={3000} />
       <div className="upper">
         {
           questArray.map((item, i) => (
@@ -108,7 +126,24 @@ const MCQ = ({ isMulti = false, setQuestion, setAnswer, setMark, isTest = false,
               <div className="lower__answer">
                 {questArray.map((item) => (
                   <h3 key={item.id} className={item.isCorrect ? "corr" : ""} onClick={() => onAnsSelectHandler(item.id, item.isCorrect ? false : true)}>Option {item.id + 1}</h3>
-                ))}
+                  ))}
+                  <div className='add_opt'>
+                    {
+                      questArray.length>2 && (
+                      <motion.div  whileTap={{scale:.95}} onClick={()=>onQuestAddHandler(true)} className="neg">
+                        <AiOutlineMinus fontSize={20} />
+                      </motion.div>
+
+                      )
+                    }
+                    {
+                      questArray.length<8 && (
+                      <motion.div whileTap={{scale:.95}} onClick={()=>onQuestAddHandler(false)} className="pos">
+                        <AiOutlinePlus fontSize={20} />
+                      </motion.div>
+                      )
+                    }
+                  </div>
               </div>
             </div>
           </div>
