@@ -177,10 +177,31 @@
           margin-bottom: 0.5rem;
         }
 
+        .add_opt{
+          @include center_elem;
+
+
+          div{
+            padding: .5rem 1rem;
+            
+            &.neg{
+              cursor: pointer;
+              background: $wrong;
+              color: white;
+            }
+            &.pos{
+              cursor: pointer;
+              background: $correct_color;
+              color: white;
+            }
+          }
+        }
+
         &__answer {
           @include center_elem;
           justify-content: flex-start;
-
+          flex-wrap: wrap;
+          gap: 1rem;
           h3 {
             cursor: pointer;
             padding: 0.7rem 2rem;

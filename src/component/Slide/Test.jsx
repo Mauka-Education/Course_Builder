@@ -10,6 +10,7 @@ import { setTestData, setUpdateSlide, updateTestLogicJump } from "../../../redux
 import { useAutoSaveMediaMutation, useAutosaveslideinlogicMutation, useAutoSaveSlideMutation } from "../../../redux/slices/slide"
 import { useRouter } from "next/router"
 import { RemoveHtmlFromString } from "../../util/RemoveHtmlFromString"
+import SideNav from "./SideNav"
 
 const templateType = [
 
@@ -87,7 +88,7 @@ const Test = ({ title, id, no, lessonId }) => {
         if (testLogicJump.length !== 0) {
             setLogicJumpArr(testLogicJump)
             setCurrentLogicJump({ id: testLogicJump[0]._id, name: "Select Logic Jump" })
-        }else{
+        } else {
             router.push(`/slide/test?no=${no}&title=${title}&key=${lessonId}`)
         }
     }, [])
@@ -200,128 +201,131 @@ const Test = ({ title, id, no, lessonId }) => {
 
 
     return (
-        <div className="course__builder-slide">
-            <ToastContainer position="bottom-left" delay={3000} />
-            <div className="upper">
+        <>
+            <SideNav type={"test"} id={lessonId} />
+            <div className="course__builder-slide">
+                <ToastContainer position="bottom-left" delay={3000} />
+                <div className="upper">
 
-                {
-                    (updateSlide.is || updateLogicSlide.is) ? null : (
-                        <>
-                            <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
-                                <div className="left">
-                                    <h2 style={{ textTransform: "capitalize" }}>{id} {no}: &nbsp;</h2>
-                                    <h2>{title}</h2>
-                                </div>
-                                <BsChevronDown size={30} />
-                                <AnimatePresence>
-                                    {
-                                        showOpt && (
-                                            <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                                {course.test.map((item, i) => (
-                                                    <Link href={`/slide/test?no=${i + 1}&title=${item?.heading}&key=${lessonId}`} key={item?.heading}>
-                                                        <div className="option__item">
-                                                            <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
-                                                            <h3>{item.heading}</h3>
-                                                        </div>
-                                                    </Link>
-                                                ))}
-                                            </motion.div>
-                                        )
-                                    }
-                                </AnimatePresence>
-                            </div>
-                            <div className="course__builder-slide__template">
-                                <div className="left">
-
-                                    <h3>Template</h3>
-                                    <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
-                                        <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
-                                        <BsChevronDown size={20} />
+                    {
+                        (updateSlide.is || updateLogicSlide.is) ? null : (
+                            <>
+                                <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
+                                    <div className="left">
+                                        <h2 style={{ textTransform: "capitalize" }}>{id} {no}: &nbsp;</h2>
+                                        <h2>{title}</h2>
                                     </div>
+                                    <BsChevronDown size={30} />
                                     <AnimatePresence>
                                         {
-                                            showTemplateOpt && (
+                                            showOpt && (
                                                 <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                                    {
-                                                        templateType.map(item => (
-                                                            <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
-                                                                <p>{item.name}</p>
+                                                    {course.test.map((item, i) => (
+                                                        <Link href={`/slide/test?no=${i + 1}&title=${item?.heading}&key=${lessonId}`} key={item?.heading}>
+                                                            <div className="option__item">
+                                                                <h3 style={{ textTransform: "capitalize" }}>{id} {i + 1}: &nbsp;</h3>
+                                                                <h3>{item.heading}</h3>
                                                             </div>
-                                                        ))
-                                                    }
+                                                        </Link>
+                                                    ))}
                                                 </motion.div>
                                             )
                                         }
                                     </AnimatePresence>
                                 </div>
-                                {
-                                    logicJumpArr.length !== 0 && (
-                                        <div className="right">
-                                            <h3>Logic Jump</h3>
-                                            <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
-                                                <h3>{RemoveHtmlFromString(currentLogicJump.name)?.slice(0, 30) ?? "No Heading"}</h3>
-                                                <BsChevronDown size={20} />
-                                            </div>
-                                            <AnimatePresence>
-                                                {
-                                                    showLogicOpt && (
-                                                        <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                                            {
-                                                                logicJumpArr.map((item, i) => (
-                                                                    <Link href={`/slide/test?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?._id}`} key={item._id}>
-                                                                        <div className="option__item" style={{ justifyContent: "space-between" }} key={item.id} onClick={() => {
-                                                                            setCurrentLogicJump({ id: item._id, name: RemoveHtmlFromString(item.question).slice(0, 15) })
-                                                                            setShowLogicOpt(false)
-                                                                        }}>
-                                                                            <b>{RemoveHtmlFromString(item.question)?.slice(0, 30) ?? "No Heading"}</b>
-                                                                        </div>
-                                                                    </Link>
-                                                                ))
-                                                            }
-                                                        </motion.div>
-                                                    )
-                                                }
-                                            </AnimatePresence>
+                                <div className="course__builder-slide__template">
+                                    <div className="left">
+
+                                        <h3>Template</h3>
+                                        <div className="button" onClick={() => setShowTemplateOpt(!showTemplateOpt)}>
+                                            <h3>{currentTemplate.name ?? "Choose A Template"}</h3>
+                                            <BsChevronDown size={20} />
                                         </div>
-                                    )
-                                }
-                            </div>
-                        </>
-                    )
-                }
-                {
-                    currentTemplate.name && (
-                        <div className="course__builder-slide__form">
-                            {renderer(currentTemplate.id)}
-                        </div>
-                    )
-                }
-            </div>
-            <div className="course__builder-slide__navigation">
-                <div className="main__btn">
+                                        <AnimatePresence>
+                                            {
+                                                showTemplateOpt && (
+                                                    <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                                        {
+                                                            templateType.map(item => (
+                                                                <div className="option__item" key={item.id} onClick={() => onTempSelectHandler(item.id, item.name)}>
+                                                                    <p>{item.name}</p>
+                                                                </div>
+                                                            ))
+                                                        }
+                                                    </motion.div>
+                                                )
+                                            }
+                                        </AnimatePresence>
+                                    </div>
+                                    {
+                                        logicJumpArr.length !== 0 && (
+                                            <div className="right">
+                                                <h3>Logic Jump</h3>
+                                                <div className="button" onClick={() => setShowLogicOpt(!showLogicOpt)}>
+                                                    <h3>{RemoveHtmlFromString(currentLogicJump.name)?.slice(0, 30) ?? "No Heading"}</h3>
+                                                    <BsChevronDown size={20} />
+                                                </div>
+                                                <AnimatePresence>
+                                                    {
+                                                        showLogicOpt && (
+                                                            <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                                                {
+                                                                    logicJumpArr.map((item, i) => (
+                                                                        <Link href={`/slide/test?no=${no}&title=${title}&key=${lessonId}&isLogicJump=${true}&logicJumpId=${item?._id}`} key={item._id}>
+                                                                            <div className="option__item" style={{ justifyContent: "space-between" }} key={item.id} onClick={() => {
+                                                                                setCurrentLogicJump({ id: item._id, name: RemoveHtmlFromString(item.question).slice(0, 15) })
+                                                                                setShowLogicOpt(false)
+                                                                            }}>
+                                                                                <b>{RemoveHtmlFromString(item.question)?.slice(0, 30) ?? "No Heading"}</b>
+                                                                            </div>
+                                                                        </Link>
+                                                                    ))
+                                                                }
+                                                            </motion.div>
+                                                        )
+                                                    }
+                                                </AnimatePresence>
+                                            </div>
+                                        )
+                                    }
+                                </div>
+                            </>
+                        )
+                    }
                     {
-                        test.length !== 0 && (
-                            <Link href={`/slide?key=${lessonId}&type=test`}>
-                                <motion.div className="all" whileTap={{ scale: .97 }}>
-                                    <p>All Slides</p>
-                                </motion.div>
-                            </Link>
+                        currentTemplate.name && (
+                            <div className="course__builder-slide__form">
+                                {renderer(currentTemplate.id)}
+                            </div>
                         )
                     }
                 </div>
+                <div className="course__builder-slide__navigation">
+                    <div className="main__btn">
+                        {
+                            test.length !== 0 && (
+                                <Link href={`/slide?key=${lessonId}&type=test`}>
+                                    <motion.div className="all" whileTap={{ scale: .97 }}>
+                                        <p>All Slides</p>
+                                    </motion.div>
+                                </Link>
+                            )
+                        }
+                    </div>
 
-                {
-                    !updateSlide?.is && (
-                        <div className="lesson__btn">
-                            <motion.button className="add" whileTap={{ scale: .97 }} onClick={() => setCurrentTemplate({ id: null, name: null, temp: null })}>
-                                <p>Add Slide</p>
-                                <AiOutlinePlus size={20} />
-                            </motion.button>
-                        </div>
-                    )
-                }
-            </div>
-        </div >
+                    {
+                        !updateSlide?.is && (
+                            <div className="lesson__btn">
+                                <motion.button className="add" whileTap={{ scale: .97 }} onClick={() => setCurrentTemplate({ id: null, name: null, temp: null })}>
+                                    <p>Add Slide</p>
+                                    <AiOutlinePlus size={20} />
+                                </motion.button>
+                            </div>
+                        )
+                    }
+                </div>
+            </div >
+        </>
     )
 }
 

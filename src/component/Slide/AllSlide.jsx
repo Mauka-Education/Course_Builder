@@ -15,13 +15,13 @@ import { deleteLogicJumpSlides, deleteTestLogicJumpSlides, setLogicJumpSlides, s
 import { useRouter } from "next/router"
 import { FaListAlt } from "react-icons/fa"
 
-const AllSlide = ({ id: key, type }) => {
+const AllSlide = ({ id: key, type, sidenav = false }) => {
     const [showOpt, setShowOpt] = useState(false)
     const [showSlideOpt, setShowSlideOpt] = useState({ id: null, show: false })
     const [allSlides, setAllSlides] = useState([])
     const { course, slide, test } = useSelector(state => state.util)
 
-    const [getSlides]=useGetSlideMutation()
+    const [getSlides] = useGetSlideMutation()
 
     const router = useRouter()
     const [deleteSlide] = useDeleteSlideMutation()
@@ -172,7 +172,7 @@ const AllSlide = ({ id: key, type }) => {
 
     const onAllLogicSlideShowHandler = ({ id, data }) => {
         // dispatch(setUpdateSlide({ is: true, data, id }))
-        router.push(`/slide/logic?id=${id}&isTest=${type==="test"}`)
+        router.push(`/slide/logic?id=${id}&isTest=${type === "test"}`)
     }
 
     const onSlideOptClickHandler = (item, index) => {
@@ -180,51 +180,57 @@ const AllSlide = ({ id: key, type }) => {
             router.push(`/slide?key=${item.isSaved}&type=lesson`)
             setAllSlides(res.data)
         }).catch(err => {
-            console.log({err})
+            console.log({ err })
             toast.error("Error Fetching Slides")
         })
     }
 
     return (
-        <div className="course__builder-slide preview">
+        <div className="course__builder-slide preview" style={{marginTop:sidenav && "4rem"}}>
             <ToastContainer position="bottom-left" delay={3000} />
-            <motion.div className="nav" whileTap={{ scale: .97 }} onClick={onBackHandler}>
-                <IoMdArrowBack size={20} />
-                <p>Back to Lessons</p>
-            </motion.div>
-            <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
-                <div className="left">
-                    <h2 style={{ textTransform: "capitalize" }}>{type === "lesson" ? "Lesson" : "Test"}  : &nbsp;</h2>
-                    <h2>{type === "lesson" ? lesson?.name : Test?.heading}</h2>
-                </div>
-                <BsChevronDown size={30} />
+            {
+                !sidenav && (
+                    <>
+                        <motion.div className="nav" whileTap={{ scale: .97 }} onClick={onBackHandler}>
+                            <IoMdArrowBack size={20} />
+                            <p>Back to Lessons</p>
+                        </motion.div>
+                        <div className="course__builder-slide__title" onClick={() => setShowOpt(!showOpt)}>
+                            <div className="left">
+                                <h2 style={{ textTransform: "capitalize" }}>{type === "lesson" ? "Lesson" : "Test"}  : &nbsp;</h2>
+                                <h2>{type === "lesson" ? lesson?.name : Test?.heading}</h2>
+                            </div>
+                            <BsChevronDown size={30} />
 
-                <AnimatePresence>
-                    {
-                        showOpt && type === "lesson" ? (
-                            <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                {course?.structure?.map((item, i) => (
-                                    <div className="option__item" onClick={() => onSlideOptClickHandler(item, i + 1)} key={item.name}>
-                                        <h3 style={{ textTransform: "capitalize" }}>Lesson {i + 1}: &nbsp;</h3>
-                                        <h3>{item.name}</h3>
-                                    </div>
-                                ))}
-                            </motion.div>
-                        ) : showOpt && (
-                            <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                                {course?.test?.map((item, i) => (
-                                    <Link href={`/slide?key=${item.id}&type=test`} key={item?.name}>
-                                        <div className="option__item">
-                                            <h3 style={{ textTransform: "capitalize" }}>Test {i + 1}: &nbsp;</h3>
-                                            <h3>{item.heading}</h3>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </motion.div>
-                        )
-                    }
-                </AnimatePresence>
-            </div>
+                            <AnimatePresence>
+                                {
+                                    showOpt && type === "lesson" ? (
+                                        <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                            {course?.structure?.map((item, i) => (
+                                                <div className="option__item" onClick={() => onSlideOptClickHandler(item, i + 1)} key={item.name}>
+                                                    <h3 style={{ textTransform: "capitalize" }}>Lesson {i + 1}: &nbsp;</h3>
+                                                    <h3>{item.name}</h3>
+                                                </div>
+                                            ))}
+                                        </motion.div>
+                                    ) : showOpt && (
+                                        <motion.div className="option" initial={{ scale: 0, opacity: 0 }} exit={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                                            {course?.test?.map((item, i) => (
+                                                <Link href={`/slide?key=${item.id}&type=test`} key={item?.name}>
+                                                    <div className="option__item">
+                                                        <h3 style={{ textTransform: "capitalize" }}>Test {i + 1}: &nbsp;</h3>
+                                                        <h3>{item.heading}</h3>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </motion.div>
+                                    )
+                                }
+                            </AnimatePresence>
+                        </div>
+                    </>
+                )
+            }
             {
                 lessonSlides.length === 0 && (
                     <div className="message" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -232,58 +238,68 @@ const AllSlide = ({ id: key, type }) => {
                     </div>
                 )
             }
-            <div className="slides">
+            <div className={`slides ${sidenav ? "sidenav" : ""}`}>
                 {
                     lessonSlides?.sort((a, b) => a.order - b.order)?.map((item, id) => (
                         <div className="slides__item" key={id}>
-                            <motion.div className="update" whileTap={{ scale: .97 }} onClick={() => editSlide(item)}>
-                                <RiEditCircleFill size={40} cursor="pointer" />
-                            </motion.div>
+                            {
+                                !sidenav && (
+                                    <motion.div className="update" whileTap={{ scale: .97 }} onClick={() => editSlide(item)}>
+                                        <RiEditCircleFill size={40} cursor="pointer" />
+                                    </motion.div>
+                                )
+                            }
                             <div className="preview">
                                 <Preview type={item?.builderslideno} data={{ ...previewData(item, item?.builderslideno), allSlide: true }} allSlide={true} />
                             </div>
-                            <div className="edit">
-                                <div className="edit__order">
-                                    {
-                                        !item?.logic_jump?.level ? (
-                                            <>
-                                                <p>Slide no</p>
-                                                <div className="title" onClick={() => setShowSlideOpt(item => ({ id: id, show: item.id === id ? !item.show : true }))}>
-                                                    <p>{item?.order} </p>
-                                                    <BsChevronDown size={15} />
-                                                </div>
-                                            </>
 
-                                        ) : (
-                                            <>
-                                                <motion.div className="title logic_jump" onClick={() => onAllLogicSlideShowHandler({ id: item._id, data: item, is: true })} whileTap={{ scale: .98 }}>
-                                                    <FaListAlt size={20} cursor="pointer" />
-                                                    <p>All Slides</p>
-                                                </motion.div>
-                                            </>
-                                        )
-                                    }
+                            {
+                                !sidenav && (
 
-                                    <AnimatePresence>
-                                        {
-                                            (showSlideOpt.id === id && showSlideOpt.show) && (
-                                                <motion.div className="option slideopt" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
-                                                    {
-                                                        orderArr()?.map((order) => order !== item.order && (
-                                                            <div className="option__item" onClick={() => onOrderSelectHandler({ id: item._id, order })} key={order}>
-                                                                <p>{order}</p>
-                                                            </div>
-                                                        ))
-                                                    }
-                                                </motion.div>
-                                            )
-                                        }
-                                    </AnimatePresence>
-                                </div>
-                                <motion.div className="edit__delete" onClick={() => deleteHandler(item._id, item.builderslideno === 11 ? true : false)} whileTap={{ scale: .98 }}>
-                                    <RiDeleteBinLine size={25} />
-                                </motion.div>
-                            </div>
+                                    <div className="edit">
+                                        <div className="edit__order">
+                                            {
+                                                !item?.logic_jump?.level ? (
+                                                    <>
+                                                        <p>Slide no</p>
+                                                        <div className="title" onClick={() => setShowSlideOpt(item => ({ id: id, show: item.id === id ? !item.show : true }))}>
+                                                            <p>{item?.order} </p>
+                                                            <BsChevronDown size={15} />
+                                                        </div>
+                                                    </>
+
+                                                ) : (
+                                                    <>
+                                                        <motion.div className="title logic_jump" onClick={() => onAllLogicSlideShowHandler({ id: item._id, data: item, is: true })} whileTap={{ scale: .98 }}>
+                                                            <FaListAlt size={20} cursor="pointer" />
+                                                            <p>All Slides</p>
+                                                        </motion.div>
+                                                    </>
+                                                )
+                                            }
+
+                                            <AnimatePresence>
+                                                {
+                                                    (showSlideOpt.id === id && showSlideOpt.show) && (
+                                                        <motion.div className="option slideopt" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} >
+                                                            {
+                                                                orderArr()?.map((order) => order !== item.order && (
+                                                                    <div className="option__item" onClick={() => onOrderSelectHandler({ id: item._id, order })} key={order}>
+                                                                        <p>{order}</p>
+                                                                    </div>
+                                                                ))
+                                                            }
+                                                        </motion.div>
+                                                    )
+                                                }
+                                            </AnimatePresence>
+                                        </div>
+                                        <motion.div className="edit__delete" onClick={() => deleteHandler(item._id, item.builderslideno === 11 ? true : false)} whileTap={{ scale: .98 }}>
+                                            <RiDeleteBinLine size={25} />
+                                        </motion.div>
+                                    </div>
+                                )
+                            }
                         </div>
                     ))
                 }

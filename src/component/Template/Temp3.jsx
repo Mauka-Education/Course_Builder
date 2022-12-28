@@ -78,7 +78,7 @@ const Temp3 = ({ lessonId, onAddSlide, order, update, isTest = false, isLogicJum
 
     const onOptAutoSave = (opt) => {
         setOption(opt)
-        autoSaveHandler(mainId, { options: opt })
+        autoSaveHandler(mainId, { options: opt,mcq_type:"radio" })
     }
     return (
         <>
