@@ -59,7 +59,6 @@ const Test = ({ title, id, no, lessonId }) => {
 
     const [totalSlideAdded, setTotalSlideAdded] = useState([])
     const dispatch = useDispatch()
-    // const [getTestSlide] = useGetTestSlideMutation()
     const router = useRouter()
 
     const { isLogicJump, logicJumpId } = router.query
@@ -70,6 +69,7 @@ const Test = ({ title, id, no, lessonId }) => {
     const [autoSave] = useAutoSaveSlideMutation()
     const [autoSaveMedia] = useAutoSaveMediaMutation()
     const [autoSaveInLogic] = useAutosaveslideinlogicMutation()
+
 
     useEffect(() => {
         if (test.length !== 0) {
@@ -133,11 +133,11 @@ const Test = ({ title, id, no, lessonId }) => {
 
         setTimeout(() => {
             if (!media) {
-                autoSave({ id: modifiedId, data, isTest: true }).unwrap().then(res => {
+                autoSave({ id: modifiedId, data, isTest: true,concatmark:true }).unwrap().then(res => {
                     setTotalSlideAdded((prev) => prev.map(obj => obj._id === modifiedId ? { ...res.data } : obj))
 
                     if (isLogicJump) {
-                        dispatch(updateLogicJump({ id: modifiedId, data: res.data }))
+                        dispatch(updateTestLogicJump({ id: modifiedId, data: res.data }))
                     }
                 }).catch(err => {
                 })
@@ -147,7 +147,7 @@ const Test = ({ title, id, no, lessonId }) => {
                     setTotalSlideAdded((prev) => prev.map(obj => obj._id === modifiedId ? { ...res.data } : obj))
 
                     if (isLogicJump) {
-                        dispatch(updateLogicJump({ id: modifiedId, data: res.data }))
+                        dispatch(updateTestLogicJump({ id: modifiedId, data: res.data }))
                     }
                 }).catch(err => {
                 })

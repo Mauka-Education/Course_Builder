@@ -59,7 +59,7 @@ const Temp10 = ({ lessonId, toast, onAddSlide, isTest = false, order, update, is
 
     useEffect(() => {
         if (subText) {
-            autoSaveHandler(mainId, { question: subText })
+            autoSaveHandler(mainId, { question: subText,mcq_type: "checkbox"  })
         }
     }, [subText])
 

@@ -64,7 +64,7 @@ const Temp9 = ({ lessonId, toast, onAddSlide, isTest, order, update, isLogicJump
 
     useEffect(() => {
         if (subText) {
-            autoSaveHandler(mainId, { question: subText })
+            autoSaveHandler(mainId, { question: subText,mcq_type: "radio"  })
         }
     }, [subText])
 

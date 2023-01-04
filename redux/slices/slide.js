@@ -132,8 +132,8 @@ export const slideApi = createApi({
       }),
     }),
     autoSaveSlide:builder.mutation({
-      query:({id,data,isTest=false})=>({
-        url:`/autosave/${id}?isTest=${isTest}`,
+      query:({id,data,isTest=false,concatmark=false})=>({
+        url:`/autosave/${id}?isTest=${isTest}&concatmark=${concatmark}`,
         body:{data},
         method:"POST"
       })
