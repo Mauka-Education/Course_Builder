@@ -133,7 +133,7 @@ const Structure = ({ toast }) => {
     const { course, preRequisite } = useSelector(state => state.util)
     const [showSwitch, setShowSwitch] = useState(false)
 
-    let [fieldArr, setFieldArr] = useState([{ name: "", pre: null, row: 0, isSaved: null, update: false }])
+    let [fieldArr, setFieldArr] = useState([])
     const [showOption, setShowOption] = useState({ id: null, show: false, row: null })
     const [showNumOpt, setShowNumOpt] = useState({ id: null, show: false })
 

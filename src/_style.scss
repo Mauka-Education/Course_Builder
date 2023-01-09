@@ -42,12 +42,28 @@
         padding: 1rem;
         @include center_elem;
         flex-direction: column;
-
+        position: relative;
         justify-content: space-between;
 
         img{
             border-radius: 1rem;
         }
+
+        .delete{
+            position: absolute;
+            right: 0;
+            top: 0;
+
+            &__circle{
+                cursor: pointer;
+                @include card_shadow;
+                @include center_elem;
+                padding: .5rem;
+                background: white;
+                border-radius: 50%;
+            }
+        }
+
         &__content{
             margin-top: 1rem;
             @include center_elem;

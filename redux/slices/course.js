@@ -42,6 +42,12 @@ export const courseApi = createApi({
         body: data,
       }),
     }),
+    deleteCourse: builder.mutation({
+      query: (id) => ({
+        url: `/course/${id}`,
+        method: "DELETE",
+      }),
+    }),
     getLesson: builder.mutation({
       query: (id) => ({
         url: `/lesson/${id}`,
@@ -124,6 +130,7 @@ export const {
   useUpdateAssignmentMutation,
   useCreateCourseMutation,
   useUpdateCourseMutation,
+  useDeleteCourseMutation,
   useInitiateAssinmentMutation,
   useInitiateLessonMutation,
   useInitiateTestMutation,
