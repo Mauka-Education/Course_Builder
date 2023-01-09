@@ -149,6 +149,7 @@ const Structure = ({ toast }) => {
     useEffect(() => {
 
     }, [dispatch, course])
+    
     useEffect(() => {
         dispatch(setCourseData({ structure: fieldArr }))
     }, [fieldArr])
@@ -159,14 +160,16 @@ const Structure = ({ toast }) => {
     }, [preType])
 
     useEffect(() => {
+        console.log({course},"inner")
         if (course?.structure) {
+            console.log("running")
             setFieldArr(course?.structure)
         }
         if (preRequisite || preRequisite?.length === 0) {
             setPreType(preRequisite)
         }
         if(!course?.assignment || !course?.assignment?.length===0){
-            getAssignment(course?.id).unwrap().then((res) => {
+            getAssignment(course?._id).unwrap().then((res) => {
                 let arr = []
                 res.data.forEach((item) => {
                   arr.push({ heading: item.heading, id: item._id, lesson: item.lesson, time_to_finish: item.time_to_finish, subtext: item.subtext, order: item?.order ?? 0 })
@@ -177,7 +180,7 @@ const Structure = ({ toast }) => {
               })
         }
         if(!course?.test || !course?.test?.length===0){
-            getTest(course?.id).unwrap().then((res) => {
+            getTest(course?._id).unwrap().then((res) => {
                 let arr = []
                 res.data.forEach((item) => {
                   arr.push({ heading: item.heading, id: item._id, lesson: item.lesson, time_to_finish: item.time_to_finish, subtext: item.subtext, order: item?.order ?? 0 })
@@ -271,7 +274,7 @@ const Structure = ({ toast }) => {
                     showNumOpt={showNumOpt}
                     setShowNumOpt={setShowNumOpt}
 
-                    courseId={course.id}
+                    courseId={course._id}
                     onChange={onLessonChangeHandler}
 
                 />

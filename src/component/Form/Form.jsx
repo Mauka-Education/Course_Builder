@@ -1,31 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { BsArrowRight, BsArrowLeft } from "react-icons/bs"
 import { motion } from 'framer-motion'
 import { Structure, Title, CourseStructure } from './subComp'
-import { useForm, FormProvider } from 'react-hook-form'
-import { useCreateCourseMutation, useGetLessonMutation, useUpdateCourseMutation } from '../../../redux/slices/course'
+import { useGetLessonMutation } from '../../../redux/slices/course'
 import { useSelector, useDispatch } from 'react-redux'
-import { setActiveStep, setCourseData, setInitiated, setPreRequisite } from '../../../redux/slices/util'
+import { setActiveStep, setCourseData, setPreRequisite } from '../../../redux/slices/util'
 import { toast, ToastContainer } from 'react-toast'
-import { uploadMediaToS3 } from '../../util/uploadMedia'
-
 
 const Form = () => {
-    const methods = useForm()
     const dispatch = useDispatch()
 
-    const [createCourseTitle] = useCreateCourseMutation()
-    const [updateCourseTitle] = useUpdateCourseMutation()
-    const [courseImage, setCourseImage] = useState({ url: null, type: null })
-    const { activeStep, initiated, course, isPreview, user } = useSelector(state => state.util)
+    const { activeStep, initiated, course, isPreview } = useSelector(state => state.util)
 
     const [getLessons] = useGetLessonMutation()
 
-    useEffect(() => {
-        if (isPreview) {
-            setCourseImage({ url: course?.image_url })
-        }
-    }, [])
     useEffect(() => {
 
     }, [dispatch, initiated])
@@ -34,7 +22,7 @@ const Form = () => {
     function formStep(step) {
         switch (step) {
             case 0:
-                return <Title setCourseImage={setCourseImage} isPreview={isPreview} />
+                return <Title isPreview={isPreview} />
             case 1:
                 return <Structure toast={toast} />
             case 2:
@@ -46,7 +34,7 @@ const Form = () => {
 
     const getAllLesson = () => {
         if (!course?.structure) {
-            getLessons(course?.id).unwrap().then((res) => {
+            getLessons(course?._id).unwrap().then((res) => {
                 let arr = []
                 let preType = []
                 res.data.forEach((item, index) => {
@@ -64,75 +52,23 @@ const Form = () => {
     }
 
 
-    const onSubmitHandler = async (data) => {
+    const onSubmitHandler = async () => {
         switch (activeStep) {
             case 0:
-                if (!initiated.once) {
-                    let url
-                    await uploadMediaToS3(courseImage.url, user.token).then((res) => {
-                        url = res.data.data
-                    })
-
-                    if (!url) toast.error("Error Occurred, While Upload Image")
-                    createCourseTitle({ ...data, img_url: url, type: courseImage.type }).unwrap().then((res) => {
-                        dispatch(setActiveStep(activeStep + 1))
-                        dispatch(setInitiated({ once: true }))
-                        dispatch(setCourseData({ ...data, image_url: res.data?.img_url, id: res.id }))
-
-                    }).catch((err) => {
-                        toast.error(err?.data?.message)
-                    })
-                } else if (initiated.once && initiated.refactor) {
-                    dispatch(setInitiated({ refactor: false }))
-
-                    if (course?.image_url === courseImage.url) {
-                        updateCourseTitle({ data, id: course?.id }).unwrap().then((res) => {
-                            dispatch(setCourseData({ ...data, ...res.data }))
-                            dispatch(setActiveStep(activeStep + 1))
-                        }).catch((err) => {
-                            console.log({ err })
-                            toast.error("Error Occured")
-                        })
-                    } else {
-                        let url
-                        await uploadMediaToS3(courseImage.url, user.token).then((res) => {
-                            url = res.data.data
-                        })
-
-                        if (!url) toast.error("Error Occurred, While Upload Image")
-
-                        updateCourseTitle({ data: { ...data, img_url: url }, id: course?.id }).unwrap().then((res) => {
-                            dispatch(setCourseData({ ...data, ...res.data }))
-                            dispatch(setActiveStep(activeStep + 1))
-                        }).catch((err) => {
-                            console.log({ err })
-                            toast.error("Error Occured")
-                        })
-
-                    }
-                    getAllLesson()
-
-                }
-                else {
-                    if (isPreview) {
-                        getAllLesson()
-                    } else {
-                        dispatch(setActiveStep(activeStep + 1))
-                        // dispatch(setActiveStep(activeStep + 1))
-                    }
-                }
+                getAllLesson()
                 break
             case 1:
                 dispatch(setActiveStep(activeStep + 1))
+                break;
 
             default:
                 return "No Function"
         }
     }
     return (
-        <FormProvider {...methods}>
+        <>
             <ToastContainer position="bottom-left" delay={3000} />
-            <form className="mauka__builder-create" onSubmit={methods.handleSubmit(onSubmitHandler)}>
+            <div className="mauka__builder-create">
                 <div className="mauka__builder-create__form">
                     {formStep(activeStep)}
                 </div>
@@ -148,7 +84,7 @@ const Form = () => {
                         }
                         {
                             activeStep !== 2 && (
-                                <motion.button className="next" whileTap={{ scale: .97 }} type="submit">
+                                <motion.button className="next" whileTap={{ scale: .97 }} onClick={onSubmitHandler}>
                                     <p>Next</p>
                                     <BsArrowRight size={20} />
                                 </motion.button>
@@ -157,8 +93,8 @@ const Form = () => {
                         }
                     </div>
                 </div>
-            </form>
-        </FormProvider>
+            </div>
+        </>
     )
 }
 

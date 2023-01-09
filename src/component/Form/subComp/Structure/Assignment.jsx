@@ -54,7 +54,7 @@ const Assignment = ({ course, toast }) => {
       setSavedData(course?.assigment)
     }
     if (isPreview) {
-      getAssignment(course?.id).unwrap().then((res) => {
+      getAssignment(course?._id).unwrap().then((res) => {
         let arr = []
         res.data.forEach((item) => {
           arr.push({ heading: item.heading, id: item._id, lesson: item.lesson, time_to_finish: item.time_to_finish, subtext: item.subtext, order: item?.order ?? 0 })
@@ -120,7 +120,7 @@ const Assignment = ({ course, toast }) => {
   }
 
   const onInitiate = () => {
-    initateAssignment(course.id).unwrap().then(res => {
+    initateAssignment(course._id).unwrap().then(res => {
       setCurrentId(res.data)
       setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
       setSelectLesson({ id: null, name: null })

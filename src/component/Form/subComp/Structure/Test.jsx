@@ -32,7 +32,7 @@ const Test = ({ course, toast }) => {
       setSavedData(course?.test)
     }
     if(isPreview){
-      getTests(course?.id).unwrap().then((res)=>{
+      getTests(course?._id).unwrap().then((res)=>{
         let arr=[]
         res.data.forEach((item)=>{
           arr.push({heading:item.heading,id:item._id,lesson: item.lesson, time_to_finish: item.time_to_finish,subtext:item.subtext,order:item?.order ?? 0 })
@@ -99,7 +99,7 @@ const Test = ({ course, toast }) => {
   }
 
   const onInitiate = () => {
-    initateTest(course.id).unwrap().then(res => {
+    initateTest(course._id).unwrap().then(res => {
       setCurrentId(res.data)
       setFormData({ heading: "", subtext: "", time_to_finish: "", lesson: "" })
       setSelectLesson({id:null,name:null})
