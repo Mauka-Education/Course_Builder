@@ -1,10 +1,17 @@
 import { Home, Login } from "../src/component"
 import { useGetCoursesQuery } from "../redux/slices/course"
 import { useSelector } from "react-redux"
+import { useEffect } from "react"
+import { useRouter } from "next/router"
 
 const Index = () => {
-  const {data}=useGetCoursesQuery()
+  const {data,refetch}=useGetCoursesQuery()
+  const router=useRouter()
   
+  useEffect(()=>{
+    refetch()
+  },[router])
+
   const {user}=useSelector(state=>state.util)
 
   if(!user?.data?.email || !user?.token ){
@@ -13,7 +20,7 @@ const Index = () => {
   
   return (
     <div className="mauka__builder">
-      <Home data={data} />
+      <Home data={data} refetch={refetch} />
     </div>
   )
 }

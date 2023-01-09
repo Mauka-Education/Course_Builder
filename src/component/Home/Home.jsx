@@ -7,11 +7,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { clearCourse } from '../../../redux/slices/util';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
-const Home = ({ data }) => {
+import { confirmAlert } from 'react-confirm-alert';
+import { useDeleteCourseMutation } from '../../../redux/slices/course';
+import { ToastContainer, toast } from 'react-toast';
+
+const Home = ({ data,refetch }) => {
   const { initiated } = useSelector(state => state.util)
   const router = useRouter()
   const dispatch = useDispatch()
+  const [deleteCourse]=useDeleteCourseMutation()
 
   function shorten(str, maxLen, separator = ' ', index, item) {
     if (str.length <= maxLen) return str;
@@ -26,8 +32,34 @@ const Home = ({ data }) => {
     return null
   }
 
+  const onDeleteHandler=(id)=>{
+    confirmAlert({
+      title:"Deleting Course",
+      message:"Are you sure you want to delete this course?",
+      buttons:[
+        {
+          label:"Yes,Sure",
+          onClick:()=>{
+            deleteCourse(id).unwrap().then(()=>{
+              toast.success("Course Deleted")
+              refetch()
+              dispatch(clearCourse())
+            }).catch(err=>{
+              toast.error("Try Again")
+              console.log("Error Occured")
+            })
+          },
+        },
+        {
+          label:"No",
+          onClick:()=>console.log("Not Deleted")
+        },
+      ]
+    })
+  }
   return (
     <>
+    <ToastContainer delay={2000} position={"bottom-left"} />
       {
         initiated?.once && (
           <header className='header'>
@@ -69,7 +101,7 @@ const Home = ({ data }) => {
           {
             data?.map((item, index) => (
               <div key={index}>
-                <Card id={item?._id} img={item?.img_url} title={item?.name} subtitle={shorten(item?.short_desc, 60, " ", index, item)} duration={item.time_to_finish} lesson={item?.lessons?.length} />
+                <Card id={item?._id} deleteHandler={onDeleteHandler} img={item?.img_url} title={item?.name} subtitle={shorten(item?.short_desc, 60, " ", index, item)} duration={item.time_to_finish} lesson={item?.lessons?.length} />
               </div>
             ))
           }

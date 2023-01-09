@@ -122,10 +122,26 @@ ul, ol {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  position: relative;
   justify-content: space-between;
 }
 .mauka__builder-card img {
   border-radius: 1rem;
+}
+.mauka__builder-card .delete {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.mauka__builder-card .delete__circle {
+  cursor: pointer;
+  box-shadow: 0 0.125rem 0.5rem -0.25rem rgba(31, 27, 45, 0.12), 0 0.25rem 1rem rgba(31, 27, 45, 0.12) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 50%;
 }
 .mauka__builder-card__content {
   margin-top: 1rem;

@@ -8,8 +8,9 @@ import { useGetCourseByIdMutation } from "../../../redux/slices/course"
 import { useEffect, useState } from "react"
 import { getPreSignedUrl } from "../../util/getPreSignedUrl"
 import { useGetTotalLessonMutation } from "../../../redux/slices/slide"
+import { MdDelete } from "react-icons/md"
 
-const Card = ({ title, subtitle, duration, img, id }) => {
+const Card = ({ title, subtitle, duration, img, id,deleteHandler }) => {
     const dispatch = useDispatch()
     const [lesson, setLesson] = useState(0)
     const [run] = useGetCourseByIdMutation()
@@ -61,11 +62,15 @@ const Card = ({ title, subtitle, duration, img, id }) => {
 
     return (
         <div className="mauka__builder-card">
+            <div className="delete">
+                <motion.div className="delete__circle" whileTap={{scale:.97}} onClick={()=>deleteHandler(id)}>
+                    <MdDelete size={30} color="red" />
+                </motion.div>
+            </div>
             <img src={imgUrl} style={{ width: "100%", height: "200px", objectFit: "cover" }} />
             <div className="mauka__builder-card__content">
                 <div className="title">
                     <h2>{renderString(title)}</h2>
-                    {/* <p>{subtitle.length>10 ? subtitle.slice(0,100) :{} }</p> */}
                     <p>{(subtitle)}</p>
                 </div>
                 <div className="info">
