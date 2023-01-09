@@ -6,20 +6,22 @@ import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { clearCourse } from '../../../redux/slices/util';
+import { clearCourse, setCourseData } from '../../../redux/slices/util';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
 import { confirmAlert } from 'react-confirm-alert';
-import { useDeleteCourseMutation } from '../../../redux/slices/course';
+import { useCreateCourseMutation, useDeleteCourseMutation } from '../../../redux/slices/course';
 import { ToastContainer, toast } from 'react-toast';
 
-const Home = ({ data,refetch }) => {
+const Home = ({ data, refetch }) => {
   const { initiated } = useSelector(state => state.util)
   const router = useRouter()
   const dispatch = useDispatch()
-  const [deleteCourse]=useDeleteCourseMutation()
+  const [deleteCourse] = useDeleteCourseMutation()
+  const [initateCourse] = useCreateCourseMutation()
 
   function shorten(str, maxLen, separator = ' ', index, item) {
+    if(!str) return ""
     if (str.length <= maxLen) return str;
     return (
       <>
@@ -32,34 +34,47 @@ const Home = ({ data,refetch }) => {
     return null
   }
 
-  const onDeleteHandler=(id)=>{
+  const onDeleteHandler = (id) => {
     confirmAlert({
-      title:"Deleting Course",
-      message:"Are you sure you want to delete this course?",
-      buttons:[
+      title: "Deleting Course",
+      message: "Are you sure you want to delete this course?",
+      buttons: [
         {
-          label:"Yes,Sure",
-          onClick:()=>{
-            deleteCourse(id).unwrap().then(()=>{
+          label: "Yes,Sure",
+          onClick: () => {
+            deleteCourse(id).unwrap().then(() => {
               toast.success("Course Deleted")
               refetch()
               dispatch(clearCourse())
-            }).catch(err=>{
+            }).catch(err => {
               toast.error("Try Again")
               console.log("Error Occured")
             })
           },
         },
         {
-          label:"No",
-          onClick:()=>console.log("Not Deleted")
+          label: "No",
+          onClick: () => console.log("Not Deleted")
         },
       ]
     })
   }
+
+  const onAddCourseHandler = () => {
+    initateCourse().unwrap().then(res => {
+      console.log({ data })
+      dispatch(clearCourse())
+      dispatch(setCourseData(res.data))
+      toast.success("Course Created")
+      router.push("/addcourse")
+    }).catch(err => {
+      console.log({ err })
+    })
+  }
+
   return (
     <>
-    <ToastContainer delay={2000} position={"bottom-left"} />
+      <ToastContainer delay={2000} position={"bottom-left"} />
       {
         initiated?.once && (
           <header className='header'>
@@ -91,13 +106,12 @@ const Home = ({ data,refetch }) => {
           </motion.div>
         </div> */}
         <div className="mauka__builder-home__content">
-          <Link href={"/addcourse"} passHref>
-            <motion.div className="add__card" whileTap={{ scale: .97 }} onClick={() => dispatch(clearCourse())}>
-              <div className="add__card-circle">
-                <BsPlusLg size={40} color="white" />
-              </div>
-            </motion.div>
-          </Link>
+
+          <motion.div className="add__card" whileTap={{ scale: .97 }} onClick={onAddCourseHandler}>
+            <div className="add__card-circle">
+              <BsPlusLg size={40} color="white" />
+            </div>
+          </motion.div>
           {
             data?.map((item, index) => (
               <div key={index}>

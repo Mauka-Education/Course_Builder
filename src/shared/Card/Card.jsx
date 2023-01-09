@@ -41,7 +41,7 @@ const Card = ({ title, subtitle, duration, img, id,deleteHandler }) => {
         dispatch(setIsPreview({ is: true, id }))
 
         run(id).unwrap().then((res) => {
-            dispatch(setCourseData({ id: res?.data._id, name: res?.data?.name, time_to_finish: res?.data?.time_to_finish, short_desc: res?.data?.short_desc, image_url: imgUrl }))
+            dispatch(setCourseData({ ...res.data, image_url: imgUrl }))
             dispatch(setInitiated({ once: true, refactor: true }))
             router.push(`/addcourse?preview=true`)
         }).catch((err) => {
@@ -50,15 +50,13 @@ const Card = ({ title, subtitle, duration, img, id,deleteHandler }) => {
     }
 
     function renderString(string, len = 23) {
+        if(!string) return ""
         if (string.length >= len) {
             return `${string.slice(0, len)}...`
         } else {
             return string
         }
     }
-
-
-
 
     return (
         <div className="mauka__builder-card">

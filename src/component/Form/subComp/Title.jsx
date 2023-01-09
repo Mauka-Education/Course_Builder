@@ -1,56 +1,74 @@
 import React, { useEffect, useState } from 'react'
 import { RiArrowUpSLine } from "react-icons/ri"
-import { useFormContext } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from 'react-redux'
-import { setInitiated } from '../../../../redux/slices/util'
+import { setInitiated, setCourseData } from '../../../../redux/slices/util'
+import { useUpdateCourseMutation } from '../../../../redux/slices/course'
 import { convertToBase64 } from '../../../util/ConvertImageToBase64'
 import { getPreSignedUrl } from '../../../util/getPreSignedUrl'
+import { uploadMediaToS3 } from '../../../util/uploadMedia'
 
-const Title = ({ setCourseImage, isPreview, data }) => {
+
+const Title = ({  isPreview }) => {
     const dispatch = useDispatch()
     const [inputText, setInputText] = useState("")
-    const { course } = useSelector(state => state.util)
-    const { register } = useFormContext()
+    const { course,user } = useSelector(state => state.util)
     const [previewImg, setpreviewImg] = useState("")
+    const [updateCourse] = useUpdateCourseMutation()
 
+    const { register, handleSubmit } = useForm()
 
     useEffect(() => {
 
     }, [dispatch])
 
-    useEffect(()=>{
-        getPreSignedUrl(course?.image_url).then((data)=>{
+    useEffect(() => {
+        getPreSignedUrl(course?.image_url).then((data) => {
             setpreviewImg(data)
         })
-    },[])
+    }, [])
 
-    const onChangeHandler = async (e) => {
-
+    const onImgChangeHandler = async (e) => {
         if (e.target.files[0]) {
+            await uploadMediaToS3(e.target.files[0], user.token).then(res=>{
+                updateCourse({id:course._id,data:{img_url:res.data.data}})
+                dispatch(setCourseData({image_url:res.data.data}))
+            }).catch(err=>{
+                console.log("Error Uploading Image")
+            })
             setInputText(e.target.files[0]?.name)
-
             const image_Url = await convertToBase64(e.target?.files[0])
             setpreviewImg(image_Url)
-            setCourseImage({ url: e.target.files[0], type: e.target?.files[0]?.type })
             dispatch(setInitiated({ refactor: true }))
         }
     }
 
 
+    const onChangeHandler = (data) => {
+        setTimeout(() => {
+            updateCourse({ id: course._id, data }).unwrap().then(res => {
+                dispatch(setInitiated({ refactor: true }))
+                dispatch(setCourseData(res.data))
+            }).catch(err => {
+                console.log("Error Occured")
+            })
+        }, 1000)
+    }
+
 
     return (
-        <div className="course__basic" >
-            <div className="course__basic-title item" >
+        <form className="course__basic" onChange={handleSubmit(onChangeHandler)} >
+            <div className="course__basic-title item">
                 <span>Course Title</span>
-                <input type="text" defaultValue={course?.name ?? null} placeholder='New Course' {...register("name", { required: true })} onChange={() => dispatch(setInitiated({ refactor: true }))} />
+                <input type="text" defaultValue={course?.name ?? null} placeholder='New Course' {...register("name")} />
             </div>
             <div className="course__basic-desc item">
                 <span>Description</span>
-                <input type="text" defaultValue={course?.short_desc ?? null} placeholder='Please Add Course Description' {...register("short_desc", { required: true })} onChange={() => dispatch(setInitiated({ refactor: true }))} />
+                <input type="text" defaultValue={course?.short_desc ?? null} placeholder='Please Add Course Description' {...register("short_desc")} />
             </div>
             <div className="course__basic-desc item">
                 <span>Duration</span>
-                <input type="number" defaultValue={course?.time_to_finish ?? null} placeholder='Please Add Course Duration in mins' {...register("time_to_finish", { required: true })} onChange={() => dispatch(setInitiated({ refactor: true }))} />
+                <input type="number" defaultValue={course?.time_to_finish ?? null} placeholder='Please Add Course Duration in mins' {...register("time_to_finish")} />
             </div>
             <div className="course__basic-img">
                 <span>Cover Image</span>
@@ -59,7 +77,7 @@ const Title = ({ setCourseImage, isPreview, data }) => {
                         <p>Upload</p>
                         <RiArrowUpSLine size={20} />
                     </label>
-                    <input type="file" name='image' id='image' accept='image/*' onChange={onChangeHandler} />
+                    <input type="file" name='image' id='image' accept='image/*' onChange={onImgChangeHandler} />
                     {
                         inputText && (
                             <span>{inputText}</span>
@@ -76,7 +94,7 @@ const Title = ({ setCourseImage, isPreview, data }) => {
                 }
 
             </div>
-        </div>
+        </form>
     )
 }
 
